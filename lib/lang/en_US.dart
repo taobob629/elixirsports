@@ -168,4 +168,6 @@ const Map<String, String> en_US = {
   'Scan to link account':'Scan to link account',
   'Please enter a valid email address':'Please enter a valid email address',
   'The passwords you entered twice do not match':'The passwords you entered twice do not match',
+  'Unpaid':'Unpaid',
+  'Refund':'Refund'
 };

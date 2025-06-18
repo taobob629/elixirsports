@@ -183,5 +183,7 @@ const Map<String, String> zh_CN = {
   'Please enter new password':'请输入新密码',
   'Canceled':'已取消',
   'Elixirs：':'金额',
+  'Unpaid':'未支付',
+  'Refund':'已退款'
 
 };
