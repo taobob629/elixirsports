@@ -49,8 +49,7 @@ class LoginCtr extends BasePageController {
         showToast("Please input password".tr);
         return;
       }
-      LoginModel model = await LoginApi.login(
-          usernameCtr.text.toString(), passwordCtr.text.toString());
+      LoginModel model = await LoginApi.login(usernameCtr.text.toString(), passwordCtr.text.toString());
       if (model.token != null) {
         StorageManager.setAccount(usernameCtr.text.toString());
         StorageManager.setPassword(passwordCtr.text.toString());

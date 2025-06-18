@@ -183,6 +183,7 @@ const Map<String, String> zh_CN = {
   'Please enter new password':'请输入新密码',
   'Canceled':'已取消',
   'Elixirs：':'金额',
+<<<<<<< HEAD
   'Unpaid':'未支付',
   'Refund':'已退款',
   'Identity Type':'证件类型',
@@ -200,5 +201,7 @@ const Map<String, String> zh_CN = {
   'Reset password successfully':'重置密码成功',
   'Invalid verification code':'验证码错误',
 
+=======
+>>>>>>> 4dc35db (init)
 
 };
