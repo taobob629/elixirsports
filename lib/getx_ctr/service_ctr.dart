@@ -23,7 +23,7 @@ class ServiceCtr extends BasePageController {
     final value = await Get.dialog(
       ConfirmDialog(
         title: 'CONFIRM'.tr,
-        info: "Are you sure you want to cancel this reservation?".tr,
+        info: "Are you sure to cancel this reservation?".tr,
       ),
       barrierColor: Colors.black26,
     );
