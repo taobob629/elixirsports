@@ -21,7 +21,7 @@ class SelectIdentityDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             InkWell(
-              onTap: () => dismissLoading(result: "PASSPORT"),
+              onTap: () => dismissLoading(result: "PASSPORT".tr),
               child: Container(
                 width: 1.sw,
                 height: 56.h,
@@ -42,7 +42,7 @@ class SelectIdentityDialog extends StatelessWidget {
               height: 1.h,
             ),
             InkWell(
-              onTap: () => dismissLoading(result: "NRC"),
+              onTap: () => dismissLoading(result: "NRC".tr),
               child: Container(
                 width: 1.sw,
                 height: 56.h,
@@ -63,7 +63,7 @@ class SelectIdentityDialog extends StatelessWidget {
               height: 1.h,
             ),
             InkWell(
-              onTap: () => dismissLoading(result: "FIN"),
+              onTap: () => dismissLoading(result: "FIN".tr),
               child: Container(
                 width: 1.sw,
                 height: 56.h,
