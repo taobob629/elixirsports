@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:scan/scan.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../base/base_scaffold.dart';
 
@@ -13,12 +13,13 @@ class ScanPage extends StatelessWidget {
       title: "Scan QR code".tr,
       body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0),
-          child: ScanView(
-            controller: controller.controller,
-            scanAreaScale: .7,
-            scanLineColor: Colors.green.shade400,
-            onCapture: (data) {
-              Get.back(result: data);
+          child: MobileScanner(
+            // controller: controller.controller,
+            onDetect: (capture) {
+              final List<Barcode> barcodes = capture.barcodes;
+              if (barcodes.isNotEmpty) {
+                Get.back(result: barcodes.first.rawValue);
+              }
             },
           )),
     );
@@ -26,11 +27,11 @@ class ScanPage extends StatelessWidget {
 }
 
 class ScanPageController extends GetxController {
-  late ScanController controller;
+  // late MobileScannerController controller;
 
   @override
   void onInit() {
     super.onInit();
-    controller = ScanController();
+    // controller = MobileScannerController();
   }
 }

@@ -8,7 +8,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -117,40 +117,44 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
         }
         File f = File(savePath);
         if (f.existsSync()) {
-          var result = await ImageGallerySaver.saveFile(savePath);
-          if (PlatformUtils().isIOS) {
-            if (result['isSuccess']) {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
-            } else {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
-            }
-          } else {
-            if (result != null) {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
-            } else {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
-            }
-          }
+          // var result = await ImageGallerySaver.saveFile(savePath);
+          // 暂时显示提示信息，因为 image_gallery_saver 插件有兼容性问题
+          onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存功能暂不可用"), infoCode: 6660411));
+          // if (PlatformUtils().isIOS) {
+          //   if (result['isSuccess']) {
+          //     onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
+          //   } else {
+          //     onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
+          //   }
+          // } else {
+          //   if (result != null) {
+          //     onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
+          //   } else {
+          //     onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
+          //   }
+          // }
+        } else {
+          onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("the message is downloading"), infoCode: -1));
         }
-      } else {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("the message is downloading"), infoCode: -1));
-      }
-      return;
-    }
-    var result = await ImageGallerySaver.saveFile(savePath);
-    if (PlatformUtils().isIOS) {
-      if (result['isSuccess']) {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
-      } else {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
-      }
-    } else {
-      if (result != null) {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
-      } else {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
+        return;
       }
     }
+    // var result = await ImageGallerySaver.saveFile(savePath);
+    // 暂时显示提示信息，因为 image_gallery_saver 插件有兼容性问题
+    onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存功能暂不可用"), infoCode: 6660411));
+    // if (PlatformUtils().isIOS) {
+    //   if (result['isSuccess']) {
+    //     onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
+    //   } else {
+    //     onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
+    //   }
+    // } else {
+    //   if (result != null) {
+    //     onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
+    //   } else {
+    //     onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
+    //   }
+    // }
     return;
   }
 
@@ -232,7 +236,8 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
                 : VideoPlayerController.networkUrl(
                     Uri.parse(widget.videoElement.localVideoUrl!),
                   ))
-        : ((TencentUtils.checkString(widget.videoElement.videoPath) != null || widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING) && File(widget.videoElement.videoPath!).existsSync())
+        : ((TencentUtils.checkString(widget.videoElement.videoPath) != null || widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING) &&
+                File(widget.videoElement.videoPath!).existsSync())
             ? VideoPlayerController.file(File(widget.videoElement.videoPath!))
             : (TencentUtils.checkString(widget.videoElement.localVideoUrl) == null)
                 ? VideoPlayerController.networkUrl(
@@ -328,7 +333,8 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
                     return Hero(
                       tag: widget.heroTag,
                       child: result,
-                      flightShuttleBuilder: (BuildContext flightContext, Animation<double> animation, HeroFlightDirection flightDirection, BuildContext fromHeroContext, BuildContext toHeroContext) {
+                      flightShuttleBuilder: (BuildContext flightContext, Animation<double> animation, HeroFlightDirection flightDirection,
+                          BuildContext fromHeroContext, BuildContext toHeroContext) {
                         final Hero hero = (flightDirection == HeroFlightDirection.pop ? fromHeroContext.widget : toHeroContext.widget) as Hero;
 
                         return hero.child;

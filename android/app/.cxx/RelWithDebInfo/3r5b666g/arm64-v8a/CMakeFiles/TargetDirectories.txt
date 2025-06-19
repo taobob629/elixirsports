@@ -1,0 +1,2 @@
+/Users/flyingfish/Desktop/others/elixir_esports_app/android/app/.cxx/RelWithDebInfo/3r5b666g/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/flyingfish/Desktop/others/elixir_esports_app/android/app/.cxx/RelWithDebInfo/3r5b666g/arm64-v8a/CMakeFiles/rebuild_cache.dir

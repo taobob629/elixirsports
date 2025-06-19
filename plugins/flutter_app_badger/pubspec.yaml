@@ -11,7 +11,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: fr.g123k.flutterappbadger
+        package: com.example.flutterappbadger
         pluginClass: FlutterAppBadgerPlugin
       ios:
         pluginClass: FlutterAppBadgerPlugin

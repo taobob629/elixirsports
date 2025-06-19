@@ -1,4 +1,4 @@
-group 'fr.g123k.flutterappbadge.flutterappbadger'
+group 'com.example.flutterappbadger'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -24,7 +24,7 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 34
 
-    namespace 'java.fr.g123k.flutterappbadger'
+    namespace 'com.example.flutterappbadger'
 
     defaultConfig {
         minSdkVersion 16

@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/flyingfish/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/flyingfish/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/flyingfish/Desktop/others/elixir_esports_app/android/app/.cxx/RelWithDebInfo/3r5b666g/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/flyingfish/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/flyingfish/Desktop/others/elixir_esports_app/android/app/.cxx/RelWithDebInfo/3r5b666g/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

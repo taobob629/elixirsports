@@ -1,3 +1,9 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -21,22 +27,22 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-
 android {
     namespace "com.elixir.esports"
-    compileSdkVersion 34
+    compileSdkVersion 35
     ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
+    }
+
+    kotlin {
+        jvmToolchain(17)
     }
 
     sourceSets {
@@ -45,8 +51,8 @@ android {
 
     defaultConfig {
         applicationId "com.elixir.esports"
-        minSdkVersion 24
-        targetSdkVersion 34
+        minSdkVersion 28
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         ndk {
@@ -73,7 +79,7 @@ android {
 
         debug {
             ndk { //这里要加上，否则debug包会出问题,后面三个为可选，x86建议加上不然部分模拟器回报错
-                abiFilters "armeabi",  "armeabi-v7a" , "arm64-v8a" , "x86"
+                abiFilters "armeabi-v7a" , "arm64-v8a" , "x86"
             }
             signingConfig signingConfigs.config
 
@@ -102,6 +108,23 @@ android {
     lintOptions {
         checkReleaseBuilds false
     }
+
+    packaging {
+        resources {
+            excludes += [
+                'META-INF/versions/9/OSGI-INF/MANIFEST.MF',
+                'META-INF/DEPENDENCIES',
+                'META-INF/LICENSE',
+                'META-INF/LICENSE.txt',
+                'META-INF/license.txt',
+                'META-INF/NOTICE',
+                'META-INF/NOTICE.txt',
+                'META-INF/notice.txt',
+                'META-INF/ASL2.0',
+                'META-INF/*.kotlin_module'
+            ]
+        }
+    }
 }
 
 flutter {
@@ -110,5 +133,4 @@ flutter {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

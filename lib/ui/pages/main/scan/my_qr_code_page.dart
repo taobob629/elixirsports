@@ -1,4 +1,4 @@
-import 'package:ai_barcode/ai_barcode.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:elixir_esports/assets_utils.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +10,6 @@ import '../../../../config/icon_font.dart';
 import '../../../../getx_ctr/user_controller.dart';
 
 class MyQrCodePage extends StatelessWidget {
-  CreatorController controller = CreatorController();
-
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: const Color(0xFF0A0A0A),
@@ -29,11 +27,7 @@ class MyQrCodePage extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment(0.00, -1.00),
                         end: Alignment(0, 1),
-                        colors: [
-                          Color(0xFF3A3859),
-                          Color(0xFF4B385A),
-                          Color(0xFF1B1A1E)
-                        ],
+                        colors: [Color(0xFF3A3859), Color(0xFF4B385A), Color(0xFF1B1A1E)],
                       ),
                     ),
                   ),
@@ -142,9 +136,10 @@ class MyQrCodePage extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
-                              child: PlatformAiBarcodeCreatorWidget(
-                                creatorController: controller,
-                                initialValue: StorageManager.getToken(),
+                              child: QrImageView(
+                                data: StorageManager.getToken(),
+                                version: QrVersions.auto,
+                                size: 180.0,
                               ),
                             ),
                           ),
