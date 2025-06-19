@@ -14,7 +14,7 @@ class ForgotPasswordCtr extends BasePageController {
   TextEditingController reNewPsdCtr = TextEditingController();
   TextEditingController codeCtr = TextEditingController();
 
-  String verifyCodeDesc = 'Verify'.tr;
+  String verifyCodeDesc = 'Send'.tr;
   var countTime = 59.obs;
   var showCountDown = false.obs;
   CountDownUtil? countDownUtil;
@@ -87,11 +87,19 @@ class ForgotPasswordCtr extends BasePageController {
       "password": newPsdCtr.text,
       "uid": uid,
     };
-    int code = await LoginApi.forgetPassword(map: map);
-    if (code == 200) {
-      Get.back();
-      showToast("Reset password successfully".tr);
-    } else
-      showToast("Invalid verification code".tr);
+
+    bool? verifySuccess =
+    await LoginApi.appRegValidCode(code: codeCtr.text, uid: uid!);
+    if (verifySuccess != null && verifySuccess) {
+      Get.to(() => LoginApi.forgetPassword(map: map));
+    } else {
+      showToast('Invalid Verification Code'.tr);
+    }
+    // int code = await LoginApi.forgetPassword(map: map);
+    // if (code == 200) {
+    //   Get.back();
+    //   showToast("Reset password successfully".tr);
+    // } else
+    //   showToast("Invalid verification code".tr);
   }
 }
