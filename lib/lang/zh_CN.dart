@@ -125,7 +125,7 @@ const Map<String, String> zh_CN = {
   'Old Password': '当前密码',
   'New Password': '新密码',
   'Repeat New Password': '重复新密码',
-  'Please enter your account or email': '请输入账户或邮箱',
+  'Please enter your account or email': '请输入账户或电话',
   'Verify': '验证',
   'Please input your account ,email or phone number': '请输入账号，邮箱或者电话',
   'Scan Login': '扫码登录',
