@@ -36,7 +36,7 @@ class ForgotPasswordPage extends BasePage<ForgotPasswordCtr> {
                     children: [
                       MyTextFieldWidget(
                         controller: controller.emailCtr,
-                        hintText: 'Please enter your account or email'.tr,
+                        hintText: 'Please enter your account or phone'.tr,
                       ).marginOnly(top: 20.h),
                       Container(
                         height: 44.h,

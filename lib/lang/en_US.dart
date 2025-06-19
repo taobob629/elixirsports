@@ -113,7 +113,7 @@ const Map<String, String> en_US = {
   'Old Password': 'Current password',
   'New Password': 'New Password',
   'Repeat New Password': 'Repeat New Password',
-  'Please enter your account or email': 'Please enter your account or email',
+  'Please enter your account or email': 'Please enter your account or phone',
   'Verify': 'Verify',
   'Scan Login': 'Scan Login',
   'Top Up': 'Top Up',
