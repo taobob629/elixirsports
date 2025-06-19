@@ -78,7 +78,7 @@ class ForgotPasswordCtr extends BasePageController {
       return;
     }
     if (newPsdCtr.text != reNewPsdCtr.text) {
-      showToast("The passwords you entered twice do not match".tr);
+      showToast("The two passwords you entered do not match".tr);
       return;
     }
     Map<String, dynamic> map = {

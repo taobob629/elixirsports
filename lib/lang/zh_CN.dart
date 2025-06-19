@@ -197,7 +197,7 @@ const Map<String, String> zh_CN = {
   'Reset password successfully': '重置密码成功',
   'Invalid verification code': '验证码错误',
   'Invalid Verification code': '验证码错误',
-
+  'The two passwords you entered do not match':'两次输入的密码不一致',
   'Resend':'发送',
   'Are you sure to cancel this reservation?':'你确定要取消此预订吗'
 };
