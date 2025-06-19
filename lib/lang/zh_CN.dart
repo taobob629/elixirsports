@@ -187,6 +187,13 @@ const Map<String, String> zh_CN = {
   'Refund':'已退款',
   'Identity Type':'证件类型',
   'ID Number':'证件号码',
+  'Please input password':'请输入密码',
+  'Please input account':'请输入账户',
+  'Please Input Verification Code':'请输入验证码',
+  'Please Input Username':'请输入昵称',
+  'Please Select Gender':'请选择性别',
+  'Please Select Birthday':'请输入生日',
+  'Please Input Your Email':'请输入邮箱',
 
 
 };

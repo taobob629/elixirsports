@@ -42,7 +42,7 @@ class LoginCtr extends BasePageController {
   void login() async {
     if (controller.check()) {
       if (usernameCtr.text.toString().isEmpty) {
-        showToast("Please input Phone number".tr);
+        showToast("Please input account".tr);
         return;
       }
       if (passwordCtr.text.toString().isEmpty) {
