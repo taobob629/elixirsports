@@ -184,6 +184,9 @@ const Map<String, String> zh_CN = {
   'Canceled':'已取消',
   'Elixirs：':'金额',
   'Unpaid':'未支付',
-  'Refund':'已退款'
+  'Refund':'已退款',
+  'Identity Type':'证件类型',
+  'ID Number':'证件号码',
+
 
 };

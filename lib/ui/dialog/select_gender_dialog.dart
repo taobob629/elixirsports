@@ -21,7 +21,7 @@ class SelectGenderDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             InkWell(
-              onTap: () => dismissLoading(result: "Male"),
+              onTap: () => dismissLoading(result: "Male".tr),
               child: Container(
                 width: 1.sw,
                 height: 56.h,
@@ -42,7 +42,7 @@ class SelectGenderDialog extends StatelessWidget {
               height: 1.h,
             ),
             InkWell(
-              onTap: () => dismissLoading(result: "Female"),
+              onTap: () => dismissLoading(result: "Female".tr),
               child: Container(
                 width: 1.sw,
                 height: 56.h,
