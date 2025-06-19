@@ -195,5 +195,10 @@ const Map<String, String> zh_CN = {
   'Please Select Birthday':'请输入生日',
   'Please Input Your Email':'请输入邮箱',
 
+  'Please click to send verification code':'点击发送验证码',
+  'Please enter the verification code':'请输入验证码',
+  'Reset password successfully':'重置密码成功',
+  'Invalid verification code':'验证码错误',
+
 
 };

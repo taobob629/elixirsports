@@ -36,12 +36,15 @@ class LoginApi {
   }
 
   /// 忘记密码
-  static Future<void> forgetPassword(
+  static Future<int> forgetPassword(
       {required Map<String, dynamic> map}) async {
     var response = await http.post(
       'app/user/forgetPassword',
       data: map,
     );
+
+    return response.data == null ? null : response.data["code"];
+
   }
 
   /// 注册发送验证码

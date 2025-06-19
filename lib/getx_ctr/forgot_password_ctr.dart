@@ -87,7 +87,14 @@ class ForgotPasswordCtr extends BasePageController {
       "password": newPsdCtr.text,
       "uid": uid,
     };
-    await LoginApi.forgetPassword(map: map);
-    Get.back();
+    int code=await LoginApi.forgetPassword(map: map);
+    if(code==200){
+      Get.back();
+      showToast("Reset password successfully".tr);
+
+    }
+    else
+      showToast("Invalid verification code".tr);
+
   }
 }
