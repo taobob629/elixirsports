@@ -110,7 +110,7 @@ class RegisterCtr extends BasePageController {
         "password": passwordCtr.text,
       });
     } else {
-      showToast('Invalid Verification Code'.tr);
+      showToast('Invalid verification Code'.tr);
     }
   }
 }

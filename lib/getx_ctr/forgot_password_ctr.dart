@@ -93,7 +93,7 @@ class ForgotPasswordCtr extends BasePageController {
     if (verifySuccess != null && verifySuccess) {
       Get.to(() => LoginApi.forgetPassword(map: map));
     } else {
-      showToast('Invalid Verification Code'.tr);
+      showToast('Invalid verification Code'.tr);
     }
     // int code = await LoginApi.forgetPassword(map: map);
     // if (code == 200) {
