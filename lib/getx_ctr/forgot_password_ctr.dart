@@ -34,26 +34,31 @@ class ForgotPasswordCtr extends BasePageController {
   }
 
   void sendVerifyCode() async {
-    if (emailCtr.text.isNotEmpty && !showCountDown.value) {
-      String? result = await LoginApi.sendValidCode(emailCtr.text);
-      if (result != null) {
-        uid = result;
-        countTime.refresh();
-        countDownUtil = CountDownUtil(
-          (int data) {
-            showCountDown.value = true;
-            countTime.value = data;
-          },
-          () {
-            showCountDown.value = false;
-            countDownUtil?.stopCountDown();
-            verifyCodeDesc = 'Resend'.tr;
-          },
-          seconds: 60,
-        );
-        countDownUtil?.startCountDown();
+    bool? verifySuccess =
+    await LoginApi.appCheckMember(code: emailCtr.text);
+    if(verifySuccess != null &&verifySuccess){
+      if (emailCtr.text.isNotEmpty && !showCountDown.value) {
+        String? result = await LoginApi.sendValidCode(emailCtr.text);
+        if (result != null) {
+          uid = result;
+          countTime.refresh();
+          countDownUtil = CountDownUtil(
+                (int data) {
+              showCountDown.value = true;
+              countTime.value = data;
+            },
+                () {
+              showCountDown.value = false;
+              countDownUtil?.stopCountDown();
+              verifyCodeDesc = 'Resend'.tr;
+            },
+            seconds: 60,
+          );
+          countDownUtil?.startCountDown();
+        }
       }
-    }
+    }else
+      showToast("Account does not exist".tr);
   }
 
   void submit() async {
@@ -91,7 +96,7 @@ class ForgotPasswordCtr extends BasePageController {
     bool? verifySuccess =
     await LoginApi.appRegValidCode(code: codeCtr.text, uid: uid!);
     if (verifySuccess != null && verifySuccess) {
-      await LoginApi.forgetPassword(map: map);
+      LoginApi.forgetPassword(map: map);
       showToast('Your password has been successfully changed'.tr);
 
       Get.back();

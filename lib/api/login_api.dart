@@ -78,7 +78,19 @@ class LoginApi {
 
     return response.data["validated"];
   }
+  /// 注册验证验证码
+  static Future<bool?> appCheckMember({
+    required String code,
+  }) async {
+    var response = await http.get(
+      'app/home/appCheckMember',
+      queryParameters: {
+        "code": code,
+      },
+    );
 
+    return response.data["validated"];
+  }
   /// 注册
   static Future<LoginModel> appRegister({
     required Map<String, dynamic> map,

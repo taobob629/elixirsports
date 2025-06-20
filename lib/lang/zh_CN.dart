@@ -200,5 +200,6 @@ const Map<String, String> zh_CN = {
   'The two passwords you entered do not match':'两次输入的密码不一致',
   'Resend':'发送',
   'Are you sure to cancel this reservation?':'你确定要取消此预订吗',
-  'Your password has been successfully changed':'密码修改成功'
+  'Your password has been successfully changed':'密码修改成功',
+  'Account does not exist':'用户不存在'
 };
