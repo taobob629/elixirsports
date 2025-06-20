@@ -300,7 +300,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog> {
               Obx(() => PayMethodWidget(
                     name: "PayNow".tr,
                     icon: SvgPicture.asset(
-                      "assets/images/paynow.jpg",
+                      "assets/images/icon_paynow.png",
                       width: 20.w,
                       height: 20.w,
                     ),
