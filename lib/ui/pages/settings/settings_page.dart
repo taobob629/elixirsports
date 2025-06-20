@@ -122,31 +122,31 @@ class SettingsPage extends BasePage<SettingsCtr> {
                     height: 1.h,
                     color: toColor('EEEEEE'),
                   ).marginSymmetric(vertical: 15.h),
-                  InkWell(
-                    onTap: () => Get.to(() => BankCardsPage(), arguments: false),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "Bank Cards".tr,
-                            style: TextStyle(
-                              color: toColor('#767676'),
-                              fontSize: 14.sp,
-                              fontFamily: FONT_LIGHT,
-                            ),
-                          ),
-                        ),
-                        Icon(
-                          Icons.keyboard_arrow_right_outlined,
-                          color: toColor('#767676'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(
-                    height: 1.h,
-                    color: toColor('EEEEEE'),
-                  ).marginSymmetric(vertical: 15.h),
+                  // InkWell(
+                  //   onTap: () => Get.to(() => BankCardsPage(), arguments: false),
+                  //   child: Row(
+                  //     children: [
+                  //       Expanded(
+                  //         child: Text(
+                  //           "Bank Cards".tr,
+                  //           style: TextStyle(
+                  //             color: toColor('#767676'),
+                  //             fontSize: 14.sp,
+                  //             fontFamily: FONT_LIGHT,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       Icon(
+                  //         Icons.keyboard_arrow_right_outlined,
+                  //         color: toColor('#767676'),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // Divider(
+                  //   height: 1.h,
+                  //   color: toColor('EEEEEE'),
+                  // ).marginSymmetric(vertical: 15.h),
                   InkWell(
                     onTap: () => controller.checkVersion(),
                     child: Row(

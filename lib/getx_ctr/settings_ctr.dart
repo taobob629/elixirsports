@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
+import '../api/login_api.dart';
 import '../api/profile_api.dart';
 import '../models/version_model.dart';
 import '../ui/dialog/upgrade_dialog.dart';
@@ -45,33 +46,40 @@ class SettingsCtr extends BasePageController {
 
   void changePassword() async {
     if (oldPsdCtr.text.isEmpty) {
-      showToast("Please input current password");
+      showToast("Please input current password".tr);
       return;
     }
     if (newPsdCtr.text.isEmpty) {
-      showToast("Please input new password");
+      showToast("Please input new password".tr);
       return;
     }
     if (repeatPsdCtr.text.isEmpty) {
-      showToast("Please repeat new password");
+      showToast("Please repeat new password".tr);
       return;
     }
     if (newPsdCtr.text != repeatPsdCtr.text) {
-      showToast("The two passwords do not match");
+      showToast("The passwords you entered twice do not match".tr);
       return;
     }
+    bool? verifySuccess =
+    await LoginApi.checkOldPwd(code: oldPsdCtr.text);
+    if(verifySuccess!=null&&verifySuccess){
+      if (oldPsdCtr.text.isNotEmpty) {
+        await ProfileApi.changePassword(
+          oldPwd: oldPsdCtr.text,
+          password: newPsdCtr.text,
+        );
+        oldPsdCtr.text = "";
+        newPsdCtr.text = "";
+        repeatPsdCtr.text = "";
+        UserController.find.requestProfileData();
+        showToast('Your password has been successfully changed'.tr);
 
-    if (oldPsdCtr.text.isNotEmpty) {
-      await ProfileApi.changePassword(
-        oldPwd: oldPsdCtr.text,
-        password: newPsdCtr.text,
-      );
-      oldPsdCtr.text = "";
-      newPsdCtr.text = "";
-      repeatPsdCtr.text = "";
-      UserController.find.requestProfileData();
-      Get.back();
-    }
+        Get.back();
+      }
+    }else
+      showToast("Incorrect password".tr);
+
   }
 
   void checkVersion() async {
@@ -79,7 +87,7 @@ class SettingsCtr extends BasePageController {
     VersionModel model = await ProfileApi.checkVersion();
     dismissLoading();
     if (!model.upgrade) {
-      showError("You are using the latest version".tr);
+      showToast("You are using the latest version".tr);
     } else {
       showCustom(
         UpgradeDialog(model: model),

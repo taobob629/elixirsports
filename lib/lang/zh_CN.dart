@@ -202,5 +202,10 @@ const Map<String, String> zh_CN = {
   'Are you sure to cancel this reservation?':'你确定要取消此预订吗',
   'Your password has been successfully changed':'密码修改成功',
   'Account does not exist':'用户不存在',
-  'Please select a payment method':'请选择支付方式'
+  'Please select a payment method':'请选择支付方式',
+  'Please input current password':'请输入当前密码',
+  'Please input new password':'请输入新密码',
+  'Incorrect password':'密码错误',
+  'You are using the latest version':'当前已是最新版本'
+
 };

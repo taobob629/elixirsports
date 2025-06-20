@@ -78,12 +78,26 @@ class LoginApi {
 
     return response.data["validated"];
   }
-  /// 注册验证验证码
+  /// 校验用户是否存在
   static Future<bool?> appCheckMember({
     required String code,
   }) async {
     var response = await http.get(
       'app/home/appCheckMember',
+      queryParameters: {
+        "code": code,
+      },
+    );
+
+    return response.data["validated"];
+  }
+
+  /// 校验用户密码是否正确
+  static Future<bool?> checkOldPwd({
+    required String code,
+  }) async {
+    var response = await http.get(
+      'app/home/checkOldPwd',
       queryParameters: {
         "code": code,
       },

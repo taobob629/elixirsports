@@ -94,16 +94,6 @@ class RegisterPage extends BasePage<RegisterCtr> {
                         countries: controller.countries.value,
                       )),
                 ),
-                MyTextFieldWidget(
-                  controller: controller.passwordCtr,
-                  leftIcon: Image.asset(
-                    AssetsUtils.icon_password,
-                    width: 20.w,
-                    height: 20.w,
-                  ),
-                  hintText: 'Password'.tr,
-                  password: true,
-                ).marginOnly(top: 20.h, left: 15.w, right: 15.w),
                 Container(
                   decoration: BoxDecoration(
                     color: toColor('#ECF1FA'),
@@ -175,6 +165,17 @@ class RegisterPage extends BasePage<RegisterCtr> {
                     ],
                   ),
                 ),
+                MyTextFieldWidget(
+                  controller: controller.passwordCtr,
+                  leftIcon: Image.asset(
+                    AssetsUtils.icon_password,
+                    width: 20.w,
+                    height: 20.w,
+                  ),
+                  hintText: 'Password'.tr,
+                  password: true,
+                ).marginOnly(top: 20.h, left: 15.w, right: 15.w),
+
                 MyButtonWidget(
                   btnText: "CREATE AN ACCOUNT".tr,
                   marginLeft: 15.w,
