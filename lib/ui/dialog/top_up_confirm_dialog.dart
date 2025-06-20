@@ -300,7 +300,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog> {
               Obx(() => PayMethodWidget(
                     name: "PayNow".tr,
                     icon: SvgPicture.asset(
-                      AssetsUtils.icon_balance,
+                      "assets/images/paynow.jpg",
                       width: 20.w,
                       height: 20.w,
                     ),
@@ -467,6 +467,11 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog> {
 
   void topUp() async {
     dismissLoading(status: SmartStatus.loading);
+
+    if(payMethod.value==null||payMethod.value==0){
+      showToast("Please select a payment method".tr);
+      return;
+    }
 
     await WalletApi.topUp(
       amount: discount.value.toString(),
