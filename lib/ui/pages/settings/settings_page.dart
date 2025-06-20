@@ -162,7 +162,7 @@ class SettingsPage extends BasePage<SettingsCtr> {
                           ),
                         ),
                         Text(
-                          '1.0.0',
+                          '',
                           style: TextStyle(
                             color: toColor('#1a1a1a'),
                             fontSize: 14.sp,
