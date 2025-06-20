@@ -92,6 +92,8 @@ class ForgotPasswordCtr extends BasePageController {
     await LoginApi.appRegValidCode(code: codeCtr.text, uid: uid!);
     if (verifySuccess != null && verifySuccess) {
       await LoginApi.forgetPassword(map: map);
+      showToast('Your password has been successfully changed'.tr);
+
       Get.back();
 
     } else {
