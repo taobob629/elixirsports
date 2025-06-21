@@ -78,11 +78,11 @@ class RegisterCtr extends BasePageController {
   }
 
   void register() async {
-    // if (!controller.check()) return;
-    // if (uid == null) {
-    //   showToast('Please click to send verification code'.tr);
-    //   return;
-    // }
+    if (!controller.check()) return;
+    if (uid == null) {
+      showToast('Please click to send verification code'.tr);
+      return;
+    }
     if (phoneNumber == null) {
       showToast('Please enter your mobile number'.tr);
       return;
@@ -101,15 +101,15 @@ class RegisterCtr extends BasePageController {
       return;
     }
 
-    // bool? verifySuccess = await LoginApi.appRegValidCode(code: codeCtr.text, uid: uid!);
-    // if (verifySuccess != null && verifySuccess) {
-    Get.to(() => RegisterNextPage(), arguments: {
-      "type": 1,
-      "phoneNumber": phoneNumber,
-      "password": passwordCtr.text,
-    });
-    // } else {
-    //   showToast('Invalid Verification Code'.tr);
-    // }
+    bool? verifySuccess = await LoginApi.appRegValidCode(code: codeCtr.text, uid: uid!);
+    if (verifySuccess != null && verifySuccess) {
+      Get.to(() => RegisterNextPage(), arguments: {
+        "type": 1,
+        "phoneNumber": phoneNumber,
+        "password": passwordCtr.text,
+      });
+    } else {
+      showToast('Invalid Verification Code'.tr);
+    }
   }
 }
