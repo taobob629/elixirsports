@@ -15,7 +15,6 @@ import '../../widget/container_tab_indicator.dart';
 import '../../widget/dashed_line_widget.dart';
 
 class CouponListPage extends BasePage<CouponListCtr> {
-
   @override
   CouponListCtr createController() => CouponListCtr();
 
@@ -27,13 +26,15 @@ class CouponListPage extends BasePage<CouponListCtr> {
           children: [
             Container(
               margin: EdgeInsets.only(top: 15.h, bottom: 15.h),
+              width: 200.w,
               child: TabBar(
                 controller: controller.tabController,
                 tabs: controller.tabs,
-                isScrollable: true,
+                isScrollable: false,
                 indicatorSize: TabBarIndicatorSize.label,
                 overlayColor: MaterialStateProperty.all(Colors.transparent),
                 onTap: (index) => controller.changeStatus(index),
+                dividerColor: Colors.transparent,
                 indicator: ContainerTabIndicator(
                   height: 4.h,
                   padding: EdgeInsets.only(top: 14.h),
@@ -44,8 +45,7 @@ class CouponListPage extends BasePage<CouponListCtr> {
             Expanded(
               child: Obx(() => controller.list.isNotEmpty
                   ? ListView.separated(
-                      itemBuilder: (c, i) =>
-                          itemWidget(controller.list[i]),
+                      itemBuilder: (c, i) => itemWidget(controller.list[i]),
                       separatorBuilder: (c, i) => 10.verticalSpace,
                       itemCount: controller.list.length,
                     )

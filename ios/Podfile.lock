@@ -1,7 +1,11 @@
 PODS:
   - audio_session (0.0.1):
     - Flutter
+  - battery_plus (1.0.0):
+    - Flutter
   - camera_avfoundation (0.0.1):
+    - Flutter
+  - connectivity_plus (0.0.1):
     - Flutter
   - device_info_plus (0.0.1):
     - Flutter
@@ -60,6 +64,8 @@ PODS:
     - Flutter
     - FlutterMacOS
   - HydraAsync (2.0.6)
+  - image_clipboard (0.0.1):
+    - Flutter
   - image_gallery_saver_plus (0.0.1):
     - Flutter
   - image_picker_ios (0.0.1):
@@ -85,7 +91,9 @@ PODS:
   - mobile_scanner (7.0.0):
     - Flutter
     - FlutterMacOS
-  - open_file (0.0.1):
+  - network_info_plus (0.0.1):
+    - Flutter
+  - open_file_ios (0.0.1):
     - Flutter
   - package_info_plus (0.4.5):
     - Flutter
@@ -109,6 +117,8 @@ PODS:
     - SDWebImage/Core (~> 5.17)
   - sensors_plus (0.0.1):
     - Flutter
+  - share_plus (0.0.1):
+    - Flutter
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -125,6 +135,10 @@ PODS:
   - tencent_cloud_uikit_core (0.0.1):
     - Flutter
   - TXIMSDK_Plus_iOS_XCFramework (8.6.7019)
+  - ume_kit_channel_observer (0.0.1):
+    - Flutter
+  - ume_kit_memory_detector (0.0.1):
+    - Flutter
   - url_launcher_ios (0.0.1):
     - Flutter
   - video_player_avfoundation (0.0.1):
@@ -138,7 +152,9 @@ PODS:
 
 DEPENDENCIES:
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
+  - battery_plus (from `.symlinks/plugins/battery_plus/ios`)
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
+  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - fc_native_video_thumbnail (from `.symlinks/plugins/fc_native_video_thumbnail/darwin`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
@@ -149,11 +165,13 @@ DEPENDENCIES:
   - flutter_plugin_record_plus (from `.symlinks/plugins/flutter_plugin_record_plus/ios`)
   - flutter_ringtone_player (from `.symlinks/plugins/flutter_ringtone_player/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
+  - image_clipboard (from `.symlinks/plugins/image_clipboard/ios`)
   - image_gallery_saver_plus (from `.symlinks/plugins/image_gallery_saver_plus/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/darwin`)
   - mobile_scanner (from `.symlinks/plugins/mobile_scanner/darwin`)
-  - open_file (from `.symlinks/plugins/open_file/ios`)
+  - network_info_plus (from `.symlinks/plugins/network_info_plus/ios`)
+  - open_file_ios (from `.symlinks/plugins/open_file_ios/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - pasteboard (from `.symlinks/plugins/pasteboard/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
@@ -161,11 +179,14 @@ DEPENDENCIES:
   - pgw_sdk (from `.symlinks/plugins/pgw_sdk/ios`)
   - photo_manager (from `.symlinks/plugins/photo_manager/ios`)
   - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
+  - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
   - store_redirect (from `.symlinks/plugins/store_redirect/ios`)
   - tencent_cloud_chat_sdk (from `.symlinks/plugins/tencent_cloud_chat_sdk/ios`)
   - tencent_cloud_uikit_core (from `.symlinks/plugins/tencent_cloud_uikit_core/ios`)
+  - ume_kit_channel_observer (from `.symlinks/plugins/ume_kit_channel_observer/ios`)
+  - ume_kit_memory_detector (from `.symlinks/plugins/ume_kit_memory_detector/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
   - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
@@ -186,8 +207,12 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   audio_session:
     :path: ".symlinks/plugins/audio_session/ios"
+  battery_plus:
+    :path: ".symlinks/plugins/battery_plus/ios"
   camera_avfoundation:
     :path: ".symlinks/plugins/camera_avfoundation/ios"
+  connectivity_plus:
+    :path: ".symlinks/plugins/connectivity_plus/ios"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
   fc_native_video_thumbnail:
@@ -208,6 +233,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_ringtone_player/ios"
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/darwin"
+  image_clipboard:
+    :path: ".symlinks/plugins/image_clipboard/ios"
   image_gallery_saver_plus:
     :path: ".symlinks/plugins/image_gallery_saver_plus/ios"
   image_picker_ios:
@@ -216,8 +243,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/just_audio/darwin"
   mobile_scanner:
     :path: ".symlinks/plugins/mobile_scanner/darwin"
-  open_file:
-    :path: ".symlinks/plugins/open_file/ios"
+  network_info_plus:
+    :path: ".symlinks/plugins/network_info_plus/ios"
+  open_file_ios:
+    :path: ".symlinks/plugins/open_file_ios/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
   pasteboard:
@@ -232,6 +261,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/photo_manager/ios"
   sensors_plus:
     :path: ".symlinks/plugins/sensors_plus/ios"
+  share_plus:
+    :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqflite_darwin:
@@ -242,6 +273,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/tencent_cloud_chat_sdk/ios"
   tencent_cloud_uikit_core:
     :path: ".symlinks/plugins/tencent_cloud_uikit_core/ios"
+  ume_kit_channel_observer:
+    :path: ".symlinks/plugins/ume_kit_channel_observer/ios"
+  ume_kit_memory_detector:
+    :path: ".symlinks/plugins/ume_kit_memory_detector/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
   video_player_avfoundation:
@@ -253,8 +288,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
+  battery_plus: b42253f6d2dde71712f8c36fef456d99121c5977
   camera_avfoundation: be3be85408cd4126f250386828e9b1dfa40ab436
-  device_info_plus: 8b1a7b1cce194cd48521ee7159feb70453ed4854
+  connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
+  device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
   DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
   fc_native_video_thumbnail: b511cec81fad66be9b28dd54b9adb39d40fcd6cc
@@ -267,14 +304,16 @@ SPEC CHECKSUMS:
   flutter_ringtone_player: a77c42464250845611eaa44c27e8714acc800138
   geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
   HydraAsync: 8d589bd725b0224f899afafc9a396327405f8063
+  image_clipboard: 4fd7aaf39abe5f24c98df299fab2528e3bbb5690
   image_gallery_saver_plus: e597bf65a7846979417a3eae0763b71b6dfec6c3
   image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
   just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
   Mantle: c5aa8794a29a022dfbbfc9799af95f477a69b62d
   mobile_scanner: 9157936403f5a0644ca3779a38ff8404c5434a93
-  open_file: 70518b3dc7beb3f9aad3ecea17cee60b1daac0a5
-  package_info_plus: 566e1b7a2f3900e4b0020914ad3fc051dcc95596
+  network_info_plus: cf61925ab5205dce05a4f0895989afdb6aade5fc
+  open_file_ios: 5ff7526df64e4394b4fe207636b67a95e83078bb
+  package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   pasteboard: 49088aeb6119d51f976a421db60d8e1ab079b63c
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
@@ -283,6 +322,7 @@ SPEC CHECKSUMS:
   SDWebImage: f29024626962457f3470184232766516dee8dfea
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
   sensors_plus: 1c5f0a01ce21c609a4df404c4e6879d62bce287f
+  share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   store_redirect: 55fd455802ceab09803b2df6e68f19a58815266a
@@ -290,6 +330,8 @@ SPEC CHECKSUMS:
   tencent_cloud_chat_sdk: 2797f99ea8ee1cd9933b9ac866a42575a85fac7a
   tencent_cloud_uikit_core: 137e8ae40882b1929508e688182b2818708cc078
   TXIMSDK_Plus_iOS_XCFramework: cb54f7de6e30e1368c6831c6eff31c25393bbb98
+  ume_kit_channel_observer: 452c7c6ed3504b3d1e04fc721a0e0da86df9d0e3
+  ume_kit_memory_detector: e516776772c144d90979fc83b9246a734315ade9
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
   video_player_avfoundation: 2cef49524dd1f16c5300b9cd6efd9611ce03639b
   wakelock_plus: 8c239121a007daa1d6759c6acdc507860273dd2f

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:dio/adapter.dart';
+// import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
-import 'package:dio/native_imp.dart';
+// import 'package:dio/native_imp.dart';
 import 'package:flutter/foundation.dart';
 
 import '../utils/platform_utils.dart';
@@ -18,33 +18,42 @@ parseJson(String text) {
   return compute(_parseAndDecode, text);
 }
 
-abstract class BaseHttp extends DioForNative {
-  BaseHttp() {
-    /// 初始化 加入app通用处理
-    (transformer as DefaultTransformer).jsonDecodeCallback = parseJson;
-    interceptors.add(HeaderInterceptor());
+// abstract class BaseHttp extends Dio {
+//   BaseHttp() {
+//     /// 初始化 加入app通用处理
+//     (transformer as DefaultTransformer).jsonDecodeCallback = parseJson;
+//     interceptors..add(HeaderInterceptor());
+//     init();
+//   }
+// }
 
-    (httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
-      client.badCertificateCallback = (X509Certificate cert, String host, int port){
-        return true;
-      };
-      // client.findProxy = (uri){
-      //   return AppConfig.isProd ? 'DIRECT':'PROXY 192.168.0.164:8888';
-      // };
-    };
+// abstract class BaseHttp extends DioForNative {
+//   BaseHttp() {
+//     /// 初始化 加入app通用处理
+//     (transformer as DefaultTransformer).jsonDecodeCallback = parseJson;
+//     interceptors.add(HeaderInterceptor());
 
-    init();
-  }
+//     (httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+//       client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+//         return true;
+//       };
+//       // client.findProxy = (uri){
+//       //   return AppConfig.isProd ? 'DIRECT':'PROXY 192.168.0.164:8888';
+//       // };
+//     };
 
-  void init();
-}
+//     init();
+//   }
+
+//   void init();
+// }
 
 /// 添加常用Header
 class HeaderInterceptor extends InterceptorsWrapper {
   @override
   onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    options.connectTimeout = 1000 * 30;
-    options.receiveTimeout = 1000 * 30;
+    options.connectTimeout = const Duration(seconds: 30);
+    options.receiveTimeout = const Duration(seconds: 30);
 
     var appVersion = await PlatformUtils.getAppVersion();
     options.headers['appVersion'] = appVersion;
@@ -63,13 +72,11 @@ abstract class BaseResponseData {
 
   BaseResponseData();
 
-
   @override
   String toString() {
     return 'BaseRespData{code: $code, message: $msg, data: $data}';
   }
 }
-
 
 /// 接口的code没有返回为true的异常
 class NotSuccessException implements Exception {
@@ -92,4 +99,3 @@ class UnAuthorizedException implements Exception {
   @override
   String toString() => 'UnAuthorizedException';
 }
-

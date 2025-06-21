@@ -12,7 +12,6 @@ import '../../../getx_ctr/top_up_ctr.dart';
 import '../../widget/my_button_widget.dart';
 
 class TopUpPage extends BasePage<TopUpCtr> {
-
   @override
   TopUpCtr createController() => TopUpCtr();
 
@@ -93,24 +92,20 @@ class TopUpPage extends BasePage<TopUpCtr> {
                           childAspectRatio: 95.w / 55.w,
                         ),
                         itemBuilder: (context, index) => Obx(() => InkWell(
-                              onTap: () =>
-                                  controller.currentIndex.value = index,
+                              onTap: () {
+                                controller.currentIndex.value = index;
+                                controller.inputMoneyCtr.text = controller.moneyList[index].toString();
+                              },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: controller.currentIndex.value ==
-                                          index
-                                      ? toColor('#18CBE6')
-                                      : toColor('#F4FAFA'),
+                                  color: controller.currentIndex.value == index ? toColor('#18CBE6') : toColor('#F4FAFA'),
                                   borderRadius: BorderRadius.circular(10.r),
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   "S\$${controller.moneyList[index]}",
                                   style: TextStyle(
-                                    color: controller.currentIndex.value ==
-                                            index
-                                        ? Colors.white
-                                        : toColor('333333'),
+                                    color: controller.currentIndex.value == index ? Colors.white : toColor('333333'),
                                     fontFamily: FONT_MEDIUM,
                                     fontSize: 14.sp,
                                   ),

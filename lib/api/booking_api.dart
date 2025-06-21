@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:elixir_esports/api/wy_http.dart';
 import 'package:elixir_esports/base/base_http.dart';
 
@@ -22,8 +20,7 @@ class BookingApi {
   }
 
   static Future<BookingDetailModel> bookingDetail(int id) async {
-    var response =
-        await http.get('app/booking/bookingDetail', queryParameters: {
+    var response = await http.get('app/booking/bookingDetail', queryParameters: {
       "id": id,
     });
     return BookingDetailModel.fromJson(response.data);

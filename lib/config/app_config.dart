@@ -1,3 +1,4 @@
+import 'package:elixir_esports/base/base_http.dart';
 import 'package:elixir_esports/utils/color_utils.dart';
 import 'package:elixir_esports/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ import '../app.dart';
 import '../utils/storage_manager.dart';
 
 class AppConfig {
-  static final Http http = Http();
+  static final Dio http = Dio();
 
   static final CoreServicesImpl _coreInstance = TIMUIKitCore.getInstance();
 
@@ -49,10 +50,8 @@ class AppConfig {
               break;
             case TIMCallbackType.API_ERROR:
               //Prints the API error to console, and shows the error message.
-              flog(
-                  "Error from TUIKit: ${callbackValue.errorMsg}, Code: ${callbackValue.errorCode}");
-              if (callbackValue.errorCode == 10004 &&
-                  callbackValue.errorMsg!.contains("not support @all")) {
+              flog("Error from TUIKit: ${callbackValue.errorMsg}, Code: ${callbackValue.errorCode}");
+              if (callbackValue.errorCode == 10004 && callbackValue.errorMsg!.contains("not support @all")) {
                 flog('');
               } else {
                 flog('');

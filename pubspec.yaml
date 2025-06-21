@@ -40,9 +40,10 @@ dependencies:
   package_info_plus: ^4.1.0
   url_launcher: ^6.3.1
   flutter_smart_dialog: ^4.9.8+3
+  ume: ^2.0.6
   # flutter_ume: ^1.1.2
   # flutter_ume_kit_dio: ^1.0.0
-  dio: 4.0.6
+  # dio:  
   get: ^4.6.5
   pull_to_refresh: ^2.0.0
   flutter_svg: ^2.0.10+1
@@ -82,11 +83,6 @@ dependencies:
     path: plugins/intl_phone_number_input
 
 dependency_overrides:
-  # flutter_svg: 1.1.6
-  # http: ^1.1.0
-  # webview_flutter: ^4.5.0
-  # pigeon: 22.7.0
-  # meta: 1.9.1
   collection: ^1.19.1
   intl: ^0.19.0
   file_picker: 8.0.7
@@ -94,22 +90,20 @@ dependency_overrides:
   extended_text_field: ^16.0.2
   extended_text: 15.0.2
   web: ^1.1.0
-  # scan:
-  #   path: plugins/scan
-  # image_clipboard: 1.1.0+1
-    # path: plugins/image_clipboard
-  # image_gallery_saver:
-  #   path: plugins/image_gallery_saver
-  open_file: 3.4.0
+  open_file: ^3.5.10
   geolocator: 14.0.1
   uuid: 4.5.1
-  # wechat_assets_picker: ^8.6.3
+  shared_preferences: ^2.3.3
+  ume_kit_device: 2.0.3
+  device_info_plus: ^11.5.0
+  file: ^7.0.1
+  package_info_plus: ^8.1.1
 
 
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  # flutter_test:
+  #   sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

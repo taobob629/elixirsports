@@ -17,18 +17,24 @@ import '../base/base_http.dart';
 ///是否正在登录
 bool isSigningIn = false;
 
-Http http = Http();
+Dio http = Dio(
+  BaseOptions(
+    baseUrl: AppConfig.getBaseServer(),
+    connectTimeout: const Duration(seconds: 30),
+    receiveTimeout: const Duration(seconds: 30),
+  ),
+);
 
-class Http extends BaseHttp {
-  @override
-  void init() async {
-    options.baseUrl = AppConfig.getBaseServer();
-    // options.baseUrl = "http://139.186.149.117:8091/";
-    interceptors
-      ..add(ApiInterceptor())
-      ..add(HeaderInterceptor());
-  }
-}
+// class Http extends BaseHttp {
+//   @override
+//   void init() async {
+//     options.baseUrl = AppConfig.getBaseServer();
+//     // options.baseUrl = "http://139.186.149.117:8091/";
+//     interceptors
+//       ..add(ApiInterceptor())
+//       ..add(HeaderInterceptor());
+//   }
+// }
 
 class HeaderInterceptor extends InterceptorsWrapper {
   @override
@@ -66,8 +72,7 @@ class ApiInterceptor extends InterceptorsWrapper {
       showLoading();
     }
     log(
-      'api-request:${options.baseUrl}${options.path}' +
-          ' queryParameters: ${options.queryParameters} data :${options.data} ',
+      'api-request:${options.baseUrl}${options.path}' + ' queryParameters: ${options.queryParameters} data :${options.data} ',
       name: "WY_API",
     );
     //debugPrint('---api-request--->data--->${options.data}');

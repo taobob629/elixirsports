@@ -8,12 +8,10 @@ import 'package:elixir_esports/utils/storage_manager.dart';
 import 'package:elixir_esports/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-// import 'package:flutter_ume/core/plugin_manager.dart';
-// import 'package:flutter_ume/core/ui/root_widget.dart';
-// import 'package:flutter_ume_kit_dio/flutter_ume_kit_dio.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pgw_sdk/core/pgw_sdk_delegate.dart';
 import 'package:pgw_sdk/enum/api_environment.dart';
+import 'package:ume/ume.dart';
 
 import 'api/wy_http.dart';
 import 'config/app_config.dart';
@@ -42,7 +40,8 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
+  http.interceptors.add(HeaderInterceptor());
+  http.interceptors.add(ApiInterceptor());
   var app = await AppConfig.createApp();
 
   ///图片缓存大小
@@ -56,8 +55,8 @@ void main() async {
     flog("初始化支付错误：$pgwsdkParams, $error");
   }).whenComplete(() {
     if (env.contains("dev")) {
-      // PluginManager.instance // 注册插件
-      //     .register(DioInspector(dio: http));
+      PluginManager.instance // 注册插件
+          .register(DioInspector(dio: http));
 
       Catcher2Options debugOptions = Catcher2Options(
         DialogReportMode(),
@@ -69,12 +68,12 @@ void main() async {
         [ConsoleHandler()],
       );
 
-      // Catcher2(
-      //   rootWidget: UMEWidget(enable: true, child: app),
-      //   debugConfig: debugOptions,
-      //   releaseConfig: releaseOptions,
-      // );
-      runApp(app);
+      Catcher2(
+        rootWidget: UMEWidget(enable: true, child: app),
+        debugConfig: debugOptions,
+        releaseConfig: releaseOptions,
+      );
+      // runApp(app);
     } else {
       runApp(app);
     }
