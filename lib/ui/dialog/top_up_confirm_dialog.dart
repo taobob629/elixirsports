@@ -468,7 +468,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog> {
   void topUp() async {
     dismissLoading(status: SmartStatus.loading);
 
-    if(payMethod.value==null||payMethod.value==0){
+    if (payMethod.value == null || payMethod.value == 0) {
       showToast("Please select a payment method".tr);
       return;
     }
@@ -651,7 +651,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog> {
     if (pgwModel?.webPaymentUrl != null && await canLaunchUrlString(pgwModel!.webPaymentUrl)) {
       await launchUrlString(pgwModel.webPaymentUrl);
       dismissLoading();
-      Get.back();
+      // Get.back();
       // 开始轮询支付结果
       // startGettingPaymentResult(pgwModel.invoiceNo);
     } else {

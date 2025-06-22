@@ -68,6 +68,17 @@ class App extends StatelessWidget {
                   unselectedWidgetColor: Colors.white,
                   scaffoldBackgroundColor: toColor('F5F5F5'),
                   primaryIconTheme: IconThemeData(color: toColor('C5C3C6')),
+                  elevatedButtonTheme: ElevatedButtonThemeData(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: toColor('F5F5F5'),
+                      foregroundColor: toColor('C5C3C6'),
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: FONT_MEDIUM,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
                   colorScheme: theme.colorScheme.copyWith(
                     primary: toColor('F5F5F5'),
                     secondary: toColor('e33e45'),

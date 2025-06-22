@@ -23,8 +23,7 @@ class EmojiPanel extends TIMUIKitStatelessWidget {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     // ignore: avoid_print
-    outputLogger.i(TIM_t(
-        "暂未安装表情包插件，如需使用表情相关功能，请根据本文档安装：https://cloud.tencent.com/document/product/269/70746"));
+    outputLogger.i(TIM_t("暂未安装表情包插件，如需使用表情相关功能，请根据本文档安装：https://cloud.tencent.com/document/product/269/70746"));
     return SingleChildScrollView(
         child: Column(
       children: [
@@ -65,8 +64,7 @@ class EmojiPanel extends TIMUIKitStatelessWidget {
 }
 
 class EmojiItem extends TIMUIKitStatelessWidget {
-  EmojiItem({Key? key, required this.name, required this.unicode})
-      : super(key: key);
+  EmojiItem({Key? key, required this.name, required this.unicode}) : super(key: key);
   final String name;
   final int unicode;
 
@@ -76,10 +74,7 @@ class EmojiItem extends TIMUIKitStatelessWidget {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     return DefaultTextStyle(
-      style: TextStyle(
-        fontSize: (PlatformUtils().isAndroid) ? 20 : 26,
-        color: hexToColor("f9453d")
-      ),
+      style: TextStyle(fontSize: (PlatformUtils().isAndroid) ? 20 : 26, color: hexToColor("f9453d")),
       child: Text(
         String.fromCharCode(unicode),
       ),
