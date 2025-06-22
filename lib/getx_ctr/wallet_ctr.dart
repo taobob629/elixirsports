@@ -30,9 +30,9 @@ class WalletCtr extends GetxRefreshController<WalletRow> {
   }
 
   void topUp() async {
-    // if (UserController.find.profileModel.value.topup == true) {
-    await Get.to(() => TopUpPage());
-    await onRefresh();
-    // }
+    if (UserController.find.profileModel.value.topup == true) {
+      await Get.to(() => TopUpPage());
+      await onRefresh();
+    }
   }
 }

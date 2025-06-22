@@ -45,7 +45,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog> {
   var cardNo = "".obs;
 
   // 支付方式：9：银行卡 4：支付宝 5：微信  8：PayNow
-  var payMethod = 0.obs;
+  var payMethod = 4.obs;
 
   // // 轮询支付结果的定时器
   // Timer? _pollingTimer;
@@ -651,7 +651,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog> {
     if (pgwModel?.webPaymentUrl != null && await canLaunchUrlString(pgwModel!.webPaymentUrl)) {
       await launchUrlString(pgwModel.webPaymentUrl);
       dismissLoading();
-      // Get.back();
+      Get.back();
       // 开始轮询支付结果
       // startGettingPaymentResult(pgwModel.invoiceNo);
     } else {
