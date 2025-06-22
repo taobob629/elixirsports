@@ -105,14 +105,10 @@ class UpgradeDialog extends StatelessWidget {
                             ),
                             child: LinearProgressIndicator(
                               backgroundColor: Colors.white24,
-                              valueColor:
-                              const AlwaysStoppedAnimation<Color>(
-                                  Colors.amber),
-                              semanticsLabel:
-                              controller.progress.value.toString(),
+                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                              semanticsLabel: controller.progress.value.toString(),
                               value: controller.progress.value / 100,
-                              semanticsValue:
-                              controller.progress.value.toString(),
+                              semanticsValue: controller.progress.value.toString(),
                             ),
                           ),
                         ),
@@ -122,7 +118,7 @@ class UpgradeDialog extends StatelessWidget {
                       onTap: () async {
                         StoreRedirect.redirect(
                           androidAppId: "com.elixir.esports",
-                          iOSAppId: "6478599943",
+                          iOSAppId: "6747395204",
                         );
                       },
                       child: Container(
@@ -131,8 +127,7 @@ class UpgradeDialog extends StatelessWidget {
                         margin: EdgeInsets.only(bottom: 20.h),
                         decoration: ShapeDecoration(
                           color: const Color(0xFFFFB20E),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
                         alignment: Alignment.center,
                         child: Text(
