@@ -46,7 +46,7 @@ const Map<String, String> zh_CN = {
   'Booking': '预订',
   'Coupon': '优惠券',
   'Order': '订单',
-  'My Elixir Card': '我的灵境卡',
+  'My Elixir Card': '我的灵竞卡',
   'Platinum': '白金',
   'Diamond': '钻石',
   'Gold': '黄金',
