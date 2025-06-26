@@ -9,14 +9,12 @@ class ProfileApi {
     required String filePath,
     Function(int, int)? sendCallback,
   }) async {
-    var name =
-        filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length);
+    var name = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length);
     FormData formData = FormData.fromMap({
       //这里写其他需要传递的参数
       "file": await MultipartFile.fromFile(filePath, filename: name)
     });
-    var response = await http.post('app/user/upload',
-        data: formData, onSendProgress: sendCallback);
+    var response = await http.post('app/user/upload', data: formData, onSendProgress: sendCallback);
 
     return response.data['url'];
   }
@@ -46,14 +44,13 @@ class ProfileApi {
   static Future<VersionModel> checkVersion() async {
     String platform = Platform.operatingSystem;
     String version = await PlatformUtils.getAppVersion();
-    var response = await http.get('app/home/checkVersion',
-        queryParameters: ({"version": version, "platform": platform}));
+    var response = await http.get('app/home/checkVersion', queryParameters: ({"version": version, "platform": platform}));
     return VersionModel.fromJson(response.data);
   }
+
   static Future<void> appDeleteUsers() async {
     // String platform = Platform.operatingSystem;
     String version = await PlatformUtils.getAppVersion();
-    var response = await http.get('/app/user/appDeleteUser',
-        queryParameters: ({"version": "", "platform": ""}));
+    var response = await http.get('app/user/appDeleteUser', queryParameters: ({"version": "", "platform": ""}));
   }
 }

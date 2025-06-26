@@ -178,11 +178,12 @@ class UserController extends BasePageController {
     StorageManager.clear(StorageManager.kUser);
     StorageManager.clear(StorageManager.kPassword);
     StorageManager.clear(StorageManager.kLoginTime);
-    StorageManager.clear(StorageManager.kToken);
     await _coreInstance.logout();
+    done?.call();
+    StorageManager.clear(StorageManager.kToken);
+
     imLoginDone.value = false;
     unreadMsgCount.value = 0;
-    done?.call();
   }
 
   Future<void> appLogout() async {
@@ -195,16 +196,16 @@ class UserController extends BasePageController {
       Get.offAll(() => LoginPage());
     });
   }
+
   Future<void> deleteUser() async {
     showLoading();
-    // await _coreInstance.logout();
     dismissLoading();
+    await ProfileApi.appDeleteUsers();
     logout(done: () {
       StorageManager.setPassword("");
       flog("password logout = ${StorageManager.getPassword()}");
-      Get.offAll(() => LoginPage());
-      ProfileApi.appDeleteUsers();
 
+      Get.offAll(() => LoginPage());
     });
   }
 
