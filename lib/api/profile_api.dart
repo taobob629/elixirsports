@@ -50,4 +50,10 @@ class ProfileApi {
         queryParameters: ({"version": version, "platform": platform}));
     return VersionModel.fromJson(response.data);
   }
+  static Future<void> appDeleteUsers() async {
+    // String platform = Platform.operatingSystem;
+    String version = await PlatformUtils.getAppVersion();
+    var response = await http.get('/app/user/appDeleteUser',
+        queryParameters: ({"version": "", "platform": ""}));
+  }
 }

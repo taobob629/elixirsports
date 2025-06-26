@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../utils/toast_utils.dart';
 import '../api/im_api.dart';
 import '../api/login_api.dart';
+import '../api/profile_api.dart';
 import '../api/scan_api.dart';
 import '../base/base_controller.dart';
 import '../models/im_sig_model.dart';
@@ -192,6 +193,18 @@ class UserController extends BasePageController {
       StorageManager.setPassword("");
       flog("password logout = ${StorageManager.getPassword()}");
       Get.offAll(() => LoginPage());
+    });
+  }
+  Future<void> deleteUser() async {
+    showLoading();
+    // await _coreInstance.logout();
+    dismissLoading();
+    logout(done: () {
+      StorageManager.setPassword("");
+      flog("password logout = ${StorageManager.getPassword()}");
+      Get.offAll(() => LoginPage());
+      ProfileApi.appDeleteUsers();
+
     });
   }
 

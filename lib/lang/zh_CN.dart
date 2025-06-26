@@ -206,6 +206,9 @@ const Map<String, String> zh_CN = {
   'Please input current password':'请输入当前密码',
   'Please input new password':'请输入新密码',
   'Incorrect password':'密码错误',
-  'You are using the latest version':'当前已是最新版本'
+  'You are using the latest version':'当前已是最新版本',
+  'Are you sure to delete your account?':'你确认删除你的账号吗?',
+  'Press again to exit':'再按一次退出',
+  'Delete Account':'删除账户'
 
 };

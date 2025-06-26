@@ -1,4 +1,5 @@
 import 'package:elixir_esports/base/base_controller.dart';
+import 'package:elixir_esports/ui/pages/login/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,7 @@ import 'package:get/get.dart';
 import '../api/login_api.dart';
 import '../api/profile_api.dart';
 import '../models/version_model.dart';
+import '../ui/dialog/confirm_dialog.dart';
 import '../ui/dialog/upgrade_dialog.dart';
 import 'user_controller.dart';
 import '../ui/dialog/change_avatar_dialog.dart';
@@ -41,6 +43,18 @@ class SettingsCtr extends BasePageController {
       await ProfileApi.updateUsername(username: nameCtr.text);
       UserController.find.requestProfileData();
       Get.back();
+    }
+  }
+  Future<void> deleteUser() async {
+    final value = await Get.dialog(
+      ConfirmDialog(
+        title: 'CONFIRM'.tr,
+        info: "Are you sure to delete your account?".tr,
+      ),
+      barrierColor: Colors.black26,
+    );
+    if (value != null) {
+     await UserController.find.deleteUser();
     }
   }
 
