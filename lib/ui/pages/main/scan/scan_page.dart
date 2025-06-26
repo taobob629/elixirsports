@@ -14,11 +14,13 @@ class ScanPage extends StatelessWidget {
       body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0),
           child: MobileScanner(
-            // controller: controller.controller,
+            controller: controller.scanCtr,
             onDetect: (capture) {
               final List<Barcode> barcodes = capture.barcodes;
               if (barcodes.isNotEmpty) {
+                controller.scanCtr?.stop();
                 Get.back(result: barcodes.first.rawValue);
+                print("barcodes.first.rawValue ${barcodes.first.rawValue}");
               }
             },
           )),
@@ -27,11 +29,17 @@ class ScanPage extends StatelessWidget {
 }
 
 class ScanPageController extends GetxController {
-  // late MobileScannerController controller;
+  MobileScannerController? scanCtr;
 
   @override
   void onInit() {
     super.onInit();
-    // controller = MobileScannerController();
+    scanCtr = MobileScannerController();
+  }
+
+  @override
+  void onClose() {
+    scanCtr?.stop();
+    super.onClose();
   }
 }
