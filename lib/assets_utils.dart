@@ -8,6 +8,11 @@ class AssetsUtils {
   static const String home_top_bg = 'assets/images/home_top_bg.svg';
   static const String mine_top_bg = 'assets/images/mine_top_bg.svg';
   static const String scan_icon = 'assets/images/scan_icon.svg';
+  static const String icon_scan = 'assets/images/icon_scan2.svg';
+  static const String icon_vip = 'assets/images/vip.svg';
+
+  static const String icon_food = 'assets/images/icon_food.svg';
+
   static const String icon_calendar = 'assets/images/icon_calendar.svg';
   static const String mine_scan_icon = 'assets/images/mine_scan_icon.svg';
   static const String mine_setting_icon = 'assets/images/mine_setting_icon.svg';
@@ -34,6 +39,8 @@ class AssetsUtils {
   static const String coupon_red_bg = 'assets/images/coupon_red_bg.svg';
   static const String icon_youdian = 'assets/images/icon_youdian.svg';
   static const String icon_online = 'assets/images/icon_online.svg';
+  static const String icon_wallet = 'assets/images/icon_wallet.svg';
+
   static const String icon_cash = 'assets/images/icon_cash.svg';
   static const String qr_code_border = 'assets/images/qr_code_border.webp';
   static const String icon_reward = 'assets/images/icon_reward.svg';

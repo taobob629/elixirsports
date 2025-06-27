@@ -194,7 +194,7 @@ Widget weServiceWidget({
                           ),
                         ),
                         SvgPicture.asset(
-                          AssetsUtils.service_book_icon,
+                          AssetsUtils.scan_icon,
                           height: 32.h,
                         ),
                       ],
@@ -237,7 +237,7 @@ Widget weServiceWidget({
                           ),
                         ),
                         SvgPicture.asset(
-                          AssetsUtils.service_book_icon,
+                          AssetsUtils.icon_wallet,
                           height: 32.h,
                         ),
                       ],
@@ -280,7 +280,7 @@ Widget weServiceWidget({
                           ),
                         ),
                         SvgPicture.asset(
-                          AssetsUtils.service_book_icon,
+                          AssetsUtils.icon_vip,
                           height: 32.h,
                         ),
                       ],
