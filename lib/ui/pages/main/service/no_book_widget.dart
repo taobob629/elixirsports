@@ -194,7 +194,7 @@ Widget weServiceWidget({
                           ),
                         ),
                         SvgPicture.asset(
-                          AssetsUtils.scan_icon,
+                          AssetsUtils.icon_scan,
                           height: 32.h,
                         ),
                       ],
