@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../../assets_utils.dart';
 import '../../../../config/icon_font.dart';
@@ -26,11 +27,11 @@ class CouponListPage extends BasePage<CouponListCtr> {
           children: [
             Container(
               margin: EdgeInsets.only(top: 15.h, bottom: 15.h),
-              width: 200.w,
+              // width: 200.w,
               child: TabBar(
                 controller: controller.tabController,
                 tabs: controller.tabs,
-                isScrollable: false,
+                // isScrollable: false,
                 indicatorSize: TabBarIndicatorSize.label,
                 overlayColor: MaterialStateProperty.all(Colors.transparent),
                 onTap: (index) => controller.changeStatus(index),
@@ -44,11 +45,17 @@ class CouponListPage extends BasePage<CouponListCtr> {
             ),
             Expanded(
               child: Obx(() => controller.list.isNotEmpty
-                  ? ListView.separated(
-                      itemBuilder: (c, i) => itemWidget(controller.list[i]),
-                      separatorBuilder: (c, i) => 10.verticalSpace,
-                      itemCount: controller.list.length,
-                    )
+                  ? SmartRefresher(
+                      controller: controller.refreshController,
+                      onRefresh: () => controller.onRefresh(),
+                      onLoading: () => controller.loadMore(),
+                      enablePullUp: true,
+                      enablePullDown: true,
+                      child: ListView.separated(
+                        itemBuilder: (c, i) => itemWidget(controller.list[i]),
+                        separatorBuilder: (c, i) => 10.verticalSpace,
+                        itemCount: controller.list.length,
+                      ))
                   : EmptyView()),
             ),
           ],

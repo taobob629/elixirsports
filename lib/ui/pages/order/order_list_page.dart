@@ -3,6 +3,7 @@ import 'package:elixir_esports/models/order_list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../../config/icon_font.dart';
 import '../../../../utils/color_utils.dart';
@@ -13,7 +14,6 @@ import '../../../getx_ctr/order_list_ctr.dart';
 import 'order_detail_page.dart';
 
 class OrderListPage extends BasePage<OrderListCtr> {
-
   @override
   OrderListCtr createController() => OrderListCtr();
 
@@ -21,11 +21,17 @@ class OrderListPage extends BasePage<OrderListCtr> {
   Widget buildBody(BuildContext context) => BaseScaffold(
         title: "Order".tr,
         body: Obx(() => controller.list.isNotEmpty
-            ? ListView.separated(
-                itemBuilder: (c, i) => itemWidget(controller.list[i]),
-                separatorBuilder: (c, i) => 10.verticalSpace,
-                itemCount: controller.list.length,
-              ).marginAll(15.r)
+            ? SmartRefresher(
+                controller: controller.refreshController,
+                onRefresh: () => controller.onRefresh(),
+                onLoading: () => controller.loadMore(),
+                enablePullUp: true,
+                enablePullDown: true,
+                child: ListView.separated(
+                  itemBuilder: (c, i) => itemWidget(controller.list[i]),
+                  separatorBuilder: (c, i) => 10.verticalSpace,
+                  itemCount: controller.list.length,
+                )).marginAll(15.r)
             : EmptyView()),
       );
 
