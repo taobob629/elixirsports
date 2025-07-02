@@ -20,7 +20,8 @@ class ScanToUnlockCtr extends BasePageController {
 
   void loginNext() async {
     ScanModel model=await ScanApi.scanLogin(ip: scanModel.ip, storeId: scanModel.storeId);
-    showToast(model.msg);
+    if(model!=null&&model.msg!=null)
+      showToast(model.msg);
     // Get.off(() => OrderDetailPage());
   }
 }
