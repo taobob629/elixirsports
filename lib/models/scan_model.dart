@@ -10,6 +10,7 @@ class ScanModel {
   String? avatar;
   int? storeId;
   String? cash;
+  String? msg;
 
   ScanModel({
     this.reward,
@@ -23,6 +24,7 @@ class ScanModel {
     this.avatar,
     this.storeId,
     this.cash,
+    this.msg,
   });
 
   factory ScanModel.fromJson(Map<String, dynamic> json) => ScanModel(
@@ -37,6 +39,8 @@ class ScanModel {
     avatar: json["avatar"],
     storeId: json["storeId"],
     cash: json["cash"],
+    msg: json["msg"],
+
   );
 
   Map<String, dynamic> toJson() => {
@@ -51,6 +55,8 @@ class ScanModel {
     "avatar": avatar,
     "storeId": storeId,
     "cash": cash,
+    "msg": msg,
+
   };
 }
 
