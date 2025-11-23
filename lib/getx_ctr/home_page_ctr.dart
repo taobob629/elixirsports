@@ -88,7 +88,7 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(model.title),
+              // Text(model.title),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 clipBehavior: Clip.antiAlias,
