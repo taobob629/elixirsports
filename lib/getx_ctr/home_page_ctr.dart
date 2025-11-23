@@ -4,6 +4,7 @@ import 'package:elixir_esports/ui/pages/store/select_store_page.dart';
 import 'package:elixir_esports/ui/pages/wallet/top_up_page.dart';
 import 'package:elixir_esports/ui/pages/wallet/wallet_page.dart';
 import 'package:elixir_esports/utils/image_util.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:geolocator/geolocator.dart';
@@ -125,18 +126,23 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
           launchUrl(Uri.parse(model.target));
         });
         break;
-      case 'TopUp':
-        Get.to(() => TopUpPage());
-        break;
-      case 'Bookings':
-        Get.to(() => SelectStorePage());
-        break;
-      case 'Points':
-        Get.to(() => WalletPage());
-        break;
-      case 'ELixirCard':
-        Get.to(() => MemberPage());
-        break;
+      case 'page':
+        switch(model.target){
+          case "TopUp":
+            Get.to(() => TopUpPage());
+            break;
+          case 'Bookings':
+            Get.to(() => SelectStorePage());
+            break;
+          case 'Points':
+            Get.to(() => WalletPage());
+            break;
+          case 'ELixirCard':
+            Get.to(() => MemberPage());
+            break;
+          default:
+            break;
+        }
       default:
         break;
     }
