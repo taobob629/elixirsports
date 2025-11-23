@@ -129,7 +129,7 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
       case 'page':
         switch(model.target){
           case "TopUp":
-            Get.to(() => TopUpPage());
+            Get.to(() => TopUpPage(message: model.msg));
             break;
           case 'Bookings':
             Get.to(() => SelectStorePage());
@@ -137,7 +137,7 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
           case 'Points':
             Get.to(() => WalletPage());
             break;
-          case 'ELixirCard':
+          case 'ElixirCard':
             Get.to(() => MemberPage());
             break;
           default:

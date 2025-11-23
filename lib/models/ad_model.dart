@@ -4,6 +4,7 @@ class AdModel {
   String image = '';
   String type = '';
   String target = '';
+  String msg='';
 
   AdModel();
 
@@ -13,6 +14,8 @@ class AdModel {
     image = json['image'] ?? '';
     type = json['type'] ?? '';
     target = json['target'] ?? '';
+    msg = json['msg'] ?? '';
+
   }
 
   Map<String, dynamic> toJson() {
@@ -22,6 +25,8 @@ class AdModel {
       'image': image,
       'target': target,
       'type': type,
+      'msg': msg,
+
     };
   }
 }
