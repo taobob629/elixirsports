@@ -120,6 +120,7 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
   }
 
   void handleAdPromote(AdModel model) {
+    ProfileApi.clickPromote(model);
     switch (model.type) {
       case 'H5':
         canLaunchUrl(Uri.parse(model.target)).then((val) {

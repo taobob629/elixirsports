@@ -5,6 +5,7 @@ class AdModel {
   String type = '';
   String target = '';
   String msg='';
+  String id='';
 
   AdModel();
 
@@ -15,6 +16,7 @@ class AdModel {
     type = json['type'] ?? '';
     target = json['target'] ?? '';
     msg = json['msg'] ?? '';
+    id = json['id'] ?? '';
 
   }
 
@@ -26,6 +28,7 @@ class AdModel {
       'target': target,
       'type': type,
       'msg': msg,
+      'id': id,
 
     };
   }
