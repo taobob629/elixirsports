@@ -112,9 +112,7 @@ class BookSeatCtr extends BasePageController {
             selectSeatList.clear();
           }
 
-          final list = seatModel.value.computers
-              .where((element) => element.areaId == computer.areaId)
-              .toList();
+          final list = seatModel.value.computers.where((element) => element.areaId == computer.areaId).toList();
           for (var element in list) {
             element.status = 4;
           }
@@ -130,42 +128,32 @@ class BookSeatCtr extends BasePageController {
               selectSeatList.clear();
             }
           }
-          seatModel.value.computers
-              .firstWhereOrNull((element) => element.id == computer.id)
-              ?.status = 4;
+          seatModel.value.computers.firstWhereOrNull((element) => element.id == computer.id)?.status = 4;
           selectSeatList.add(computer);
           seatModel.refresh();
         }
       } else {
         if (computer.bookingType == 1) {
-          final list = seatModel.value.computers
-              .where((element) => element.areaId == computer.areaId)
-              .toList();
+          final list = seatModel.value.computers.where((element) => element.areaId == computer.areaId).toList();
           for (var element in list) {
             element.status = 0;
           }
-          selectSeatList
-              .removeWhere((element) => element.areaId == computer.areaId);
+          selectSeatList.removeWhere((element) => element.areaId == computer.areaId);
           seatModel.refresh();
         } else {
-          seatModel.value.computers
-              .firstWhereOrNull((element) => element.id == computer.id)
-              ?.status = 0;
+          seatModel.value.computers.firstWhereOrNull((element) => element.id == computer.id)?.status = 0;
           selectSeatList.remove(computer);
           seatModel.refresh();
         }
       }
     }
 
-    totalPrice.value = selectSeatList.fold<String>("0",
-        (previousValue, element) => previousValue.add(element.price ?? "0"));
+    totalPrice.value = selectSeatList.fold<String>("0", (previousValue, element) => previousValue.add(element.price ?? "0"));
   }
 
   void cancelSelectSeat() {
     for (var seat in selectSeatList) {
-      seatModel.value.computers
-          .firstWhereOrNull((element) => element.id == seat.id)
-          ?.status = 0;
+      seatModel.value.computers.firstWhereOrNull((element) => element.id == seat.id)?.status = 0;
     }
     seatModel.refresh();
     selectSeatList.clear();
@@ -183,13 +171,13 @@ class BookSeatCtr extends BasePageController {
       ConfirmDialog(
         title: 'CONFIRM'.tr,
         info: seatModel.value.info.join("\n"),
+        htmlString: seatModel.value.htmlString,
       ),
       barrierColor: Colors.black26,
     );
     if (value == null) return;
 
-    List<String> idsArr =
-        selectSeatList.map((computer) => computer.id.toString()).toList();
+    List<String> idsArr = selectSeatList.map((computer) => computer.id.toString()).toList();
 
     final result = await BookingApi.submitBooking(
       storeId: storeModel.id,

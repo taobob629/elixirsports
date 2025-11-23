@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:elixir_esports/api/wy_http.dart';
+import 'package:elixir_esports/models/ad_model.dart';
 import 'package:elixir_esports/utils/platform_utils.dart';
 
 import '../models/version_model.dart';
@@ -52,5 +53,10 @@ class ProfileApi {
     // String platform = Platform.operatingSystem;
     String version = await PlatformUtils.getAppVersion();
     var response = await http.get('app/user/appDeleteUser', queryParameters: ({"version": "", "platform": ""}));
+  }
+
+  static Future<AdModel> checkAdPromote() async {
+    var response = await http.get('app/home/checkAdPromote');
+    return AdModel.fromJson(response.data);
   }
 }

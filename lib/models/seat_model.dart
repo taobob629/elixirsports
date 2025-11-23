@@ -2,28 +2,27 @@ class SeatModel {
   String? image;
   List<Computer> computers;
   List<String> info;
+  String? htmlString;
 
   SeatModel({
     this.image,
+    this.htmlString,
     required this.computers,
     required this.info,
   });
 
   factory SeatModel.fromJson(Map<String, dynamic> json) => SeatModel(
         image: json["image"],
-        computers: json["computers"] == null
-            ? []
-            : List<Computer>.from(
-                json["computers"]!.map((x) => Computer.fromJson(x))),
-        info: json["info"] == null
-            ? []
-            : List<String>.from(json["info"]!.map((x) => x)),
+        computers: json["computers"] == null ? [] : List<Computer>.from(json["computers"]!.map((x) => Computer.fromJson(x))),
+        info: json["info"] == null ? [] : List<String>.from(json["info"]!.map((x) => x)),
+        htmlString: json["htmlString"],
       );
 
   Map<String, dynamic> toJson() => {
         "image": image,
         "computers": List<dynamic>.from(computers.map((x) => x.toJson())),
         "info": List<dynamic>.from(info.map((x) => x)),
+        "htmlString": htmlString,
       };
 }
 

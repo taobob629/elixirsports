@@ -1,7 +1,14 @@
+import 'package:elixir_esports/models/ad_model.dart';
+import 'package:elixir_esports/ui/pages/member/members_page.dart';
+import 'package:elixir_esports/ui/pages/store/select_store_page.dart';
+import 'package:elixir_esports/ui/pages/wallet/top_up_page.dart';
+import 'package:elixir_esports/ui/pages/wallet/wallet_page.dart';
+import 'package:elixir_esports/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../api/home_api.dart';
 import '../api/profile_api.dart';
@@ -38,10 +45,10 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
     bodys.add(TabServicesPage());
     bodys.add(TabMinePage());
 
-    everPosition =
-        ever(locationService.position, (Position? pos) => list.refresh());
+    everPosition = ever(locationService.position, (Position? pos) => list.refresh());
 
     checkVersion();
+    checkAdPromote();
   }
 
   @override
@@ -65,6 +72,73 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
         clickMaskDismiss: !model.force,
         backType: SmartBackType.block,
       );
+    }
+  }
+
+  void checkAdPromote() async {
+    AdModel model = await ProfileApi.checkAdPromote();
+    if (model.image.isNotEmpty) {
+      Get.dialog(Center(
+        child: GestureDetector(
+          onTap: () {
+            Get.back();
+            handleAdPromote(model);
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(model.title),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ImageUtil.networkImage(url: model.image),
+              ),
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: () {
+                  Get.back();
+                },
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  child: const Icon(
+                    Icons.close,
+                    size: 30,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ));
+    }
+  }
+
+  void handleAdPromote(AdModel model) {
+    switch (model.type) {
+      case 'H5':
+        canLaunchUrl(Uri.parse(model.target)).then((val) {
+          launchUrl(Uri.parse(model.target));
+        });
+        break;
+      case 'TopUp':
+        Get.to(() => TopUpPage());
+        break;
+      case 'Bookings':
+        Get.to(() => SelectStorePage());
+        break;
+      case 'Points':
+        Get.to(() => WalletPage());
+        break;
+      case 'ELixirCard':
+        Get.to(() => MemberPage());
+        break;
+      default:
+        break;
     }
   }
 }
