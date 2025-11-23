@@ -59,7 +59,7 @@ class ConfirmDialog extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 child: HtmlWidget(
-                  "$htmlString$htmlString",
+                  "$htmlString",
                   renderMode: RenderMode.column,
                   textStyle: TextStyle(color: toColor('141517')),
                 ),
