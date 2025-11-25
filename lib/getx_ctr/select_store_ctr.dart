@@ -18,6 +18,21 @@ class SelectStoreCtr extends BasePageController {
   void requestData() async {
     isToOnline = Get.arguments ?? false;
     storeList.value = await HomeApi.getStoresList();
+    await getUnreadCount();
+  }
+
+  getUnreadCount() async {
+    var conversationIDList = storeList.map((e) => "c2c_${e.serviceAccount}").toList();
+    var conversationList =
+        (await TencentImSDKPlugin.v2TIMManager.getConversationManager().getConversationListByConversationIds(conversationIDList: conversationIDList)).data ??
+            [];
+    for (var i = 0; i < storeList.length; i++) {
+      var conversation = conversationList[i];
+      if (conversation.unreadCount! > 0) {
+        storeList[i].unreadCount = conversation.unreadCount!;
+      }
+    }
+    storeList.refresh();
   }
 
   void search(String value) async {

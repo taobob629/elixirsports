@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart' as badges;
 import 'package:elixir_esports/base/empty_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,7 +15,6 @@ import '../../../utils/color_utils.dart';
 import '../../widget/search_widget.dart';
 
 class SelectStorePage extends BasePage<SelectStoreCtr> {
-
   @override
   SelectStoreCtr createController() => SelectStoreCtr();
 
@@ -29,8 +29,7 @@ class SelectStorePage extends BasePage<SelectStoreCtr> {
             Expanded(
               child: Obx(() => controller.storeList.isNotEmpty
                   ? ListView.separated(
-                      itemBuilder: (c, i) =>
-                          itemWidget(controller.storeList[i]),
+                      itemBuilder: (c, i) => itemWidget(controller.storeList[i]),
                       separatorBuilder: (c, i) => 15.verticalSpace,
                       itemCount: controller.storeList.length,
                     )
@@ -55,13 +54,27 @@ class SelectStorePage extends BasePage<SelectStoreCtr> {
               Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      model.name ?? '',
-                      style: TextStyle(
-                        color: toColor('#3D3D3D'),
-                        fontFamily: FONT_LIGHT,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: badges.Badge(
+                        showBadge: model.unreadCount > 0,
+                        badgeContent: Text(
+                          '${model.unreadCount}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10.sp,
+                          ),
+                        ),
+                        position: badges.BadgePosition.topEnd(),
+                        child: Text(
+                          model.name ?? '',
+                          style: TextStyle(
+                            color: toColor('#3D3D3D'),
+                            fontFamily: FONT_LIGHT,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
