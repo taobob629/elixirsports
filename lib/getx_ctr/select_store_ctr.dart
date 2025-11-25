@@ -26,13 +26,15 @@ class SelectStoreCtr extends BasePageController {
     var conversationList =
         (await TencentImSDKPlugin.v2TIMManager.getConversationManager().getConversationListByConversationIds(conversationIDList: conversationIDList)).data ??
             [];
-    for (var i = 0; i < storeList.length; i++) {
-      var conversation = conversationList[i];
-      if (conversation.unreadCount! > 0) {
-        storeList[i].unreadCount = conversation.unreadCount!;
+    for (var conversation in conversationList) {
+      if (conversation.unreadCount != null && conversation.unreadCount! > 0) {
+        var index = storeList.indexWhere((e) => e.serviceAccount == conversation.userID);
+        if (index >= 0) {
+          storeList[index].unreadCount = conversation.unreadCount!;
+          storeList.refresh();
+        }
       }
     }
-    storeList.refresh();
   }
 
   void search(String value) async {
