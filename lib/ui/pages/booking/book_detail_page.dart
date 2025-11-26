@@ -219,7 +219,7 @@ class BookDetailPage extends BasePage<BookDetailCtr> {
                                               ),
                                             ),
                                             Text(
-                                              "S\$${e.price}/H",
+                                              "S\$${e.price}/Hrs",
                                               style: TextStyle(
                                                 color: toColor('#3D3D3D'),
                                                 fontFamily: FONT_LIGHT,
@@ -249,7 +249,7 @@ class BookDetailPage extends BasePage<BookDetailCtr> {
                                   ),
                                 ).paddingOnly(right: 6.w),
                                 Text(
-                                  "S\$${controller.bookingDetailModel.value.sites.fold<String>("0", (previousValue, element) => previousValue.add(element.price ?? "0"))}/H",
+                                  "S\$${controller.bookingDetailModel.value.sites.fold<String>("0", (previousValue, element) => previousValue.add(element.price ?? "0"))}/Hrs",
                                   style: TextStyle(
                                     color: toColor('#EA0000'),
                                     fontFamily: FONT_LIGHT,

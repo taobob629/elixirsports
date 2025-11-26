@@ -169,7 +169,7 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                                 ),
                                 Expanded(
                                   child: Obx(() => Text(
-                                        "S\$${controller.totalPrice.value}",
+                                        "S\$${controller.totalPrice.value}/Hrs",
                                         style: TextStyle(
                                           color: toColor('#EA0000'),
                                           fontFamily: FONT_MEDIUM,
