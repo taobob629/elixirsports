@@ -90,7 +90,7 @@ const Map<String, String> zh_CN = {
   'Price': '价格',
   'Discount': '折扣',
   'Pending payment': '待付款',
-  'Remaining Balance': '剩余余额',
+  'Remaining Balance': '余额',
   'Are you sure you want to delete this bank card?': '您确定要删除这张银行卡吗?',
   'Available for caming Free Time': '预计可上网时长',
   'Remaining caming Free Time': '预计可上网时长',
@@ -209,6 +209,8 @@ const Map<String, String> zh_CN = {
   'You are using the latest version':'当前已是最新版本',
   'Are you sure to delete your account?':'你确认删除你的账号吗?',
   'Press again to exit':'再按一次退出',
-  'Delete Account':'删除账户'
+  'Delete Account':'删除账户',
+  'Remaining Reward':'奖励金',
+
 
 };

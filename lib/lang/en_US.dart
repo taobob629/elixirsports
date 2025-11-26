@@ -85,6 +85,7 @@ const Map<String, String> en_US = {
   'Discount': 'Discount',
   'Pending payment': 'Pending payment',
   'Remaining Balance': 'Remaining Balance',
+  'Remaining Reward':'Remaining Reward',
   'Available for caming Free Time': 'Available for gaming Free Time',
   'Remaining caming Free Time': 'Remaining gaming Free Time',
   'Remaining Credit Duration': 'Remaining Credit Duration',

@@ -178,6 +178,8 @@ class ScanToUnlockPage extends BasePage<ScanToUnlockCtr> {
                         controller.scanModel.discount ?? ''),
                     orderingInfoWidget('Remaining Balance'.tr,
                         controller.scanModel.cash ?? ''),
+                    orderingInfoWidget('Remaining Reward'.tr,
+                        controller.scanModel.reward ?? ''),
                   ],
                 ),
               ),
