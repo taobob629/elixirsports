@@ -29,8 +29,7 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
   BookSeatCtr createController() => BookSeatCtr();
 
   void _getImageSize() {
-    RenderBox renderBox =
-        widgetKey.currentContext!.findRenderObject() as RenderBox;
+    RenderBox renderBox = widgetKey.currentContext!.findRenderObject() as RenderBox;
     Size size = renderBox.size;
     flog("width = ${size.width}, height = ${size.height}");
 
@@ -66,21 +65,18 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                         loadStateChanged: (ExtendedImageState state) {
                           switch (state.extendedImageLoadState) {
                             case LoadState.loading:
-                              SchedulerBinding.instance
-                                  .addPostFrameCallback((_) {
+                              SchedulerBinding.instance.addPostFrameCallback((_) {
                                 controller.loadComplete.value = false;
                               });
                               return Container();
                             case LoadState.failed:
-                              SchedulerBinding.instance
-                                  .addPostFrameCallback((_) {
+                              SchedulerBinding.instance.addPostFrameCallback((_) {
                                 dismissLoading();
                                 controller.loadComplete.value = false;
                               });
                               return EmptyView();
                             case LoadState.completed:
-                              SchedulerBinding.instance
-                                  .addPostFrameCallback((_) {
+                              SchedulerBinding.instance.addPostFrameCallback((_) {
                                 dismissLoading();
                                 _getImageSize();
                               });
@@ -94,12 +90,8 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                       if (controller.loadComplete.value)
                         ...controller.seatModel.value.computers.map((element) {
                           // 根据比例调整每个座位图的坐标
-                          double scaledX =
-                              (double.parse(element.lefts ?? "0") / 100) *
-                                  scaledWidth;
-                          double scaledY =
-                              (double.parse(element.tops ?? "0") / 100) *
-                                  scaledHeight;
+                          double scaledX = (double.parse(element.lefts ?? "0") / 100) * scaledWidth;
+                          double scaledY = (double.parse(element.tops ?? "0") / 100) * scaledHeight;
                           return Positioned(
                             left: scaledX,
                             top: scaledY,
@@ -143,86 +135,56 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
             topLeft: Radius.circular(15.r),
           ),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Obx(() => Container(
-                  height: 102.h,
-                  padding: EdgeInsets.only(
-                    left: 15.w,
-                    right: 15.w,
-                    top: 15.h,
-                  ),
-                  child: controller.selectSeatList.isNotEmpty
-                      ? Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Prices".tr,
-                                  style: TextStyle(
-                                    color: toColor('#3D3D3D'),
-                                    fontFamily: FONT_MEDIUM,
-                                    fontSize: 14.sp,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Obx(() => Text(
-                                        "S\$${controller.totalPrice.value}/Hrs",
-                                        style: TextStyle(
-                                          color: toColor('#EA0000'),
-                                          fontFamily: FONT_MEDIUM,
-                                          fontSize: 14.sp,
-                                        ),
-                                      ).paddingOnly(left: 15.w)),
-                                ),
-                                InkWell(
-                                  onTap: () => controller.cancelSelectSeat(),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.black,
-                                        width: 0.5.w,
-                                      ),
-                                      borderRadius: BorderRadius.circular(4.r),
-                                    ),
-                                    width: 60.w,
-                                    height: 30.h,
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      "CANCEL".tr,
-                                      style: TextStyle(
-                                        color: toColor('#1A1A1A'),
-                                        fontSize: 11.sp,
-                                        fontFamily: FONT_MEDIUM,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Obx(() => Container(
+                    height: 102.h,
+                    padding: EdgeInsets.only(
+                      left: 15.w,
+                      right: 15.w,
+                      top: 15.h,
+                    ),
+                    child: controller.selectSeatList.isNotEmpty
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "Prices".tr,
+                                    style: TextStyle(
+                                      color: toColor('#3D3D3D'),
+                                      fontFamily: FONT_MEDIUM,
+                                      fontSize: 14.sp,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              height: 30.h,
-                              margin: EdgeInsets.only(top: 13.h),
-                              child: Obx(() => ListView.separated(
-                                    scrollDirection: Axis.horizontal,
-                                    itemBuilder: (c, i) => Container(
+                                  Expanded(
+                                    child: Obx(() => Text(
+                                          "S\$${controller.totalPrice.value}",
+                                          style: TextStyle(
+                                            color: toColor('#EA0000'),
+                                            fontFamily: FONT_MEDIUM,
+                                            fontSize: 14.sp,
+                                          ),
+                                        ).paddingOnly(left: 15.w)),
+                                  ),
+                                  InkWell(
+                                    onTap: () => controller.cancelSelectSeat(),
+                                    child: Container(
                                       decoration: BoxDecoration(
-                                        color: toColor('#F4FAFA'),
                                         border: Border.all(
                                           color: Colors.black,
                                           width: 0.5.w,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(4.r),
+                                        borderRadius: BorderRadius.circular(4.r),
                                       ),
                                       width: 60.w,
                                       height: 30.h,
                                       alignment: Alignment.center,
                                       child: Text(
-                                        "NO.${controller.selectSeatList[i].name}",
+                                        "CANCEL".tr,
                                         style: TextStyle(
                                           color: toColor('#1A1A1A'),
                                           fontSize: 11.sp,
@@ -231,64 +193,93 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                                         ),
                                       ),
                                     ),
-                                    separatorBuilder: (c, i) =>
-                                        12.horizontalSpace,
-                                    itemCount: controller.selectSeatList.length,
-                                  )),
-                            )
-                          ],
-                        )
-                      : Row(
-                          children: [
-                            commonWidget(
-                              name: 'enable'.tr,
-                              icon: AssetsUtils.seat_white_icon,
-                            ),
-                            commonWidget(
-                              name: 'selected'.tr,
-                              icon: AssetsUtils.seat_green_icon,
-                            ),
-                            commonWidget(
-                              name: 'used'.tr,
-                              icon: AssetsUtils.seat_red_icon,
-                            ),
-                            commonWidget(
-                              name: 'booked'.tr,
-                              icon: AssetsUtils.seat_purple_icon,
-                            ),
-                            commonWidget(
-                              name: 'disable'.tr,
-                              icon: AssetsUtils.seat_gray_icon,
-                            ),
-                          ],
-                        ),
-                )),
-            InkWell(
-              onTap: () => controller.bookASeat(context),
-              child: Container(
-                height: 40.h,
-                decoration: BoxDecoration(
-                  color: toColor('#141517'),
-                  borderRadius: BorderRadius.circular(5.r),
-                ),
-                margin: EdgeInsets.only(
-                  top: 8.h,
-                  bottom: 20.h,
-                  left: 20.w,
-                  right: 20.w,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  "BOOK A SEAT".tr,
-                  style: TextStyle(
-                    color: toColor('ffffff'),
-                    fontFamily: FONT_LIGHT,
-                    fontSize: 14.sp,
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                height: 30.h,
+                                margin: EdgeInsets.only(top: 13.h),
+                                child: Obx(() => ListView.separated(
+                                      scrollDirection: Axis.horizontal,
+                                      itemBuilder: (c, i) => Container(
+                                        decoration: BoxDecoration(
+                                          color: toColor('#F4FAFA'),
+                                          border: Border.all(
+                                            color: Colors.black,
+                                            width: 0.5.w,
+                                          ),
+                                          borderRadius: BorderRadius.circular(4.r),
+                                        ),
+                                        width: 60.w,
+                                        height: 30.h,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          "NO.${controller.selectSeatList[i].name}",
+                                          style: TextStyle(
+                                            color: toColor('#1A1A1A'),
+                                            fontSize: 11.sp,
+                                            fontFamily: FONT_MEDIUM,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      separatorBuilder: (c, i) => 12.horizontalSpace,
+                                      itemCount: controller.selectSeatList.length,
+                                    )),
+                              )
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              commonWidget(
+                                name: 'enable'.tr,
+                                icon: AssetsUtils.seat_white_icon,
+                              ),
+                              commonWidget(
+                                name: 'selected'.tr,
+                                icon: AssetsUtils.seat_green_icon,
+                              ),
+                              commonWidget(
+                                name: 'used'.tr,
+                                icon: AssetsUtils.seat_red_icon,
+                              ),
+                              commonWidget(
+                                name: 'booked'.tr,
+                                icon: AssetsUtils.seat_purple_icon,
+                              ),
+                              commonWidget(
+                                name: 'disable'.tr,
+                                icon: AssetsUtils.seat_gray_icon,
+                              ),
+                            ],
+                          ),
+                  )),
+              InkWell(
+                onTap: () => controller.bookASeat(context),
+                child: Container(
+                  height: 40.h,
+                  decoration: BoxDecoration(
+                    color: toColor('#141517'),
+                    borderRadius: BorderRadius.circular(5.r),
+                  ),
+                  margin: EdgeInsets.only(
+                    top: 8.h,
+                    left: 20.w,
+                    right: 20.w,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "BOOK A SEAT".tr,
+                    style: TextStyle(
+                      color: toColor('ffffff'),
+                      fontFamily: FONT_LIGHT,
+                      fontSize: 14.sp,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

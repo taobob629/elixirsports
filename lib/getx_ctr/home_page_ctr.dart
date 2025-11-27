@@ -4,6 +4,7 @@ import 'package:elixir_esports/ui/pages/store/select_store_page.dart';
 import 'package:elixir_esports/ui/pages/wallet/top_up_page.dart';
 import 'package:elixir_esports/ui/pages/wallet/wallet_page.dart';
 import 'package:elixir_esports/utils/image_util.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -93,19 +94,32 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: ImageUtil.networkImage(url: model.image),
+                child: ExtendedImage.network(
+                  model.image,
+                  fit: BoxFit.cover,
+                  loadStateChanged: (state) {
+                    if (state.extendedImageLoadState == LoadState.loading) {
+                      return AspectRatio(
+                        aspectRatio: 0.75,
+                        child: Container(color: Colors.white, alignment: Alignment.center, child: const CircularProgressIndicator()),
+                      );
+                    }
+                    return null;
+                  },
+                ),
               ),
               const SizedBox(height: 10),
               GestureDetector(
                 onTap: () {
                   Get.back();
                 },
-                child: Container(
+                child: const SizedBox(
                   height: 30,
                   width: 30,
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
                     size: 30,
                     color: Colors.white,
@@ -128,7 +142,7 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
         });
         break;
       case 'page':
-        switch(model.target){
+        switch (model.target) {
           case "TopUp":
             Get.to(() => TopUpPage(message: model.msg));
             break;
