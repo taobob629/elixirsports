@@ -266,6 +266,7 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                     top: 8.h,
                     left: 20.w,
                     right: 20.w,
+                    bottom: GetPlatform.isAndroid ? 20 : 0,
                   ),
                   alignment: Alignment.center,
                   child: Text(
