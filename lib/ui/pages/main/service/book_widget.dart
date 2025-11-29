@@ -308,7 +308,7 @@ class BookWidget extends StatelessWidget {
                                                               ),
                                                             ),
                                                             Text(
-                                                              "S\$${e.price}/H",
+                                                              "S\$${e.price}/Hrs",
                                                               style: TextStyle(
                                                                 color: toColor(
                                                                     '#3D3D3D'),
@@ -345,7 +345,7 @@ class BookWidget extends StatelessWidget {
                                                   ),
                                                 ).paddingOnly(right: 6.w),
                                                 Text(
-                                                  "S\$${ServiceCtr.find.bookingDetailModel.value.sites.fold<String>("0", (previousValue, element) => previousValue.add(element.price ?? "0"))}/H",
+                                                  "S\$${ServiceCtr.find.bookingDetailModel.value.sites.fold<String>("0", (previousValue, element) => previousValue.add(element.price ?? "0"))}/Hrs",
                                                   style: TextStyle(
                                                     color: toColor('#EA0000'),
                                                     fontFamily: FONT_LIGHT,
