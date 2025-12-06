@@ -111,7 +111,7 @@ const Map<String, String> zh_CN = {
   'selected': '已选中',
   'used': '已占用',
   'booked': '已预定',
-  'disable': '不可用',
+  'disable': '不可预定',
   'Order Detail': '订单详情',
   'Select Store': '选择门店',
   'Setting': '设置',
