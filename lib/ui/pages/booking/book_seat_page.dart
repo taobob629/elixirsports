@@ -244,6 +244,10 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                                 icon: AssetsUtils.seat_red_icon,
                               ),
                               commonWidget(
+                                name: 'maintenance'.tr,
+                                icon: AssetsUtils.seat_red_icon,
+                              ),
+                              commonWidget(
                                 name: 'booked'.tr,
                                 icon: AssetsUtils.seat_purple_icon,
                               ),
