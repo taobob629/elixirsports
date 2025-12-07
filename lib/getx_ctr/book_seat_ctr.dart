@@ -38,7 +38,7 @@ class BookSeatCtr extends BasePageController {
     switch (computer.rotate) {
       case "-90":
         switch (computer.status) {
-          // 0：可用；1：已占用；2：已预订；3：不可用
+          // 0：可用；1：已占用；2：已预订；3：不可用,5:维护中
           case 1:
             return AssetsUtils.seat_red_left_icon;
           case 2:
@@ -47,6 +47,9 @@ class BookSeatCtr extends BasePageController {
             return AssetsUtils.seat_gray_left_icon;
           case 4:
             return AssetsUtils.seat_green_left_icon;
+          case 5:
+            return AssetsUtils.seat_orange_left_icon;
+
           default:
             return AssetsUtils.seat_white_left_icon;
         }
@@ -62,6 +65,8 @@ class BookSeatCtr extends BasePageController {
             return AssetsUtils.seat_gray_right_icon;
           case 4:
             return AssetsUtils.seat_green_right_icon;
+          case 5:
+            return AssetsUtils.seat_orange_right_icon;
           default:
             return AssetsUtils.seat_white_right_icon;
         }
@@ -77,6 +82,8 @@ class BookSeatCtr extends BasePageController {
             return AssetsUtils.seat_gray_down_icon;
           case 4:
             return AssetsUtils.seat_green_down_icon;
+          case 5:
+            return AssetsUtils.seat_orange_down_icon;
           default:
             return AssetsUtils.seat_white_down_icon;
         }
@@ -92,6 +99,8 @@ class BookSeatCtr extends BasePageController {
             return AssetsUtils.seat_gray_icon;
           case 4:
             return AssetsUtils.seat_green_icon;
+          case 5:
+            return AssetsUtils.seat_orange_icon;
           default:
             return AssetsUtils.seat_white_icon;
         }

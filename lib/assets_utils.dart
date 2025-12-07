@@ -84,4 +84,9 @@ class AssetsUtils {
   static const String seat_purple_right_icon = 'assets/images/seat/purple_right_icon.webp';
   static const String seat_red_right_icon = 'assets/images/seat/red_right_icon.webp';
   static const String seat_white_right_icon = 'assets/images/seat/white_right_icon.webp';
+  static const String seat_orange_icon = 'assets/images/seat/orange.png';
+  static const String seat_orange_left_icon = 'assets/images/seat/orange_left.png';
+  static const String seat_orange_right_icon = 'assets/images/seat/orange_right.png';
+  static const String seat_orange_down_icon = 'assets/images/seat/orange_down.png';
+
 }
