@@ -17,6 +17,7 @@ const Map<String, String> en_US = {
   'After arriving at the store, scan the code or enter the unlock code to unlock it': 'After arriving at the store, enter the unlock code to unlock computer',
   'ORDERING INFORMATION': 'ORDERING INFORMATION',
   'Order No.': 'Order No.',
+  'maintenance': 'maintenance',
   'Reservation start': 'Reservation start',
   'Reservation ended': 'Reservation ended',
   'SEAT DETAILS': 'SEAT DETAILS',

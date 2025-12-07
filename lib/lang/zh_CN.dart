@@ -211,6 +211,7 @@ const Map<String, String> zh_CN = {
   'Press again to exit':'再按一次退出',
   'Delete Account':'删除账户',
   'Remaining Reward':'奖励金',
+  'maintenance': '维护中',
 
 
 };
