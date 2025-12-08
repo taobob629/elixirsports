@@ -229,33 +229,36 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                               )
                             ],
                           )
-                        : Row(
-                            children: [
-                              commonWidget(
-                                name: 'enable'.tr,
-                                icon: AssetsUtils.seat_white_icon,
-                              ),
-                              commonWidget(
-                                name: 'selected'.tr,
-                                icon: AssetsUtils.seat_green_icon,
-                              ),
-                              commonWidget(
-                                name: 'used'.tr,
-                                icon: AssetsUtils.seat_red_icon,
-                              ),
-                              commonWidget(
-                                name: 'maintenance'.tr,
-                                icon: AssetsUtils.seat_orange_icon,
-                              ),
-                              commonWidget(
-                                name: 'booked'.tr,
-                                icon: AssetsUtils.seat_purple_icon,
-                              ),
-                              commonWidget(
-                                name: 'disable'.tr,
-                                icon: AssetsUtils.seat_gray_icon,
-                              ),
-                            ],
+                        : Padding(
+                            padding: EdgeInsets.only(top: 10.h),
+                            child: Row(
+                              children: [
+                                commonWidget(
+                                  name: 'enable'.tr,
+                                  icon: AssetsUtils.seat_white_icon,
+                                ),
+                                commonWidget(
+                                  name: 'selected'.tr,
+                                  icon: AssetsUtils.seat_green_icon,
+                                ),
+                                commonWidget(
+                                  name: 'used'.tr,
+                                  icon: AssetsUtils.seat_red_icon,
+                                ),
+                                commonWidget(
+                                  name: 'maintenance'.tr,
+                                  icon: AssetsUtils.seat_orange_icon,
+                                ),
+                                commonWidget(
+                                  name: 'booked'.tr,
+                                  icon: AssetsUtils.seat_purple_icon,
+                                ),
+                                commonWidget(
+                                  name: 'disable'.tr,
+                                  icon: AssetsUtils.seat_gray_icon,
+                                ),
+                              ],
+                            ),
                           ),
                   )),
               InkWell(
@@ -295,19 +298,24 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
     required String icon,
   }) =>
       Expanded(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(icon),
-            Text(
-              name,
-              style: TextStyle(
-                color: toColor('#767676'),
-                fontSize: name == 'maintenance'.tr || name=='disable'.tr? 8.sp : 11.sp,
-                fontFamily: FONT_MEDIUM,
+        child: Container(
+          alignment: Alignment.topCenter,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Image.asset(icon),
+              Text(
+                name,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: toColor('#767676'),
+                  fontSize: 11.sp,
+                  fontFamily: FONT_MEDIUM,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
 }
