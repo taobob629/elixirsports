@@ -106,13 +106,13 @@ PODS:
     - Flutter
   - pgw_sdk (4.0.1):
     - Flutter
-  - photo_manager (3.7.1):
+  - photo_manager (3.8.3):
     - Flutter
     - FlutterMacOS
-  - SDWebImage (5.21.1):
-    - SDWebImage/Core (= 5.21.1)
-  - SDWebImage/Core (5.21.1)
-  - SDWebImageWebPCoder (0.14.6):
+  - SDWebImage (5.21.5):
+    - SDWebImage/Core (= 5.21.5)
+  - SDWebImage/Core (5.21.5)
+  - SDWebImageWebPCoder (0.15.0):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.17)
   - sensors_plus (0.0.1):
@@ -131,10 +131,10 @@ PODS:
   - tencent_cloud_chat_sdk (8.0.0):
     - Flutter
     - HydraAsync
-    - TXIMSDK_Plus_iOS_XCFramework (= 8.6.7019)
+    - TXIMSDK_Plus_iOS_XCFramework (~> 8.8.7354)
   - tencent_cloud_uikit_core (0.0.1):
     - Flutter
-  - TXIMSDK_Plus_iOS_XCFramework (8.6.7019)
+  - TXIMSDK_Plus_iOS_XCFramework (8.8.7357)
   - ume_kit_channel_observer (0.0.1):
     - Flutter
   - ume_kit_memory_detector (0.0.1):
@@ -177,7 +177,7 @@ DEPENDENCIES:
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - pgw_sdk (from `.symlinks/plugins/pgw_sdk/ios`)
-  - photo_manager (from `.symlinks/plugins/photo_manager/ios`)
+  - photo_manager (from `.symlinks/plugins/photo_manager/darwin`)
   - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -258,7 +258,7 @@ EXTERNAL SOURCES:
   pgw_sdk:
     :path: ".symlinks/plugins/pgw_sdk/ios"
   photo_manager:
-    :path: ".symlinks/plugins/photo_manager/ios"
+    :path: ".symlinks/plugins/photo_manager/darwin"
   sensors_plus:
     :path: ".symlinks/plugins/sensors_plus/ios"
   share_plus:
@@ -318,18 +318,18 @@ SPEC CHECKSUMS:
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   pgw_sdk: dbce7158c11e2d4f1d3a28653388172ab7961f6f
-  photo_manager: 1d80ae07a89a67dfbcae95953a1e5a24af7c3e62
-  SDWebImage: f29024626962457f3470184232766516dee8dfea
-  SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
+  photo_manager: fe4cbb0808b96f8be4af7ce6ae18dcd9c9b983c6
+  SDWebImage: e9c98383c7572d713c1a0d7dd2783b10599b9838
+  SDWebImageWebPCoder: 0e06e365080397465cc73a7a9b472d8a3bd0f377
   sensors_plus: 1c5f0a01ce21c609a4df404c4e6879d62bce287f
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   store_redirect: 55fd455802ceab09803b2df6e68f19a58815266a
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
-  tencent_cloud_chat_sdk: 2797f99ea8ee1cd9933b9ac866a42575a85fac7a
+  tencent_cloud_chat_sdk: 38c8a02898a7abc995b1bdf42dad5d3cc85e8477
   tencent_cloud_uikit_core: 137e8ae40882b1929508e688182b2818708cc078
-  TXIMSDK_Plus_iOS_XCFramework: cb54f7de6e30e1368c6831c6eff31c25393bbb98
+  TXIMSDK_Plus_iOS_XCFramework: d3635f1a5d26451ccf2324f5e88d90bf4f41e540
   ume_kit_channel_observer: 452c7c6ed3504b3d1e04fc721a0e0da86df9d0e3
   ume_kit_memory_detector: e516776772c144d90979fc83b9246a734315ade9
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
@@ -337,6 +337,6 @@ SPEC CHECKSUMS:
   wakelock_plus: e29112ab3ef0b318e58cfa5c32326458be66b556
   webview_flutter_wkwebview: 1821ceac936eba6f7984d89a9f3bcb4dea99ebb2
 
-PODFILE CHECKSUM: 2058bf11698c18b3a8b3c48e5442453a3bfb74b5
+PODFILE CHECKSUM: ecd02d6dc67a78b8dfa6e8ded35b16e256c8b6d3
 
 COCOAPODS: 1.16.2
