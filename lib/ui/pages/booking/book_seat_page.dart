@@ -303,7 +303,7 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
               name,
               style: TextStyle(
                 color: toColor('#767676'),
-                fontSize: 11.sp,
+                fontSize: name == 'maintenance'.tr ? 8.sp : 11.sp,
                 fontFamily: FONT_MEDIUM,
               ),
             ),
