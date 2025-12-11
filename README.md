@@ -2,8 +2,10 @@
 开发环境：flutter版本  3.29.2 
 
 iOS： flutter build ipa
-android: flutter build apk --flavor arm64
-
+<!-- android: flutter build apk --flavor arm64 -->
+Android：
+aab: 运行脚本 build_abb_release.sh
+apk: 运行脚本 build_apk_release.sh
 
 1、升级xcode和macos以后iOS会编译报错：error: type 'UIApplication' does not conform to protocol 'Launcher'
 extension UIApplication: Launcher {}
