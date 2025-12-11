@@ -29,7 +29,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.elixir.esports"
-    compileSdkVersion 35
+    compileSdk 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -52,7 +52,7 @@ android {
     defaultConfig {
         applicationId "com.elixir.esports"
         minSdkVersion 28
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         ndk {

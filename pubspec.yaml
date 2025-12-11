@@ -97,7 +97,7 @@ dependency_overrides:
   open_file: ^3.5.10
   geolocator: 14.0.1
   uuid: 4.5.1
-  shared_preferences: ^2.3.3
+  shared_preferences: 2.3.3
   ume_kit_device: 2.0.3
   device_info_plus: ^11.5.0
   file: ^7.0.1
