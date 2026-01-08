@@ -166,5 +166,6 @@ const Map<String, String> en_US = {
   'Please enter a valid email address': 'Please enter a valid email address',
   'The passwords you entered twice do not match': 'The passwords you entered twice do not match',
   'Unpaid': 'Unpaid',
-  'Refund': 'Refund'
+  'Refund': 'Refund',
+  "Camera initialization failed":"Camera initialization failed"
 };

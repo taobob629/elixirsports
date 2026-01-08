@@ -212,6 +212,7 @@ const Map<String, String> zh_CN = {
   'Delete Account':'删除账户',
   'Remaining Reward':'奖励金',
   'maintenance': '维护中',
+  "Camera initialization failed":"无法使用相机"
 
 
 };

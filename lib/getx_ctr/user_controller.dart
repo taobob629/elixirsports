@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
-
+import '../ui/pages/scanOrder/login_confirm_page.dart';
+import '../ui/pages/scanOrder/pay_order_page.dart';
 import 'package:elixir_esports/getx_ctr/wallet_ctr.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:get/get.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/material.dart';
 
 import '../../utils/toast_utils.dart';
 import '../api/im_api.dart';
@@ -24,6 +26,15 @@ import '../ui/pages/main/scan/scan_to_unlock_page.dart';
 import '../utils/message/chat_tool.dart';
 import '../utils/storage_manager.dart';
 import '../utils/utils.dart';
+
+import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../config/icon_font.dart'; // 你的字体配置
+import '../../utils/storage_manager.dart'; // 你的本地存储工具
+import '../../ui/pages/scanOrder/scan_qr_page.dart'; // 扫码页面
+import '../../ui/pages/scanOrder/login_confirm_page.dart'; // 登录确认页
+import '../../ui/pages/scanOrder/pay_order_page.dart'; // 订单支付页
+import '../../utils/order_api_utils.dart'; // 订单接口工具类
 
 class UserController extends BasePageController {
   static UserController get find => Get.find();
@@ -212,7 +223,117 @@ class UserController extends BasePageController {
   @override
   void requestData() {}
 
-  void scan() async {
+  Future<void> scan() async {
+    try {
+      // 1. 打开扫码页面，等待返回结果
+      final String? scanResult = await Get.to(const ScanQrPage());
+
+      // 处理用户取消扫码（返回null/空字符串）
+      if (scanResult == null || scanResult.isEmpty) {
+        return;
+      }
+
+      // 2. 核心分支：判断是否为订单二维码（scanOrderPage:xxxxxx）
+      if (scanResult.startsWith('scanOrderPage:')) {
+        // 提取订单号（去掉前缀并去空格）
+        String orderId = scanResult.replaceAll('scanOrderPage:', '').trim();
+
+        // 校验订单号是否为空
+        if (orderId.isEmpty) {
+          Get.snackbar(
+            'Error'.tr,
+            'Invalid order number, please scan a valid QR code'.tr,
+            backgroundColor: const Color(0xFFFF760E).withOpacity(0.8),
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+            margin: EdgeInsets.only(bottom: 20.h, left: 15.w, right: 15.w),
+            duration: const Duration(seconds: 2),
+          );
+          return;
+        }
+
+        // 3. 显示加载弹窗（匹配你的页面深色风格）
+        Get.dialog(
+          Center(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.h),
+              decoration: ShapeDecoration(
+                color: Colors.black.withOpacity(0.8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(color: Color(0xFFFF760E)),
+                  10.horizontalSpace,
+                  Text(
+                    'Loading'.tr,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14.sp,
+                      fontFamily: FONT_MEDIUM,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          barrierDismissible: false, // 禁止点击空白关闭
+        );
+
+        // 4. 请求订单数据（根据订单号）
+        final orderResponse = await OrderApiUtils.getOrderByOrderId(orderId);
+
+        // 关闭加载弹窗
+        Get.back();
+
+        // 5. 根据订单数据跳转对应页面
+        if (orderResponse != null && orderResponse.code == 200 && orderResponse.data != null) {
+          if (orderResponse.data!.needLogin) {
+            // 需要登录 → 跳转到登录确认页
+            Get.to(
+              LoginConfirmPage(
+                loginTips: orderResponse.data!.loginTips,
+                orderData: orderResponse.data!,
+              ),
+            );
+          } else {
+            // 无需登录 → 直接跳转到支付页
+            Get.to(PayOrderPage(orderData: orderResponse.data!));
+          }
+        } else {
+          // 订单数据获取失败提示
+          Get.snackbar(
+            'Error'.tr,
+            orderResponse?.msg ?? 'Failed to get order data'.tr,
+            backgroundColor: const Color(0xFFFF760E).withOpacity(0.8),
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+            margin: EdgeInsets.only(bottom: 20.h, left: 15.w, right: 15.w),
+            duration: const Duration(seconds: 2),
+          );
+        }
+      } else {
+        // 非订单二维码 → 执行你的原有扫码逻辑
+        _handleOriginalScanLogic(scanResult);
+      }
+    } catch (e) {
+      // 通用异常捕获（扫码过程中的所有错误）
+      Get.snackbar(
+        'Error'.tr,
+        'Scan failed: $e'.tr,
+        backgroundColor: const Color(0xFFFF760E).withOpacity(0.8),
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: EdgeInsets.only(bottom: 20.h, left: 15.w, right: 15.w),
+        duration: const Duration(seconds: 2),
+      );
+    }
+  }
+  /// 原有扫码逻辑（保留你自己的业务代码）
+  void _handleOriginalScanLogic(String scanResult) async {
     final value = await Get.to(() => ScanPage());
     flog('value $value');
     if (value == null) {
@@ -222,7 +343,6 @@ class UserController extends BasePageController {
     ScanModel model = await ScanApi.scanInfo(data: data);
     Get.to(() => ScanToUnlockPage(), arguments: model);
   }
-
   void jumpPhoneOrMap({String? phone, String? map}) async {
     if (phone != null) {
       Uri uri = Uri.parse('tel:$phone');
