@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import '../../../utils/order_api_utils.dart';
 
 // 优惠券模型（保留）
-class CouponModel {
+class SelectCouponModel {
   final String couponId;
   final String name;
   final String expireTime;
@@ -15,7 +15,7 @@ class CouponModel {
   final String? useDesc;
   bool isSelected;
 
-  CouponModel({
+  SelectCouponModel({
     required this.couponId,
     required this.name,
     required this.expireTime,
@@ -33,7 +33,7 @@ class CouponSelectPage extends StatefulWidget {
 }
 
 class _CouponSelectPageState extends State<CouponSelectPage> {
-  List<CouponModel> _couponList = [];
+  List<SelectCouponModel> _couponList = [];
   bool _isLoading = true;
   String? _selectedCouponId;
 
@@ -48,7 +48,7 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
       SmartDialog.showLoading(msg: "Loading coupons...".tr);
       // 调用整合后的接口
       final response = await OrderApiUtils.getCustomerCoupon();
-      _couponList = response.map((item) => CouponModel(
+      _couponList = response.map((item) => SelectCouponModel(
         couponId: item['couponId'] ?? '',
         name: item['name'] ?? '',
         expireTime: item['expireTime'] ?? '',
@@ -85,7 +85,7 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
         'couponId': usedCouponId,
         'discountAmount': discountAmount,
       });
-      showToast("Coupon applied successfully".tr);
+      // showToast("Coupon applied successfully".tr);
     } catch (e) {
       debugPrint('使用优惠券失败：$e');
       showError(e.toString());

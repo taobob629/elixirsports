@@ -20,8 +20,9 @@ class OrderData {
   final String orderId;
   final String orderTitle;
   final List<GoodsModel> goodsList;
-  final List<CouponModel> couponList;
+  // final List<CouponModel> couponList;
   final AmountInfo amountInfo;
+  final int couponLength;
 
   OrderData({
     required this.needLogin,
@@ -29,8 +30,10 @@ class OrderData {
     required this.orderId,
     required this.orderTitle,
     required this.goodsList,
-    required this.couponList,
+    // required this.couponList,
     required this.amountInfo,
+    required this.couponLength,
+
   });
 
   factory OrderData.fromJson(Map<String, dynamic> json) {
@@ -38,15 +41,17 @@ class OrderData {
     List<GoodsModel> goodsList = goodsListJson.map((i) => GoodsModel.fromJson(i)).toList();
 
     var couponListJson = json['couponList'] as List;
-    List<CouponModel> couponList = couponListJson.map((i) => CouponModel.fromJson(i)).toList();
+    // List<CouponModel> couponList = couponListJson.map((i) => CouponModel.fromJson(i)).toList();
 
     return OrderData(
       needLogin: json['needLogin'],
       loginTips: json['loginTips'],
       orderId: json['orderId'],
+      couponLength: json['couponLength'],
+
       orderTitle: json['orderTitle'],
       goodsList: goodsList,
-      couponList: couponList,
+      // couponList: couponList,
       amountInfo: AmountInfo.fromJson(json['amountInfo']),
     );
   }

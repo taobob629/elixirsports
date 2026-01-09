@@ -35,6 +35,7 @@ import '../../ui/pages/scanOrder/scan_qr_page.dart'; // 扫码页面
 import '../../ui/pages/scanOrder/login_confirm_page.dart'; // 登录确认页
 import '../../ui/pages/scanOrder/pay_order_page.dart'; // 订单支付页
 import '../../utils/order_api_utils.dart'; // 订单接口工具类
+import '../../models/order_model.dart'; // 订单接口工具类
 
 class UserController extends BasePageController {
   static UserController get find => Get.find();
@@ -247,12 +248,12 @@ class UserController extends BasePageController {
             colorText: Colors.white,
             snackPosition: SnackPosition.BOTTOM,
             margin: EdgeInsets.only(bottom: 20.h, left: 15.w, right: 15.w),
-            duration: const Duration(seconds: 2),
+            duration: const Duration(seconds: 3),
           );
           return;
         }
 
-        // 3. 显示加载弹窗（匹配你的页面深色风格）
+        // 3. 显示加载弹窗
         Get.dialog(
           Center(
             child: Container(
@@ -283,28 +284,52 @@ class UserController extends BasePageController {
           barrierDismissible: false, // 禁止点击空白关闭
         );
 
-        // 4. 请求订单数据（根据订单号）
-        final orderResponse = await OrderApiUtils.getOrderByOrderId(orderId);
+        OrderResponse? orderResponse; // 订单响应数据
+        try {
+          // 4. 请求订单数据（增加10秒超时处理）
+          orderResponse = await OrderApiUtils.getOrderByOrderId(orderId)
+              .timeout(const Duration(seconds: 10), onTimeout: () {
+            throw Exception('Request timeout, please try again later');
+          });
+        } catch (e) {
+          // 请求异常：先关闭弹窗，再提示
+          Get.back(); // 必须先关闭弹窗
+          Get.snackbar(
+            'Error'.tr,
+            'Failed to get order data: ${e.toString()}'.tr,
+            backgroundColor: const Color(0xFFFF760E).withOpacity(0.8),
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+            margin: EdgeInsets.only(bottom: 20.h, left: 15.w, right: 15.w),
+            duration: const Duration(seconds: 3),
+          );
+          return; // 终止后续逻辑
+        } finally {
+          // 最终保障：无论成功/失败，都关闭弹窗（防止漏关）
+          if (Get.isDialogOpen == true) {
+            Get.back();
+          }
+        }
 
-        // 关闭加载弹窗
-        Get.back();
-
-        // 5. 根据订单数据跳转对应页面
+        // 5. 弹窗已关闭，再处理页面跳转
         if (orderResponse != null && orderResponse.code == 200 && orderResponse.data != null) {
           if (orderResponse.data!.needLogin) {
             // 需要登录 → 跳转到登录确认页
-            Get.to(
+            print("需要登录");
+            await Get.to(
               LoginConfirmPage(
                 loginTips: orderResponse.data!.loginTips,
                 orderData: orderResponse.data!,
               ),
             );
           } else {
+            print("直接跳转到支付页");
             // 无需登录 → 直接跳转到支付页
-            Get.to(PayOrderPage(orderData: orderResponse.data!));
+            await Get.to(PayOrderPage(orderData: orderResponse.data!));
           }
         } else {
-          // 订单数据获取失败提示
+          print("报错了，订单数据获取失败提示");
+          // 订单数据无效：提示用户
           Get.snackbar(
             'Error'.tr,
             orderResponse?.msg ?? 'Failed to get order data'.tr,
@@ -315,25 +340,54 @@ class UserController extends BasePageController {
             duration: const Duration(seconds: 2),
           );
         }
+
       } else {
-        // 非订单二维码 → 执行你的原有扫码逻辑
-        _handleOriginalScanLogic(scanResult);
+        // 非订单二维码：内层捕获异常，避免冒泡到外层
+        try {
+          _handleOriginalScanLogic(scanResult); // 补加await，确保异步完成
+        } catch (innerE) {
+          print('非订单二维码逻辑异常：$innerE');
+          Get.snackbar(
+            'Non-Order QR Code'.tr,
+            'Invalid QR code: ${innerE.toString()}'.tr,
+            backgroundColor: Colors.black.withOpacity(0.8),
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+            margin: EdgeInsets.only(bottom: 20.h, left: 15.w, right: 15.w),
+            duration: const Duration(seconds: 5),
+          );
+        }
       }
     } catch (e) {
-      // 通用异常捕获（扫码过程中的所有错误）
+      print('扫码流程全局异常：$e');
+      // 全局异常：若有弹窗未关，先关闭
+      if (Get.isDialogOpen == true) {
+        Get.back();
+      }
       Get.snackbar(
         'Error'.tr,
-        'Scan failed: $e'.tr,
+        'Scan failed: ${e.toString()}'.tr,
         backgroundColor: const Color(0xFFFF760E).withOpacity(0.8),
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
         margin: EdgeInsets.only(bottom: 20.h, left: 15.w, right: 15.w),
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 5),
       );
     }
   }
-  /// 原有扫码逻辑（保留你自己的业务代码）
+// 补全/修复原有扫码逻辑
   void _handleOriginalScanLogic(String scanResult) async {
+    // 临时：仅显示扫码结果，无其他操作（确认无异常后再恢复原有逻辑）
+    Get.snackbar(
+      'Scan Result'.tr,
+      scanResult,
+      backgroundColor: Colors.black.withOpacity(0.8),
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+      margin: EdgeInsets.only(bottom: 20.h, left: 15.w, right: 15.w),
+      duration: const Duration(seconds: 3),
+    );
+
     final value = await Get.to(() => ScanPage());
     flog('value $value');
     if (value == null) {
@@ -343,6 +397,17 @@ class UserController extends BasePageController {
     ScanModel model = await ScanApi.scanInfo(data: data);
     Get.to(() => ScanToUnlockPage(), arguments: model);
   }
+  /// 原有扫码逻辑（保留你自己的业务代码）
+  // void _handleOriginalScanLogic(String scanResult) async {
+  //   final value = await Get.to(() => ScanPage());
+  //   flog('value $value');
+  //   if (value == null) {
+  //     return;
+  //   }
+  //   String data = value.toString();
+  //   ScanModel model = await ScanApi.scanInfo(data: data);
+  //   Get.to(() => ScanToUnlockPage(), arguments: model);
+  // }
   void jumpPhoneOrMap({String? phone, String? map}) async {
     if (phone != null) {
       Uri uri = Uri.parse('tel:$phone');

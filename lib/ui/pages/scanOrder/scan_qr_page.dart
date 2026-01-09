@@ -4,6 +4,17 @@ import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../config/icon_font.dart'; // 你的字体配置
 import '../../../getx_ctr/user_controller.dart'; // UserController
+// 导入所有必要的包
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ScanQrPage extends StatefulWidget {
   const ScanQrPage({super.key});
@@ -12,116 +23,150 @@ class ScanQrPage extends StatefulWidget {
   State<ScanQrPage> createState() => _ScanQrPageState();
 }
 
-class _ScanQrPageState extends State<ScanQrPage> with WidgetsBindingObserver {
-  late MobileScannerController _controller;
-  bool _isScanning = true; // 防止重复扫码
+class _ScanQrPageState extends State<ScanQrPage> {
+  MobileScannerController? _controller;
+  bool _isScanning = false;
 
   @override
   void initState() {
     super.initState();
-    // 初始化控制器（仅保留核心扫码配置，移除所有闪光灯相关）
+    // 初始化扫码控制器
     _controller = MobileScannerController(
+      facing: CameraFacing.back,
       detectionSpeed: DetectionSpeed.normal,
-      facing: CameraFacing.back, // 7.0.1 正确字段名
-      formats: const [BarcodeFormat.qrCode], // 仅扫描二维码
-      // 移除 torchEnabled 配置，默认关闭闪光灯
+      autoStart: true,
     );
 
-    // 监听扫码结果（核心逻辑，无任何改动）
-    _controller.barcodes.listen((BarcodeCapture barcodeCapture) {
-      if (_isScanning &&
-          barcodeCapture.barcodes.isNotEmpty &&
-          barcodeCapture.barcodes.first.rawValue != null) {
-        _isScanning = false; // 锁定，避免重复触发
-        String scanResult = barcodeCapture.barcodes.first.rawValue!;
-        Get.back(result: scanResult); // 返回结果到上一页
-      }
-    });
-
-    WidgetsBinding.instance.addObserver(this);
+    // 模拟器适配：启动后自动模拟扫码
+    _checkEmulatorAndSimulateScan();
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _controller.dispose();
-    super.dispose();
+  // 判断是否为模拟器
+  Future<bool> _isEmulator() async {
+    if (!Platform.isAndroid) return false; // 仅处理安卓模拟器
+    final AndroidDeviceInfo info = await DeviceInfoPlugin().androidInfo;
+    return !info.isPhysicalDevice; // true = 模拟器，false = 真机
+  }
+
+  // 模拟器中模拟扫码（适配mobile_scanner 7.0.1）
+  Future<void> _simulateQrScan() async {
+    if (!_isScanning) {
+      _isScanning = true;
+      try {
+        // 步骤1：将assets中的二维码图片保存到模拟器本地（7.0.1仅支持文件路径）
+        final ByteData data = await rootBundle.load('assets/images/scanOrderPage.png');
+        final Uint8List bytes = data.buffer.asUint8List();
+        // 保存到模拟器临时目录
+        final String tempPath = (await getTemporaryDirectory()).path;
+        final File tempFile = File('$tempPath/scanOrderPage.png');
+        await tempFile.writeAsBytes(bytes);
+
+        // 步骤2：使用图片路径解析二维码（7.0.1的analyzeImage仅支持String路径）
+        final BarcodeCapture? capture = await _controller?.analyzeImage(tempFile.path);
+        if (capture != null && capture.barcodes.isNotEmpty) {
+          String? qrContent = capture.barcodes.first.rawValue;
+          if (qrContent != null) {
+            // 返回扫码结果到上一页（GetX路由）
+            Get.back(result: qrContent);
+          }
+        }
+      } catch (e) {
+        print('模拟扫码失败：$e');
+        _isScanning = false;
+      }
+    }
+  }
+
+  // 检查是否为模拟器，若是则模拟扫码
+  Future<void> _checkEmulatorAndSimulateScan() async {
+    bool isEmulator = await _isEmulator();
+    if (isEmulator) {
+      // 延迟1秒，确保控制器初始化完成
+      await Future.delayed(const Duration(seconds: 1));
+      await _simulateQrScan();
+    }
+  }
+
+  // 真机扫码回调
+  void _onDetect(BarcodeCapture capture) {
+    final List<Barcode> barcodes = capture.barcodes;
+    if (barcodes.isNotEmpty && !_isScanning) {
+      _isScanning = true;
+      String? qrContent = barcodes.first.rawValue;
+      Get.back(result: qrContent); // 返回结果
+    }
+  }
+
+  // 从相册选择二维码图片（可选功能）
+  Future<void> _pickImageFromGallery() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      final BarcodeCapture? capture = await _controller?.analyzeImage(image.path);
+      if (capture != null && capture.barcodes.isNotEmpty) {
+        Get.back(result: capture.barcodes.first.rawValue);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // 深色背景适配你的页面风格
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text('Scan QR Code'),
+        backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.white),
+          onPressed: () => Get.back(), // 关闭扫码页
+        ),
+        actions: [
+          // 相册选择按钮（可选）
+          IconButton(
+            icon: const Icon(Icons.photo_library, color: Colors.white),
+            onPressed: _pickImageFromGallery,
+          ),
+        ],
+      ),
       body: Stack(
         children: [
-          // 扫码预览层（仅保留核心配置，移除errorBuilder外的所有冗余）
+          // 扫码预览（真机显示摄像头，模拟器无画面但不影响逻辑）
           MobileScanner(
             controller: _controller,
-            fit: BoxFit.cover,
+            onDetect: _onDetect,
+            // 修复：移除多余的 child 参数，仅保留 context 和 error
             errorBuilder: (context, error) {
               return Center(
                 child: Text(
-                  'Camera initialization failed'.tr,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.sp,
-                    fontFamily: FONT_MEDIUM,
-                  ),
-                  textAlign: TextAlign.center,
+                  'Scanner error: $error',
+                  style: const TextStyle(color: Colors.white),
                 ),
               );
             },
           ),
-
-          // 仅保留返回按钮，移除闪光灯按钮
-          Positioned(
-            top: 40.h,
-            left: 10.w,
-            child: IconButton(
-              onPressed: () => Get.back(),
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-                size: 20.sp,
-              ),
-            ),
-          ),
-
-          // 扫码框（视觉引导，保留原有风格）
-          Center(
-            child: Container(
-              width: 250.w,
-              height: 250.w,
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFFFF760E), width: 2.w),
-                borderRadius: BorderRadius.circular(15.r),
-                color: Colors.black.withOpacity(0.5),
-                backgroundBlendMode: BlendMode.srcOver,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(13.r),
-                child: Container(color: Colors.transparent),
-              ),
-            ),
-          ),
-
-          // 底部提示文字（保留）
-          Positioned(
-            bottom: 80.h,
-            left: 0,
-            right: 0,
-            child: Text(
-              'Align the QR code within the frame'.tr,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14.sp,
-                fontFamily: FONT_LIGHT,
-              ),
-            ),
+          // 模拟器提示（可选）
+          FutureBuilder<bool>(
+            future: _isEmulator(),
+            builder: (context, snapshot) {
+              if (snapshot.data == true) {
+                return const Center(
+                  child: Text(
+                    '模拟器模式：自动识别测试二维码',
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
   }
 }

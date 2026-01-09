@@ -3,6 +3,7 @@ import 'package:elixir_esports/api/wy_http.dart';
 import '../base/base_http.dart';
 import '../models/bank_card_model.dart';
 import '../models/coupon_list_model.dart';
+import '../models/order_model.dart';
 import '../models/pay_result_model.dart';
 import '../models/pgw_pay_model.dart';
 import '../models/wallet_model.dart';
@@ -68,7 +69,17 @@ class WalletApi {
         }));
     return PgwPayModel.fromJson(response.data);
   }
-
+  // 或者PGW的支付Token
+  static Future<PgwPayModel?> balancePay({
+    required Map<String, dynamic> map,
+  }) async {
+    var response = await http.post('app/pay/balancePay',
+        data: map,
+        options: Options(extra: {
+          "showLoading": false,
+        }));
+    return PgwPayModel.fromJson(response.data);
+  }
   // 获取支付结果
   static Future<PayResultModel?> getPGWPaymentResult({
     required String orderSN,
