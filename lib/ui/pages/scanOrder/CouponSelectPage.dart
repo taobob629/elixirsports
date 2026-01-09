@@ -80,7 +80,7 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
       // 调用整合后的接口
       final response = await OrderApiUtils.useCoupon(_selectedCouponId!);
       final usedCouponId = response['couponId'] ?? '';
-      final  discountAmount = double.tryParse(response['discountAmount'].toString()) ?? 0.0;
+      final discountAmount = double.tryParse(response['discountAmount'].toString()) ?? 0.0;
       Get.back(result: {
         'couponId': usedCouponId,
         'discountAmount': discountAmount,
@@ -123,21 +123,53 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
           icon: const Icon(Icons.arrow_back_ios, color: Color(0xff333333)),
           onPressed: () => Get.back(),
         ),
-        actions: [
-          TextButton(
-            onPressed: _selectedCouponId != null ? _confirmUseCoupon : null,
-            child: Text(
-              "Confirm".tr,
-              style: TextStyle(
-                fontSize: 15.sp,
-                color: _selectedCouponId != null ? toColor('#1890ff') : toColor('#cccccc'),
-                fontWeight: FontWeight.bold,
+        // 移除顶部的确认按钮
+        actions: const [],
+      ),
+      // 核心修改：使用Stack+Column实现底部固定按钮，列表可滚动
+      body: Stack(
+        children: [
+          // 1. 优惠券列表（占满屏幕，底部留按钮空间）
+          Padding(
+            padding: EdgeInsets.only(bottom: 60.h), // 给底部按钮留50h高度+10h间距
+            child: _buildBody(),
+          ),
+          // 2. 底部固定确认按钮 - 修复color和decoration冲突问题
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              height: 60.h,
+              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
+              // 核心修复：删除单独的color属性，将颜色移到decoration中
+              decoration: BoxDecoration(
+                color: Colors.white, // 原color属性移到这里
+                border: Border(top: BorderSide(color: toColor('#EEEEEE'), width: 1.w)),
+              ),
+              child: ElevatedButton(
+                onPressed: _selectedCouponId != null ? _confirmUseCoupon : null,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(1.sw, 48.h),
+                  backgroundColor: _selectedCouponId != null ? toColor('#1890ff') : toColor('#cccccc'),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  "Confirm".tr,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ),
         ],
       ),
-      body: _buildBody(),
     );
   }
 
@@ -168,7 +200,7 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
     return Container(
       width: 1.sw,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white, // 优惠券卡片背景色移到decoration中
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: coupon.isSelected ? toColor('#1890ff') : toColor('#EEEEEE'),
