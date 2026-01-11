@@ -11,7 +11,7 @@ import '../../../../utils/image_util.dart';
 import '../../../base/base_page.dart';
 import '../../../base/base_scaffold.dart';
 import '../../../getx_ctr/order_list_ctr.dart';
-import 'order_detail_page.dart';
+import 'new_order_detail_page.dart';
 
 class OrderListPage extends BasePage<OrderListCtr> {
   @override
@@ -36,7 +36,7 @@ class OrderListPage extends BasePage<OrderListCtr> {
       );
 
   Widget itemWidget(OrderRow model) => InkWell(
-        onTap: () => Get.to(() => OrderDetailPage(), arguments: model.id),
+        onTap: () => Get.to(() => NewOrderDetailPage(), arguments: model.id),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,

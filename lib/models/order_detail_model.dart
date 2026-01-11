@@ -6,6 +6,9 @@ class OrderDetailModel {
   String? tax;
   String? tel;
   String? time;
+  String? service;
+  String? memberDiscount;
+
   String? subTotal;
   String? store;
   dynamic map;
@@ -20,6 +23,8 @@ class OrderDetailModel {
     this.tax,
     this.tel,
     this.time,
+    this.service,
+    this.memberDiscount,
     this.subTotal,
     this.store,
     this.map,
@@ -37,6 +42,9 @@ class OrderDetailModel {
         tel: json["tel"],
         time: json["time"],
         subTotal: json["subTotal"],
+        service:json["service"],
+        memberDiscount:json["memberDiscount"],
+
         store: json["store"],
         map: json["map"],
         items: json["items"] == null
@@ -52,6 +60,8 @@ class OrderDetailModel {
         "orderSn": orderSn,
         "discount": discount,
         "tax": tax,
+        "service": service,
+        "memberDiscount": memberDiscount,
         "tel": tel,
         "time": time,
         "subTotal": subTotal,
@@ -67,12 +77,14 @@ class OrderDetailItem {
   String? name;
   double? price;
   String? image;
+  List<String> keywords;
 
   OrderDetailItem({
     this.num,
     this.name,
     this.price,
     this.image,
+    this.keywords = const [],
   });
 
   factory OrderDetailItem.fromJson(Map<String, dynamic> json) =>
@@ -81,6 +93,9 @@ class OrderDetailItem {
         name: json["name"],
         price: json["price"],
         image: json["image"],
+        keywords: json["keywords"] == null
+            ? []
+            : List<String>.from(json["keywords"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -88,5 +103,6 @@ class OrderDetailItem {
         "name": name,
         "price": price,
         "image": image,
+        "keywords": keywords,
       };
 }

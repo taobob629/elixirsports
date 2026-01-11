@@ -10,23 +10,21 @@ class OrderApiUtils {
     try {
       // 替换为你的实际订单接口地址，拼接订单号参数
       final response = await http.get(
-        Uri.parse('http://146.56.192.175:8091/app/home/getScanOrder?orderId=$orderId'),
-        headers: {
-          'Content-Type': 'application/json',
-          // 可添加token等请求头，比如从StorageManager获取
-          // 'Authorization': 'Bearer ${StorageManager.getToken()}',
-        },
+        Uri.parse('http://146.56.192.175:8091/app/scanOrder/getScanOrder?orderId=$orderId'),
+          headers: ApiConfig.defaultHeaders,
       );
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
+        print("jsonData:${jsonData}");
         return OrderResponse.fromJson(jsonData);
       } else {
-        Get.snackbar('错误', '订单接口请求失败：${response.statusCode}');
+        print('错误，订单接口请求失败：${response.statusCode}');
         return null;
       }
     } catch (e) {
-      Get.snackbar('错误', '网络异常：$e');
+      print('错误网络异常：$e');
+      e.printError();
       return null;
     }
   }
@@ -35,11 +33,10 @@ class OrderApiUtils {
 
   // ===================== 新增优惠券接口 =====================
   /// 获取用户优惠券列表
-  /// 接口地址：/app/home/getCustomerCoupon
-  static Future<List<dynamic>> getCustomerCoupon() async {
+  static Future<List<dynamic>> getCustomerCoupon(String orderId) async {
     try {
-      final url = Uri.parse("${ApiConfig.baseUrl}/app/home/getCustomerCoupon");
-      print("${ApiConfig.baseUrl}/app/home/getCustomerCoupon");
+      final url = Uri.parse("${ApiConfig.baseUrl}/app/scanOrder/getCustomerCoupon?orderId=$orderId");
+      print("${ApiConfig.baseUrl}/app/scanOrder/getCustomerCoupon");
 
       final response = await http.get(
         url,
@@ -53,21 +50,26 @@ class OrderApiUtils {
       throw Exception("Failed to load coupons");
     }
   }
-
-  /// 使用优惠券
-  /// 接口地址：/app/home/useCoupon?couponId=xxx
-  /// [couponId] 优惠券ID
-  static Future<Map<String, dynamic>> useCoupon(String couponId) async {
+  static Future<Map<String, dynamic>?> useCoupon(String orderId, String couponId) async {
     try {
-      final url = Uri.parse("${ApiConfig.baseUrl}/app/home/useCoupon?couponId=$couponId");
+      final url = Uri.parse("${ApiConfig.baseUrl}/app/scanOrder/useCoupon?orderId=$orderId&couponId=$couponId");
+
       final response = await http.get(
         url,
         headers: ApiConfig.defaultHeaders,
       );
-      final data = json.decode(response.body);
-      return data['data'] ?? {}; // 返回使用结果（空对象兜底）
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print(data.toString());
+        return data['data'] ?? {}; // 返回优惠券结果
+      } else {
+        print('Error: useCoupon API failed with status code: ${response.statusCode}');
+        return null;
+      }
     } catch (e) {
-      throw Exception("Failed to apply coupon");
+      print('Error: useCoupon API error: $e');
+      throw Exception("Failed to use coupon");
     }
   }
 

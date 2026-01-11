@@ -16,21 +16,23 @@ class OrderResponse {
 
 class OrderData {
   final bool needLogin;
+  final bool openOrder;
+
   final String loginTips;
   final String orderId;
   final String orderTitle;
   final List<GoodsModel> goodsList;
-  // final List<CouponModel> couponList;
   final AmountInfo amountInfo;
   final int couponLength;
 
   OrderData({
     required this.needLogin,
+    required this.openOrder,
+
     required this.loginTips,
     required this.orderId,
     required this.orderTitle,
     required this.goodsList,
-    // required this.couponList,
     required this.amountInfo,
     required this.couponLength,
 
@@ -40,18 +42,14 @@ class OrderData {
     var goodsListJson = json['goodsList'] as List;
     List<GoodsModel> goodsList = goodsListJson.map((i) => GoodsModel.fromJson(i)).toList();
 
-    var couponListJson = json['couponList'] as List;
-    // List<CouponModel> couponList = couponListJson.map((i) => CouponModel.fromJson(i)).toList();
-
     return OrderData(
       needLogin: json['needLogin'],
+      openOrder: json['openOrder'],
       loginTips: json['loginTips'],
       orderId: json['orderId'],
       couponLength: json['couponLength'],
-
       orderTitle: json['orderTitle'],
       goodsList: goodsList,
-      // couponList: couponList,
       amountInfo: AmountInfo.fromJson(json['amountInfo']),
     );
   }
@@ -65,6 +63,7 @@ class GoodsModel {
   final String discountType;
   final double discountAmount;
   final int count;
+  final List<String> keyWord; // 纯字符串
 
   GoodsModel({
     required this.goodsId,
@@ -74,6 +73,8 @@ class GoodsModel {
     required this.discountType,
     required this.discountAmount,
     required this.count,
+    required this.keyWord,
+
   });
 
   factory GoodsModel.fromJson(Map<String, dynamic> json) {
@@ -85,49 +86,50 @@ class GoodsModel {
       discountType: json['discountType'],
       discountAmount: json['discountAmount'].toDouble(),
       count: json['count'],
+      keyWord: (json['keyWord'] as List?)?.map((e) => e.toString()).toList() ?? [],
     );
   }
 }
 
-class CouponModel {
-  final String couponId;
-  final String couponName;
-  final double couponValue;
-
-  CouponModel({
-    required this.couponId,
-    required this.couponName,
-    required this.couponValue,
-  });
-
-  factory CouponModel.fromJson(Map<String, dynamic> json) {
-    return CouponModel(
-      couponId: json['couponId'],
-      couponName: json['couponName'],
-      couponValue: json['couponValue'].toDouble(),
-    );
-  }
-}
 
 class AmountInfo {
   final double totalGoodsPrice;
-  final double totalDiscountPrice;
   final double selectedCouponValue;
   final double payAmount;
+  final double memberDiscountPrice;
+  final double tax;
+  final double service;
+  final double subTotal;
+  final double couponDiscount;
+
+
+
 
   AmountInfo({
     required this.totalGoodsPrice,
-    required this.totalDiscountPrice,
+    required this.couponDiscount,
     required this.selectedCouponValue,
     required this.payAmount,
+    required this.memberDiscountPrice,
+    required this.tax,
+    required this.service,
+    required this.subTotal,
+
+
   });
 
   factory AmountInfo.fromJson(Map<String, dynamic> json) {
     return AmountInfo(
       totalGoodsPrice: json['totalGoodsPrice'].toDouble(),
-      totalDiscountPrice: json['totalDiscountPrice'].toDouble(),
+      couponDiscount: json['couponDiscount'].toDouble(),
       selectedCouponValue: json['selectedCouponValue'].toDouble(),
       payAmount: json['payAmount'].toDouble(),
+      memberDiscountPrice: json['memberDiscountPrice'].toDouble(),
+      tax: json['tax'].toDouble(),
+      service: json['service'].toDouble(),
+      subTotal: json['subTotal'].toDouble(),
+
+
     );
   }
 }

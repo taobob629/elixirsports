@@ -16,7 +16,7 @@ class OrderApi {
   }
 
   static Future<OrderDetailModel> storeOrderDetail({
-    required int orderId,
+    required var orderId,
   }) async {
     var response =
         await http.get('app/user/storeOrderDetail', queryParameters: {
