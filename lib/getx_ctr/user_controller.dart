@@ -34,7 +34,7 @@ import '../../utils/storage_manager.dart'; // 你的本地存储工具
 import '../../ui/pages/scanOrder/scan_qr_page.dart'; // 扫码页面
 import '../../ui/pages/scanOrder/login_confirm_page.dart'; // 登录确认页
 import '../../ui/pages/scanOrder/pay_order_page.dart'; // 订单支付页
-import '../../utils/order_api_utils.dart'; // 订单接口工具类
+import '../api/order_api.dart'; // 订单接口
 import '../../models/order_model.dart'; // 订单接口工具类
 
 class UserController extends BasePageController {
@@ -288,7 +288,7 @@ class UserController extends BasePageController {
         OrderResponse? orderResponse; // 订单响应数据
         try {
           // 4. 请求订单数据（增加10秒超时处理）
-          orderResponse = await OrderApiUtils.getOrderByOrderId(orderId)
+          orderResponse = await OrderApi.getOrderByOrderId(orderId)
               .timeout(const Duration(seconds: 10), onTimeout: () {
             throw Exception('Request timeout, please try again later');
           });

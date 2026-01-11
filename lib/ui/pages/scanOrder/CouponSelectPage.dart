@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-import '../../../utils/order_api_utils.dart';
+import '../../../api/order_api.dart';
 
 // 优惠券模型（保留）
 class SelectCouponModel {
@@ -53,7 +53,7 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
     try {
       SmartDialog.showLoading(msg: "Loading coupons...".tr);
       // 调用接口
-      final response = await OrderApiUtils.getCustomerCoupon(widget.orderId);
+      final response = await OrderApi.getCustomerCoupon(widget.orderId);
 
       // 关键修复1：校验response是否为List，非List则置为空列表
       if (response == null || response is! List) {
@@ -67,8 +67,10 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
         // 安全解析每个字段，避免null报错
         String couponId = item['couponId']?.toString() ?? '';
         String name = item['name']?.toString() ?? 'Unnamed coupon'.tr;
-        String expireTime = item['expireTime']?.toString() ?? 'No expiration date'.tr;
-        double couponDiscount = double.tryParse(item['couponDiscount'].toString()) ?? 0.0;
+        String expireTime =
+            item['expireTime']?.toString() ?? 'No expiration date'.tr;
+        double couponDiscount =
+            double.tryParse(item['couponDiscount'].toString()) ?? 0.0;
         String? useDesc = item['useDesc']?.toString();
 
         return SelectCouponModel(
@@ -107,10 +109,10 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
     try {
       // 显示加载状态
       SmartDialog.showLoading(msg: "Applying coupon...".tr);
-      
+
       // 2. 根据选中的couponId找到对应的优惠券对象
       SelectCouponModel selectedCoupon = _couponList.firstWhere(
-            (coupon) => coupon.couponId == _selectedCouponId,
+        (coupon) => coupon.couponId == _selectedCouponId,
         // 兜底返回空优惠券（避免firstWhere抛错）
         orElse: () => SelectCouponModel(
           couponId: "",
@@ -121,8 +123,9 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
       );
 
       // 3. 调用useCoupon API
-      final couponResult = await OrderApiUtils.useCoupon(widget.orderId, selectedCoupon.couponId);
-      
+      final couponResult =
+          await OrderApi.useCoupon(widget.orderId, selectedCoupon.couponId);
+
       // 4. 隐藏加载状态
       SmartDialog.dismiss(status: SmartStatus.loading);
 
@@ -132,11 +135,15 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
           'couponId': selectedCoupon.couponId,
           'discountAmount': selectedCoupon.couponDiscount,
           'couponName': selectedCoupon.name,
-          'memberDiscountPrice': double.tryParse(couponResult['memberDiscountPrice'].toString()) ?? 0.0,
+          'memberDiscountPrice':
+              double.tryParse(couponResult['memberDiscountPrice'].toString()) ??
+                  0.0,
           'tax': double.tryParse(couponResult['tax'].toString()) ?? 0.0,
           'service': double.tryParse(couponResult['service'].toString()) ?? 0.0,
-          'subTotal': double.tryParse(couponResult['subTotal'].toString()) ?? 0.0,
-          'couponDiscount': double.tryParse(couponResult['couponDiscount'].toString()) ?? 0.0,
+          'subTotal':
+              double.tryParse(couponResult['subTotal'].toString()) ?? 0.0,
+          'couponDiscount':
+              double.tryParse(couponResult['couponDiscount'].toString()) ?? 0.0,
         });
         // showToast("Coupon selected successfully".tr);
       } else {
@@ -195,13 +202,16 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
               padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(top: BorderSide(color: toColor('#EEEEEE'), width: 1.w)),
+                border: Border(
+                    top: BorderSide(color: toColor('#EEEEEE'), width: 1.w)),
               ),
               child: ElevatedButton(
                 onPressed: _selectedCouponId != null ? _confirmUseCoupon : null,
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(1.sw, 48.h),
-                  backgroundColor: _selectedCouponId != null ? toColor('#1890ff') : toColor('#cccccc'),
+                  backgroundColor: _selectedCouponId != null
+                      ? toColor('#1890ff')
+                      : toColor('#cccccc'),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.r),
                   ),
@@ -307,8 +317,11 @@ class _CouponSelectPageState extends State<CouponSelectPage> {
             Align(
               alignment: Alignment.centerRight,
               child: Icon(
-                coupon.isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                color: coupon.isSelected ? toColor('#1890ff') : toColor('#cccccc'),
+                coupon.isSelected
+                    ? Icons.check_circle
+                    : Icons.radio_button_unchecked,
+                color:
+                    coupon.isSelected ? toColor('#1890ff') : toColor('#cccccc'),
                 size: 20.w,
               ),
             ),

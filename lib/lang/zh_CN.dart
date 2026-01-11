@@ -232,7 +232,7 @@ const Map<String, String> zh_CN = {
   "No coupons available":"无可用优惠券",
   "coupons available":"张优惠券可用",
   "Payment successfully":"支付成功",
-  "Order expired":"订单已关闭(超时未支付)"
+  "Order expired":"订单已关闭(超时未支付)",
 
 
 };

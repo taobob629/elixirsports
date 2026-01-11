@@ -21,25 +21,27 @@ class PayOrderPage extends StatefulWidget {
 }
 
 class _PayOrderPageState extends State<PayOrderPage> {
-  late SelectCouponModel _selectedCoupon = SelectCouponModel(couponId: "0", name: "", expireTime: "", couponDiscount: 0.0);
+  late SelectCouponModel _selectedCoupon = SelectCouponModel(
+      couponId: "0", name: "", expireTime: "", couponDiscount: 0.0);
   late double _finalPayAmount;
   late double _discountAmount;
-  late double _subTotal;//商品总价;
-  late double _tax;//税费，
-  late double _service;//服务费
-  late double _couponDiscount;//优惠券折扣
-  late double _memberDiscountPrice;  // 会员折扣
+  late double _subTotal; //商品总价;
+  late double _tax; //税费，
+  late double _service; //服务费
+  late double _couponDiscount; //优惠券折扣
+  late double _memberDiscountPrice; // 会员折扣
   //
 //_finalPayAmount计算公式: _subTotal+（_service）+（_tax）-_couponDiscount-_memberDiscountPrice
   @override
   void initState() {
     super.initState();
     // 初始化基础金额（保存初始值，用于后续重新计算）
-    _memberDiscountPrice = widget.orderData.amountInfo.memberDiscountPrice ?? 0.0;
+    _memberDiscountPrice =
+        widget.orderData.amountInfo.memberDiscountPrice ?? 0.0;
     _tax = widget.orderData.amountInfo.tax ?? 0.0;
     _service = widget.orderData.amountInfo.service ?? 0.0;
-    _couponDiscount= widget.orderData.amountInfo.couponDiscount ?? 0.0;
-    _subTotal= widget.orderData.amountInfo.subTotal ?? 0.0;
+    _couponDiscount = widget.orderData.amountInfo.couponDiscount ?? 0.0;
+    _subTotal = widget.orderData.amountInfo.subTotal ?? 0.0;
 
     // 初始化优惠券和金额
     _discountAmount = 0.0;
@@ -50,7 +52,8 @@ class _PayOrderPageState extends State<PayOrderPage> {
   /// 核心：金额计算逻辑（抽离为独立方法，便于复用和维护）
   double _calculateFinalAmount() {
     // 使用完整计算公式：_subTotal+（_service）+（_tax）-_couponDiscount-_memberDiscountPrice
-    double finalAmount = _subTotal + _service + _tax - _couponDiscount - _memberDiscountPrice;
+    double finalAmount =
+        _subTotal + _service + _tax - _couponDiscount - _memberDiscountPrice;
     // 确保最终金额非负
     return finalAmount < 0 ? 0 : finalAmount;
   }
@@ -68,17 +71,21 @@ class _PayOrderPageState extends State<PayOrderPage> {
   /// 跳转优惠券选择页并处理返回结果（完善价格计算逻辑）
   Future<void> _openCouponSelectPage() async {
     // 跳转优惠券选择页，等待返回结果
-    final result = await Get.to(() => CouponSelectPage(orderId: widget.orderData.orderId));
+    final result =
+        await Get.to(() => CouponSelectPage(orderId: widget.orderData.orderId));
     if (result != null) {
       // 从优惠券页返回后，解析结果
       String couponId = result['couponId'] ?? '';
-      double discountAmount = double.tryParse(result['discountAmount'].toString()) ?? 0.0;
+      double discountAmount =
+          double.tryParse(result['discountAmount'].toString()) ?? 0.0;
       String couponName = result['couponName'] ?? '';
-      double memberDiscountPrice = double.tryParse(result['memberDiscountPrice'].toString()) ?? 0.0;
+      double memberDiscountPrice =
+          double.tryParse(result['memberDiscountPrice'].toString()) ?? 0.0;
       double tax = double.tryParse(result['tax'].toString()) ?? 0.0;
       double service = double.tryParse(result['service'].toString()) ?? 0.0;
       double subTotal = double.tryParse(result['subTotal'].toString()) ?? 0.0;
-      double couponDiscount = double.tryParse(result['couponDiscount'].toString()) ?? 0.0;
+      double couponDiscount =
+          double.tryParse(result['couponDiscount'].toString()) ?? 0.0;
 
       if (couponId.isNotEmpty) {
         // 有优惠券ID：更新所有金额字段
@@ -107,11 +114,10 @@ class _PayOrderPageState extends State<PayOrderPage> {
           _discountAmount = 0.0;
           _couponDiscount = 0.0;
           _selectedCoupon = SelectCouponModel(
-            couponId: "0", 
-            name: "未选择优惠券", 
-            expireTime: "", 
-            couponDiscount: 0.0
-          );
+              couponId: "0",
+              name: "No coupon selected".tr,
+              expireTime: "",
+              couponDiscount: 0.0);
           // 重新计算最终金额
           _finalPayAmount = _calculateFinalAmount();
           // showToast("已取消选择优惠券".tr);
@@ -278,7 +284,8 @@ class _PayOrderPageState extends State<PayOrderPage> {
                               SizedBox(height: 8.h),
                               // 价格行：价格+折扣标签左，数量右
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
@@ -292,10 +299,12 @@ class _PayOrderPageState extends State<PayOrderPage> {
                                       ),
                                       SizedBox(width: 8.w),
                                       Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 6.w, vertical: 2.h),
                                         decoration: BoxDecoration(
                                           color: const Color(0xfffff7e6),
-                                          borderRadius: BorderRadius.circular(4.r),
+                                          borderRadius:
+                                              BorderRadius.circular(4.r),
                                         ),
                                         child: Text(
                                           goods.discountType,
@@ -343,38 +352,30 @@ class _PayOrderPageState extends State<PayOrderPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          'Please choose coupon'.tr,
+                          widget.orderData.couponLength > 0
+                              ? "${widget.orderData.couponLength}${"coupons available".tr}"
+                              : "No coupons available".tr,
                           style: TextStyle(
-                            fontSize: 15.sp,
-                            color: const Color(0xff333333),
+                            fontSize: 14.sp,
+                            color: const Color(0xff666666),
                           ),
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              widget.orderData.couponLength > 0 ? "${widget.orderData.couponLength}${"coupons available".tr}" : "No coupons available".tr,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: const Color(0xff666666),
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            const Icon(
-                              Icons.arrow_forward_ios,
-                              color: Color(0xffcccccc),
-                              size: 18,
-                            ),
-                          ],
+                        SizedBox(width: 8.w),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xffcccccc),
+                          size: 18,
                         ),
                       ],
                     ),
                     SizedBox(height: 12.h),
                     // 显示当前选中的优惠券
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12.w, vertical: 12.h),
                       decoration: BoxDecoration(
                         border: Border.all(color: const Color(0xffe0e0e0)),
                         borderRadius: BorderRadius.circular(6.r),
@@ -383,12 +384,18 @@ class _PayOrderPageState extends State<PayOrderPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            _selectedCoupon.name.isEmpty ? "No coupon selected".tr : _selectedCoupon.name,
-                            style: TextStyle(fontSize: 15.sp, color: const Color(0xff333333)),
+                            _selectedCoupon.name.isEmpty
+                                ? "No coupon selected".tr
+                                : _selectedCoupon.name,
+                            style: TextStyle(
+                                fontSize: 15.sp,
+                                color: const Color(0xff333333)),
                           ),
                           Text(
                             '-¥${_discountAmount.toStringAsFixed(2)}',
-                            style: TextStyle(fontSize: 15.sp, color: const Color(0xffea0000)),
+                            style: TextStyle(
+                                fontSize: 15.sp,
+                                color: const Color(0xffea0000)),
                           ),
                         ],
                       ),
@@ -409,11 +416,15 @@ class _PayOrderPageState extends State<PayOrderPage> {
               ),
               child: Column(
                 children: [
-                  _buildAmountRow('Subtotal'.tr, 'S\$${_subTotal.toStringAsFixed(2)}'),
+                  _buildAmountRow(
+                      'Subtotal'.tr, 'S\$${_subTotal.toStringAsFixed(2)}'),
                   _buildAmountRow('GST'.tr, 'S\$${_tax.toStringAsFixed(2)}'),
-                  _buildAmountRow('Service Charge'.tr, 'S\$${_service.toStringAsFixed(2)}'),
-                  _buildAmountRow('Member Discount'.tr, '-S\$${_memberDiscountPrice.toStringAsFixed(2)}'),
-                  _buildAmountRow('Coupon Discount'.tr, '-S\$${_couponDiscount.toStringAsFixed(2)}'),
+                  _buildAmountRow(
+                      'Service Charge'.tr, 'S\$${_service.toStringAsFixed(2)}'),
+                  _buildAmountRow('Member Discount'.tr,
+                      '-S\$${_memberDiscountPrice.toStringAsFixed(2)}'),
+                  _buildAmountRow('Coupon Discount'.tr,
+                      '-S\$${_couponDiscount.toStringAsFixed(2)}'),
                   Padding(
                     padding: EdgeInsets.only(top: 8.h),
                     child: Row(

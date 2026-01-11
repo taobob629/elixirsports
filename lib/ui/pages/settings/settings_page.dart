@@ -5,6 +5,7 @@ import 'package:elixir_esports/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../../config/icon_font.dart';
 import '../../../../utils/color_utils.dart';
@@ -17,7 +18,6 @@ import '../../widget/my_button_widget.dart';
 import '../banks/bank_cards_page.dart';
 
 class SettingsPage extends BasePage<SettingsCtr> {
-
   @override
   SettingsCtr createController() => SettingsCtr();
 
@@ -151,33 +151,39 @@ class SettingsPage extends BasePage<SettingsCtr> {
                   // ).marginSymmetric(vertical: 15.h),
                   InkWell(
                     onTap: () => controller.checkVersion(),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "Version".tr,
-                            style: TextStyle(
-                              color: toColor('#767676'),
-                              fontSize: 14.sp,
-                              fontFamily: FONT_LIGHT,
+                    child: FutureBuilder<PackageInfo>(
+                      future: PackageInfo.fromPlatform(),
+                      builder: (context, snapshot) {
+                        String version = snapshot.data?.version ?? '';
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "Version".tr,
+                                style: TextStyle(
+                                  color: toColor('#767676'),
+                                  fontSize: 14.sp,
+                                  fontFamily: FONT_LIGHT,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        Text(
-                          '',
-                          style: TextStyle(
-                            color: toColor('#1a1a1a'),
-                            fontSize: 14.sp,
-                            fontFamily: FONT_MEDIUM,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Icon(
-                          Icons.keyboard_arrow_right_outlined,
-                          color: toColor('#767676'),
-                        ),
-                      ],
+                            Text(
+                              version,
+                              style: TextStyle(
+                                color: toColor('#1a1a1a'),
+                                fontSize: 14.sp,
+                                fontFamily: FONT_MEDIUM,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Icon(
+                              Icons.keyboard_arrow_right_outlined,
+                              color: toColor('#767676'),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                   Divider(
