@@ -144,20 +144,26 @@ class OrderDetailPage extends BasePage<OrderDetailCtr> {
                   ),
                 ),
               ),
-              Text(
-                value,
-                style: TextStyle(
-                  color: toColor('#1A1A1A'),
-                  fontSize: 12.sp,
-                  fontFamily: FONT_MEDIUM,
+              SizedBox(width: 20.w),
+              Expanded(
+                flex: 1,
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    color: toColor('#1A1A1A'),
+                    fontSize: 12.sp,
+                    fontFamily: FONT_MEDIUM,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.visible,
+                  textAlign: TextAlign.right,
                 ),
-                textAlign: TextAlign.center,
               ),
             ],
           ).paddingSymmetric(vertical: 22.h),
           Divider(
             height: 1.h,
-            color: toColor("EEEEEE"),
+            color: toColor('#F0F0F0'),
           )
         ],
       );
