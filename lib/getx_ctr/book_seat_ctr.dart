@@ -121,7 +121,8 @@ class BookSeatCtr extends BasePageController {
             selectSeatList.clear();
           }
 
-          final list = seatModel.value.computers.where((element) => element.areaId == computer.areaId).toList();
+          // 修复：只选择该区域的可用座位
+          final list = seatModel.value.computers.where((element) => element.areaId == computer.areaId && element.status == 0).toList();
           for (var element in list) {
             element.status = 4;
           }
@@ -143,7 +144,8 @@ class BookSeatCtr extends BasePageController {
         }
       } else {
         if (computer.bookingType == 1) {
-          final list = seatModel.value.computers.where((element) => element.areaId == computer.areaId).toList();
+          // 修复：只取消该区域的已选择座位
+          final list = seatModel.value.computers.where((element) => element.areaId == computer.areaId && element.status == 4).toList();
           for (var element in list) {
             element.status = 0;
           }

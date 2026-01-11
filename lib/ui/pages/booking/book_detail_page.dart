@@ -52,12 +52,16 @@ class BookDetailPage extends BasePage<BookDetailCtr> {
                             height: 14.h,
                           ).marginOnly(top: 2.h),
                           4.horizontalSpace,
-                          Text(
-                            '${controller.bookingDetailModel.value.address}\n${controller.bookingDetailModel.value.postCode}',
-                            style: TextStyle(
-                              color: toColor('#3D3D3D'),
-                              fontFamily: FONT_LIGHT,
-                              fontSize: 12.sp,
+                          Expanded(
+                            child: Text(
+                              '${controller.bookingDetailModel.value.address}\n${controller.bookingDetailModel.value.postCode}',
+                              style: TextStyle(
+                                color: toColor('#3D3D3D'),
+                                fontFamily: FONT_LIGHT,
+                                fontSize: 12.sp,
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -226,6 +230,8 @@ class BookDetailPage extends BasePage<BookDetailCtr> {
                                                 fontSize: 14.sp,
                                                 fontWeight: FontWeight.bold,
                                               ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
                                         ).paddingAll(12.r),
@@ -248,13 +254,18 @@ class BookDetailPage extends BasePage<BookDetailCtr> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ).paddingOnly(right: 6.w),
-                                Text(
-                                  "S\$${controller.bookingDetailModel.value.sites.fold<String>("0", (previousValue, element) => previousValue.add(element.price ?? "0"))}/Hrs",
-                                  style: TextStyle(
-                                    color: toColor('#EA0000'),
-                                    fontFamily: FONT_LIGHT,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
+                                Expanded(
+                                  child: Text(
+                                    "S\$${controller.bookingDetailModel.value.sites.fold<String>("0", (previousValue, element) => previousValue.add(element.price ?? "0"))}/Hrs",
+                                    style: TextStyle(
+                                      color: toColor('#EA0000'),
+                                      fontFamily: FONT_LIGHT,
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -343,6 +354,7 @@ class BookDetailPage extends BasePage<BookDetailCtr> {
           Row(
             children: [
               Expanded(
+                flex: 1,
                 child: Text(
                   name,
                   style: TextStyle(
@@ -352,14 +364,19 @@ class BookDetailPage extends BasePage<BookDetailCtr> {
                   ),
                 ),
               ),
-              Text(
-                value,
-                style: TextStyle(
-                  color: toColor('#1A1A1A'),
-                  fontSize: 12.sp,
-                  fontFamily: FONT_MEDIUM,
+              Expanded(
+                flex: 2,
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    color: toColor('#1A1A1A'),
+                    fontSize: 12.sp,
+                    fontFamily: FONT_MEDIUM,
+                  ),
+                  textAlign: TextAlign.right,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                textAlign: TextAlign.center,
               ),
             ],
           ).paddingAll(15.w),
