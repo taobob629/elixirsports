@@ -212,7 +212,27 @@ const Map<String, String> zh_CN = {
   'Delete Account':'删除账户',
   'Remaining Reward':'奖励金',
   'maintenance': '维护中',
-  "Camera initialization failed":"无法使用相机"
+  "Camera initialization failed":"无法使用相机",
+  "Payment Completed":"支付成功",
+  "Coupon Discount":"优惠券折扣",
+  "Member Discount":"会员折扣",
+  "CouponDiscount":"优惠券折扣",
+  "MemberDiscount":"会员折扣",
+  "GST":"税",
+  "Subtotal":"商品价格",
+  "Please choose coupon":"请选择优惠券",
+  "No coupon selected":"未选择优惠券",
+  "Total to pay":"支付",
+  "Select Coupon":"选择优惠券",
+  "No available coupons":"无可用优惠券",
+  "Failed to apply coupon":"优惠券选择失败",
+  "Valid until:":"有效期",
+  "Pay Now:":"立即支付",
+  "Service Charge":"服务费",
+  "No coupons available":"无可用优惠券",
+  "coupons available":"张优惠券可用",
+  "Payment successfully":"支付成功",
+  "Order expired":"订单已关闭(超时未支付)"
 
 
 };

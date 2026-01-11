@@ -167,5 +167,9 @@ const Map<String, String> en_US = {
   'The passwords you entered twice do not match': 'The passwords you entered twice do not match',
   'Unpaid': 'Unpaid',
   'Refund': 'Refund',
-  "Camera initialization failed":"Camera initialization failed"
+  "Camera initialization failed":"Camera initialization failed",
+  "Service Charge":"Service Charge",
+  "Order expired":"Order closed due to not pay in time"
+
+
 };
