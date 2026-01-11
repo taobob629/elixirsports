@@ -8,11 +8,9 @@ import '../../../getx_ctr/order_detail_ctr.dart';
 import '../../../models/order_detail_model.dart';
 import '../../../utils/image_util.dart';
 
-
-
 class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
   NewOrderDetailPage({Key? key});
-  
+
   @override
   OrderDetailCtr createController() => OrderDetailCtr();
 
@@ -48,7 +46,7 @@ class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
                   // 订单状态显示
                   _orderStatusWidget(),
                   SizedBox(height: 10.h),
-                  
+
                   // 商品列表区域（重构布局）
                   Container(
                     width: double.infinity,
@@ -64,7 +62,7 @@ class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
                           .toList(),
                     ),
                   ),
-                  
+
                   // 金额汇总区域
                   Container(
                     width: double.infinity,
@@ -85,8 +83,10 @@ class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
                         _buildAmountRow('Service Charge'.tr,
                             controller.orderDetailModel.value.service ?? '',
                             isAmount: true),
-                        _buildAmountRow('Member Discount'.tr,
-                            controller.orderDetailModel.value.memberDiscount ?? '',
+                        _buildAmountRow(
+                            'Member Discount'.tr,
+                            controller.orderDetailModel.value.memberDiscount ??
+                                '',
                             isAmount: true),
                         _buildAmountRow('Coupon Discount'.tr,
                             controller.orderDetailModel.value.discount ?? '',
@@ -106,8 +106,6 @@ class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
         // 移除支付按钮，无论订单状态如何都不需要支付功能
         bottomNavigationBar: const SizedBox.shrink(),
       );
-
-
 
   // 移除订单状态显示Widget，不再显示支付状态
   Widget _orderStatusWidget() {
@@ -157,7 +155,9 @@ class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
                     children: [
                       // 价格
                       Text(
-                        item.price == null ? "S\$0.00" : "S\$${item.price!.toStringAsFixed(2)}",
+                        item.price == null
+                            ? "S\$0.00"
+                            : "S\$${item.price!.toStringAsFixed(2)}",
                         style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
@@ -187,16 +187,18 @@ class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
     String formattedValue = value;
     if (isAmount) {
       // 尝试解析金额字符串
-      double? amount = double.tryParse(value.replaceAll(RegExp(r'[^0-9.]'), ''));
+      double? amount =
+          double.tryParse(value.replaceAll(RegExp(r'[^0-9.]'), ''));
       if (amount != null) {
-        formattedValue = "S\$${amount.toStringAsFixed(2)}";
+        formattedValue = "S${amount.toStringAsFixed(2)}";
       }
     }
-    
+
     return Padding(
       padding: EdgeInsets.only(bottom: 8.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
@@ -205,11 +207,18 @@ class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
               color: const Color(0xff666666),
             ),
           ),
-          Text(
-            formattedValue,
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: const Color(0xff333333),
+          SizedBox(width: 20.w),
+          Expanded(
+            flex: 1,
+            child: Text(
+              formattedValue,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: const Color(0xff333333),
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.visible,
+              textAlign: TextAlign.right,
             ),
           ),
         ],
