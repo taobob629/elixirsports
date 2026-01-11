@@ -229,6 +229,7 @@ class UserController extends BasePageController {
       // 1. 打开扫码页面，等待返回结果
       final String? scanResult = await Get.to(const ScanQrPage());
 
+      print("二维码数据:${scanResult}");
       // 处理用户取消扫码（返回null/空字符串）
       if (scanResult == null || scanResult.isEmpty) {
         return;
@@ -315,7 +316,6 @@ class UserController extends BasePageController {
         if (orderResponse != null && orderResponse.code == 200 && orderResponse.data != null) {
           if (orderResponse.data!.needLogin) {
             // 需要登录 → 跳转到登录确认页
-            print("需要登录");
             await Get.to(
               LoginConfirmPage(
                 loginTips: orderResponse.data!.loginTips,
@@ -324,8 +324,21 @@ class UserController extends BasePageController {
             );
           } else {
             print("直接跳转到支付页");
+            if (orderResponse.data!.openOrder){
+              await Get.to(PayOrderPage(orderData: orderResponse.data!));
+            }else {
+              Get.snackbar(
+                'Error'.tr,
+                orderResponse?.msg ?? 'Order expired'.tr,
+                backgroundColor: const Color(0xFFFF760E).withOpacity(0.8),
+                colorText: Colors.white,
+                snackPosition: SnackPosition.BOTTOM,
+                margin: EdgeInsets.only(bottom: 20.h, left: 15.w, right: 15.w),
+                duration: const Duration(seconds: 4),
+              );
+            }
             // 无需登录 → 直接跳转到支付页
-            await Get.to(PayOrderPage(orderData: orderResponse.data!));
+
           }
         } else {
           print("报错了，订单数据获取失败提示");
@@ -377,37 +390,17 @@ class UserController extends BasePageController {
   }
 // 补全/修复原有扫码逻辑
   void _handleOriginalScanLogic(String scanResult) async {
-    // 临时：仅显示扫码结果，无其他操作（确认无异常后再恢复原有逻辑）
-    Get.snackbar(
-      'Scan Result'.tr,
-      scanResult,
-      backgroundColor: Colors.black.withOpacity(0.8),
-      colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
-      margin: EdgeInsets.only(bottom: 20.h, left: 15.w, right: 15.w),
-      duration: const Duration(seconds: 3),
-    );
 
-    final value = await Get.to(() => ScanPage());
-    flog('value $value');
-    if (value == null) {
-      return;
-    }
-    String data = value.toString();
-    ScanModel model = await ScanApi.scanInfo(data: data);
+    // final value = await Get.to(() => ScanPage());
+    // flog('value $value');
+    // if (value == null) {
+    //   return;
+    // }
+    // String data = value.toString();
+    ScanModel model = await ScanApi.scanInfo(data: scanResult);
     Get.to(() => ScanToUnlockPage(), arguments: model);
   }
-  /// 原有扫码逻辑（保留你自己的业务代码）
-  // void _handleOriginalScanLogic(String scanResult) async {
-  //   final value = await Get.to(() => ScanPage());
-  //   flog('value $value');
-  //   if (value == null) {
-  //     return;
-  //   }
-  //   String data = value.toString();
-  //   ScanModel model = await ScanApi.scanInfo(data: data);
-  //   Get.to(() => ScanToUnlockPage(), arguments: model);
-  // }
+
   void jumpPhoneOrMap({String? phone, String? map}) async {
     if (phone != null) {
       Uri uri = Uri.parse('tel:$phone');

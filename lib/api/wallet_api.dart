@@ -69,39 +69,50 @@ class WalletApi {
         }));
     return PgwPayModel.fromJson(response.data);
   }
-  // 或者PGW的支付Token
-  static Future<PgwPayModel?> balancePay({
+
+  static Future<PgwPayModel?> getPGWPaymentTokenAndUrlScanPay({
     required Map<String, dynamic> map,
   }) async {
-    var response = await http.post('app/pay/balancePay',
+    var response = await http.post('app/pay/scan2c2p',
         data: map,
         options: Options(extra: {
           "showLoading": false,
         }));
     return PgwPayModel.fromJson(response.data);
   }
-  // 获取支付结果
-  static Future<PayResultModel?> getPGWPaymentResult({
-    required String orderSN,
+  // 或者PGW的支付Token
+  static Future<BalancePayResult?> balancePay({
+    required Map<String, dynamic> map,
   }) async {
-    var response = await http.get('/app/pay/checkOrderStatus',
-        queryParameters: {"orderSN": orderSN},
+    var response = await http.post('/app/pay/balancePay',
+        data: map,
         options: Options(extra: {
           "showLoading": false,
         }));
-    return PayResultModel.fromJson(response.data);
+    return BalancePayResult.fromJson(response.data);
   }
+  // 获取支付结果
+  // static Future<PayResultModel?> getPGWPaymentResult({
+  //   required String orderSN,
+  // }) async {
+  //   var response = await http.get('/app/pay/checkOrderStatus',
+  //       queryParameters: {"orderSN": orderSN},
+  //       options: Options(extra: {
+  //         "showLoading": false,
+  //       }));
+  //   return PayResultModel.fromJson(response.data);
+  // }
 
   // 支付结果通知我们后台服务
-  static Future<void> payNotifyServer({
-    required Map<String, dynamic> map,
-  }) async {
-    var response = await http.post('web/tool/2c2p/app/notify',
-        data: map,
-        options: Options(extra: {
-          "showLoading": true,
-        }));
-  }
+  // static Future<void> payNotifyServer({
+  //   required Map<String, dynamic> map,
+  // }) async {
+  //   var response = await http.post('web/tool/2c2p/app/notify',
+  //       data: map,
+  //       options: Options(extra: {
+  //         "showLoading": true,
+  //       }));
+  // }
 
   // 保存银行卡信息
   static Future<void> saveBankInfo({

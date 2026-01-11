@@ -42,7 +42,7 @@ class ApiConfig {
 
   /// 优惠券相关接口
   static const String getCustomerCoupon = "/app/home/getCustomerCoupon";
-  static const String useCoupon = "/app/home/useCoupon";
+  static const String useCoupon = "/app/scanOrder/useCoupon";
 
   /// 支付相关接口
   static const String balancePay = "/app/wallet/balancePay";

@@ -507,11 +507,6 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog> with SingleTick
       return;
     }
 
-    await WalletApi.topUp(
-      amount: discount.value.toString(),
-      couponId: currentSelectIndex.value == -1 ? null : couponList[currentSelectIndex.value].id,
-    );
-
     thirdPay();
   }
 

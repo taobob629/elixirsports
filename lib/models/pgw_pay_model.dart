@@ -21,3 +21,30 @@ class PgwPayModel {
     "invoiceNo": invoiceNo,
   };
 }
+
+class BalancePayResult {
+  final String msg;
+  final bool  state;
+  int? orderId;
+
+  BalancePayResult({
+    required this.msg,
+    required this.state,
+    required this.orderId,
+
+  });
+
+  factory BalancePayResult.fromJson(Map<String, dynamic> json) => BalancePayResult(
+    msg: json["msg"] ?? "",
+    orderId: json["orderId"],
+    state: json["state"] ?? false,
+  );
+
+  Map<String, dynamic> toJson() => {
+    "msg": msg,
+    "state": state,
+    "orderId": orderId,
+
+  };
+}
+

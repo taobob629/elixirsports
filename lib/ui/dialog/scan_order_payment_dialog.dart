@@ -1,6 +1,7 @@
 import 'package:elixir_esports/api/wallet_api.dart';
 import 'package:elixir_esports/assets_utils.dart';
 import 'package:elixir_esports/config/icon_font.dart';
+import 'package:elixir_esports/ui/pages/order/new_order_detail_page.dart';
 import 'package:elixir_esports/utils/color_utils.dart';
 import 'package:elixir_esports/utils/toast_utils.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,10 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../widget/my_button_widget.dart';
 import '../widget/pay_method_widget.dart';
+import '../pages/order/order_detail_page.dart';
+
+// 导入目标页面（根据你项目的实际路径调整）
+import 'package:elixir_esports/ui/pages/main/scan/my_qr_code_page.dart';
 
 // 封装金额格式化工具函数（全局/单独封装均可）
 String formatAmount(double amount) {
@@ -297,8 +302,9 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog> with Si
       await _thirdPay();
     }
 
-
+    Get.offAll(() => OrderDetailPage(), arguments: widget.orderId);
   }
+
   Future<void> _balancePay() async {
     try {
       SmartDialog.showLoading(msg: "Processing payment...".tr);
@@ -311,26 +317,18 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog> with Si
       };
 
       // 调用支付接口
-      final pgwModel = await WalletApi.balancePay(map: map);
+      final result = await WalletApi.balancePay(map: map);
 
-      debugPrint('pgwModel?.webPaymentUrl: ${pgwModel?.webPaymentUrl}');
-      debugPrint('pgwModel?.paymentToken: ${pgwModel?.paymentToken}');
-      debugPrint('pgwModel?.invoiceNo: ${pgwModel?.invoiceNo}');
+      if(result!.state){
+        _dismissDialog(); // 关闭支付弹窗
+        showSuccess("Payment successfully".tr);
 
-      // 校验并打开支付链接
-      if (pgwModel?.webPaymentUrl != null && pgwModel!.webPaymentUrl.isNotEmpty) {
-        if (await canLaunchUrlString(pgwModel.webPaymentUrl)) {
-          await launchUrlString(
-            pgwModel.webPaymentUrl,
-            mode: LaunchMode.externalApplication, // 跳转到外部浏览器/支付APP
-          );
-          _dismissDialog(); // 关闭支付弹窗
-        } else {
-          throw Exception("Cannot launch payment URL");
-        }
-      } else {
-        throw Exception("Payment URL is null or empty");
+        Get.to(() => NewOrderDetailPage(), arguments:widget.orderId);
+
+      }else{
+        showError(result!.msg);
       }
+
     } catch (e) {
       debugPrint('Payment error: $e');
       showError("Payment failed".tr);
@@ -338,6 +336,7 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog> with Si
       SmartDialog.dismiss(status: SmartStatus.loading);
     }
   }
+
   /// 调用第三方支付
   Future<void> _thirdPay() async {
     try {
@@ -351,7 +350,7 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog> with Si
       };
 
       // 调用支付接口
-      final pgwModel = await WalletApi.getPGWPaymentTokenAndUrl(map: map);
+      final pgwModel = await WalletApi.getPGWPaymentTokenAndUrlScanPay(map: map);
 
       debugPrint('pgwModel?.webPaymentUrl: ${pgwModel?.webPaymentUrl}');
       debugPrint('pgwModel?.paymentToken: ${pgwModel?.paymentToken}');
