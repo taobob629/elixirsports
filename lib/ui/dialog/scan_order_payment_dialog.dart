@@ -364,13 +364,15 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
                 child: MyButtonWidget(
                   btnText: "Cancel".tr,
                   onTap: () {
-                    // 用户主动取消轮询，只关闭轮询等待弹窗，不关闭支付弹窗
+                    // 用户主动取消轮询，关闭弹窗并跳转到订单列表
                     _isPollingCancelled = true;
                     _isPaymentProcessed = true;
                     pollingTimer?.cancel();
-                    SmartDialog.dismiss(); // 只关闭轮询等待弹窗
-                    showInfo("Payment check cancelled. Please try again or check your order status later."
-                        .tr); // 给出取消提示
+                    SmartDialog.dismiss(); // 关闭轮询等待弹窗
+                    _dismissDialog(); // 关闭支付弹窗
+                    // showInfo("Payment check cancelled. Redirecting to order list."
+                    //     .tr); // 给出取消提示
+                    Get.to(() => OrderListPage()); // 跳转到订单列表
                   },
                   height: 45.h,
                   marginBottom: 0.h,
@@ -637,7 +639,7 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
           await _startCheckOrderStatePolling(returnedOrderId);
         } else {
           // 支付失败或取消
-          showSuccess("Payment failed6".tr);
+          // showSuccess("Payment failed6".tr);
         }
       } else {
         showInfo("Payment failed7".tr);
