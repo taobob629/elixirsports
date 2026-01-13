@@ -142,4 +142,14 @@ class WalletApi {
     List<BankCardModel> list = response.data.map<BankCardModel>((item) => BankCardModel.fromJson(item)).toList();
     return list;
   }
+
+  // 检查订单状态
+  static Future<Map<String, dynamic>> checkOrderState({required String orderId}) async {
+    var response = await http.get('/app/pay/checkOrderState',
+        queryParameters: {"orderId": orderId},
+        options: Options(extra: {
+          "showLoading": false,
+        }));
+    return response.data;
+  }
 }

@@ -144,7 +144,7 @@ const Map<String, String> zh_CN = {
   'NOT PURCHASED.': '未购买',
   'PURCHASED.': '已购买',
   'Upgrade to enjoy more benefits.': '升级以享受更多优惠',
-  'Scan QR code': '扫码登录',
+  'Scan QR code': '扫码',
   'Top Up Elixir': '充值水滴币',
   'PURCHASE NOW': '立即购买',
   'Elixir：': '水滴币：',
@@ -233,6 +233,16 @@ const Map<String, String> zh_CN = {
   "coupons available":"张优惠券可用",
   "Payment successfully":"支付成功",
   "Order expired":"订单已关闭(超时未支付)",
+  'Please wait while we check your payment status':'支付结果获取中，请等待',
+  'Checking payment status':'获取支付结果',
+  'Payment cancelled':'已取消支付',
+  'Cannot open the payment app. Please make sure the app is installed.':'拉起支付软件失败，请确保已经安装支付软件',
+  'Cannot open Alipay. Please make sure the app is installed.':'无法打开支付宝',
+  'Error handling payment request. Please try again or use another payment method.':'无法处理支付请求，请重试或选择其他支付方式',
+  'Payment failed':'支付失败',
+  'Payment failed. Please try again or check your order status.':'支付失败，请重试',
+  'Check order status timeout. Please try again or check your order status later.':'支付状态检查超时，请重试或查看订单状态',
+  'Payment check cancelled. Please try again or check your order status later.':'取消支付检查，请重试或查看订单状态'
 
 
 };

@@ -10,6 +10,8 @@ import 'CouponSelectPage.dart';
 import 'package:elixir_esports/ui/dialog/scan_order_payment_dialog.dart';
 // 新增：导入优惠券选择页
 import 'package:elixir_esports/ui/pages/scanOrder/CouponSelectPage.dart';
+// 导入订单列表页面
+import 'package:elixir_esports/ui/pages/order/order_list_page.dart';
 
 class PayOrderPage extends StatefulWidget {
   final OrderData orderData;
@@ -145,6 +147,11 @@ class _PayOrderPageState extends State<PayOrderPage> {
         couponId: _selectedCoupon.couponId ?? "0",
         discountAmount: _discountAmount,
         payAmount: _finalPayAmount,
+        onPaymentSuccess: () {
+          // 支付成功后跳转到订单列表页面
+          // 使用Get.to()而不是Get.off()，确保可以正常回退
+          Get.to(() => OrderListPage());
+        },
       ),
       alignment: Alignment.bottomCenter,
       clickMaskDismiss: true,

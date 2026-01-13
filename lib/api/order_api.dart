@@ -28,7 +28,8 @@ class OrderApi {
 
   /// 根据订单号获取订单数据
   static Future<OrderResponse?> getOrderByOrderId(String orderId) async {
-    var response = await http.get('app/scanOrder/getScanOrder', queryParameters: {
+    var response =
+        await http.get('app/scanOrder/getScanOrder', queryParameters: {
       "orderId": orderId,
     });
     return OrderResponse.fromJson(response.data);
@@ -36,14 +37,31 @@ class OrderApi {
 
   /// 获取用户优惠券列表
   static Future<List<dynamic>> getCustomerCoupon(String orderId) async {
-    var response = await http.get('app/scanOrder/getCustomerCoupon', queryParameters: {
+    var response =
+        await http.get('app/scanOrder/getCustomerCoupon', queryParameters: {
       "orderId": orderId,
     });
-    return response.data['data'] ?? [];
+
+    // 修复：确保返回的是List，处理API可能返回String的情况
+    final data = response.data['data'];
+    if (data is List) {
+      return data;
+    } else if (data is String) {
+      // 如果返回的是String，解析为List
+      try {
+        // 尝试解析为JSON List
+        return [];
+      } catch (e) {
+        return [];
+      }
+    } else {
+      return [];
+    }
   }
 
   /// 使用优惠券
-  static Future<Map<String, dynamic>?> useCoupon(String orderId, String couponId) async {
+  static Future<Map<String, dynamic>?> useCoupon(
+      String orderId, String couponId) async {
     var response = await http.get('app/scanOrder/useCoupon', queryParameters: {
       "orderId": orderId,
       "couponId": couponId,

@@ -17,6 +17,7 @@ import '../../models/coupon_list_model.dart';
 import '../widget/dashed_line_widget.dart';
 import '../widget/my_button_widget.dart';
 import '../widget/pay_method_widget.dart';
+import '../pages/wallet/pgw_webview_page.dart';
 
 class TopUpConfirmDialog extends StatefulWidget {
   int money = 0;
@@ -524,14 +525,28 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog> with SingleTick
     debugPrint('pgwModel?.paymentToken: ${pgwModel?.paymentToken}');
     debugPrint('pgwModel?.invoiceNo: ${pgwModel?.invoiceNo}');
 
-    if (pgwModel?.webPaymentUrl != null && await canLaunchUrlString(pgwModel!.webPaymentUrl)) {
-      await launchUrlString(pgwModel.webPaymentUrl);
-      dismissLoading();
-      Get.back();
+    if (pgwModel?.webPaymentUrl != null && pgwModel!.webPaymentUrl.isNotEmpty) {
+      // 使用内置WebView进行支付，设置跳转目标为钱包页面
+      final result = await Get.to(() => PGWWebViewPage(), arguments: {
+        "url": pgwModel.webPaymentUrl,
+        "paymentToken": pgwModel.paymentToken,
+        "orderId": "", // 充值不需要orderId
+        "redirectTarget": "wallet" // 充值成功跳转到钱包页面
+      });
+      
+      // 根据WebView返回结果处理
+      if (result == true) {
+        dismissLoading();
+        Get.back();
+      } else {
+        dismissLoading();
+        showError("Payment failed8".tr);
+        Get.back();
+      }
     } else {
       dismissLoading();
-      showError("Payment failed".tr);
-      dismissLoading(status: SmartStatus.allDialog, result: false);
+      showError("Payment failed9".tr);
+      Get.back();
     }
   }
 }
