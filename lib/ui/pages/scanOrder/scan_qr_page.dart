@@ -131,7 +131,8 @@ class _ScanQrPageState extends State<ScanQrPage> {
         await tempFile.writeAsBytes(bytes);
 
         // 步骤4：使用图片路径解析二维码（7.0.1的analyzeImage仅支持String路径）
-        final BarcodeCapture? capture = await _controller?.analyzeImage(tempFile.path);
+        final BarcodeCapture? capture =
+            await _controller?.analyzeImage(tempFile.path);
         if (capture != null && capture.barcodes.isNotEmpty) {
           String? qrContent = capture.barcodes.first.rawValue;
           if (qrContent != null) {
@@ -171,7 +172,8 @@ class _ScanQrPageState extends State<ScanQrPage> {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      final BarcodeCapture? capture = await _controller?.analyzeImage(image.path);
+      final BarcodeCapture? capture =
+          await _controller?.analyzeImage(image.path);
       if (capture != null && capture.barcodes.isNotEmpty) {
         Get.back(result: capture.barcodes.first.rawValue);
       }

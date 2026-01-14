@@ -13,6 +13,7 @@ import '../../../base/base_scaffold.dart';
 import '../../../base/empty_view.dart';
 import '../../../getx_ctr/user_controller.dart';
 import '../../../getx_ctr/wallet_ctr.dart';
+import '../../widget/animated_value_widget.dart';
 import '../../widget/cash_animator/animated_text_switcher.dart';
 
 class WalletPage extends BasePage<WalletCtr> {
@@ -52,6 +53,7 @@ class WalletPage extends BasePage<WalletCtr> {
                                 'Elixir Wallet'.tr,
                                 style: TextStyle(
                                   color: Colors.white,
+
                                   fontSize: 12.sp,
                                   fontFamily: FONT_MEDIUM,
                                 ),
@@ -76,10 +78,11 @@ class WalletPage extends BasePage<WalletCtr> {
                             Expanded(
                               child: Obx(() => Align(
                                     alignment: Alignment.centerLeft,
-                                    child: AnimatedTextSwitcher(
-                                      'S\$${controller.walletModel.value.cash}',
-                                      textAlign: TextAlign.left,
-                                      duration: const Duration(seconds: 2),
+                                    child: AnimatedValueWidget(
+                                      oldValue: controller.oldWalletModel.value.cash,
+                                      newValue: controller.walletModel.value.cash,
+                                      showAnimation: controller.showAnimator.value,
+                                      currencySymbol: 'S\$',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 17.sp,
@@ -90,10 +93,11 @@ class WalletPage extends BasePage<WalletCtr> {
                             ),
                             Obx(() => Align(
                                   alignment: Alignment.centerLeft,
-                                  child: AnimatedTextSwitcher(
-                                    'S\$${controller.walletModel.value.reward}',
-                                    textAlign: TextAlign.left,
-                                    duration: const Duration(seconds: 2),
+                                  child: AnimatedValueWidget(
+                                    oldValue: controller.oldWalletModel.value.reward,
+                                    newValue: controller.walletModel.value.reward,
+                                    showAnimation: controller.showAnimator.value,
+                                    currencySymbol: 'S\$',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 17.sp,
@@ -164,10 +168,8 @@ class WalletPage extends BasePage<WalletCtr> {
                           Expanded(
                             child: Obx(() => controller.list.isNotEmpty
                                 ? SmartRefresher(
-                                    controller:
-                                        controller.refreshController,
-                                    onRefresh: () =>
-                                        controller.onRefresh(),
+                                    controller: controller.refreshController,
+                                    onRefresh: () => controller.onRefresh(),
                                     onLoading: () => controller.loadMore(),
                                     enablePullUp: true,
                                     enablePullDown: true,

@@ -29,7 +29,8 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
   BookSeatCtr createController() => BookSeatCtr();
 
   void _getImageSize() {
-    RenderBox renderBox = widgetKey.currentContext!.findRenderObject() as RenderBox;
+    RenderBox renderBox =
+        widgetKey.currentContext!.findRenderObject() as RenderBox;
     Size size = renderBox.size;
     flog("width = ${size.width}, height = ${size.height}");
 
@@ -65,18 +66,21 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                         loadStateChanged: (ExtendedImageState state) {
                           switch (state.extendedImageLoadState) {
                             case LoadState.loading:
-                              SchedulerBinding.instance.addPostFrameCallback((_) {
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((_) {
                                 controller.loadComplete.value = false;
                               });
                               return Container();
                             case LoadState.failed:
-                              SchedulerBinding.instance.addPostFrameCallback((_) {
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((_) {
                                 dismissLoading();
                                 controller.loadComplete.value = false;
                               });
                               return EmptyView();
                             case LoadState.completed:
-                              SchedulerBinding.instance.addPostFrameCallback((_) {
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((_) {
                                 dismissLoading();
                                 _getImageSize();
                               });
@@ -90,8 +94,12 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                       if (controller.loadComplete.value)
                         ...controller.seatModel.value.computers.map((element) {
                           // 根据比例调整每个座位图的坐标
-                          double scaledX = (double.parse(element.lefts ?? "0") / 100) * scaledWidth;
-                          double scaledY = (double.parse(element.tops ?? "0") / 100) * scaledHeight;
+                          double scaledX =
+                              (double.parse(element.lefts ?? "0") / 100) *
+                                  scaledWidth;
+                          double scaledY =
+                              (double.parse(element.tops ?? "0") / 100) *
+                                  scaledHeight;
                           return Positioned(
                             left: scaledX,
                             top: scaledY,
@@ -140,11 +148,11 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Obx(() => Container(
-                    height: 102.h,
                     padding: EdgeInsets.only(
                       left: 15.w,
                       right: 15.w,
                       top: 15.h,
+                      bottom: 8.h,
                     ),
                     child: controller.selectSeatList.isNotEmpty
                         ? Column(
@@ -178,7 +186,8 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                                           color: Colors.black,
                                           width: 0.5.w,
                                         ),
-                                        borderRadius: BorderRadius.circular(4.r),
+                                        borderRadius:
+                                            BorderRadius.circular(4.r),
                                       ),
                                       width: 60.w,
                                       height: 30.h,
@@ -208,7 +217,8 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                                             color: Colors.black,
                                             width: 0.5.w,
                                           ),
-                                          borderRadius: BorderRadius.circular(4.r),
+                                          borderRadius:
+                                              BorderRadius.circular(4.r),
                                         ),
                                         width: 60.w,
                                         height: 30.h,
@@ -223,14 +233,16 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                                           ),
                                         ),
                                       ),
-                                      separatorBuilder: (c, i) => 12.horizontalSpace,
-                                      itemCount: controller.selectSeatList.length,
+                                      separatorBuilder: (c, i) =>
+                                          12.horizontalSpace,
+                                      itemCount:
+                                          controller.selectSeatList.length,
                                     )),
                               )
                             ],
                           )
                         : Padding(
-                            padding: EdgeInsets.only(top: 10.h),
+                            padding: EdgeInsets.only(top: 5.h),
                             child: Row(
                               children: [
                                 commonWidget(
@@ -299,19 +311,25 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
   }) =>
       Expanded(
         child: Container(
-          alignment: Alignment.topCenter,
+          alignment: Alignment.center,
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(icon),
-              Text(
-                name,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: toColor('#767676'),
-                  fontSize: 11.sp,
-                  fontFamily: FONT_MEDIUM,
+              SizedBox(height: 4.h),
+              SizedBox(
+                height: 30.h,
+                child: Text(
+                  name,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: toColor('#767676'),
+                    fontSize: name.length > 10 ? 10.sp : 11.sp,
+                    fontFamily: FONT_MEDIUM,
+                  ),
                 ),
               ),
             ],

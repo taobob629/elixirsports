@@ -77,15 +77,6 @@ class _TopUpPageBodyState extends State<_TopUpPageBody> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "TOP UP".tr,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontFamily: FONT_MEDIUM,
-                        fontWeight: FontWeight.bold,
-                        color: toColor('#3d3d3d'),
-                      ),
-                    ),
                     Container(
                       height: 44.h,
                       decoration: BoxDecoration(

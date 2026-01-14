@@ -50,9 +50,7 @@ String toTime(date, [bool isParse = true]) {
   var day = hour * 24;
   var week = day * 7;
   var month = day * 30;
-  var now = DateTime
-      .now()
-      .millisecondsSinceEpoch; //获取当前时间毫秒
+  var now = DateTime.now().millisecondsSinceEpoch; //获取当前时间毫秒
   var diffValue = now - old.millisecondsSinceEpoch; //时间差
   if (diffValue < 0) return "刚刚";
   var result = '';
@@ -92,10 +90,7 @@ String toTime(date, [bool isParse = true]) {
 }
 
 ///获取当前时间戳
-int getTime() =>
-    DateTime
-        .now()
-        .millisecondsSinceEpoch;
+int getTime() => DateTime.now().millisecondsSinceEpoch;
 
 ///间隔日
 int daysBetween(DateTime a, DateTime b, [bool ignoreTime = false]) {
@@ -151,6 +146,7 @@ searchDelay(Function doSomething, {durationTime = 500}) {
     timer = null;
   });
 }
+
 /**
  * 只显示最后四位数字
  */
@@ -159,12 +155,11 @@ getPayCardStr(String? code) {
   final int length = code.length;
   final int replaceLength = length - 4;
   final String replacement =
-  List<String>.generate((replaceLength / 4).ceil(), (int _) => '****    ')
-      .join('');
+      List<String>.generate((replaceLength / 4).ceil(), (int _) => '****    ')
+          .join('');
   return code.replaceRange(0, replaceLength, replacement);
 }
 
 buildGroupQrData(var gid) {
-  return jsonEncode(Map()
-    ..['gid'] = gid);
+  return jsonEncode(Map()..['gid'] = gid);
 }

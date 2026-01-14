@@ -152,4 +152,13 @@ class WalletApi {
         }));
     return response.data;
   }
+  // 检查充值订单状态
+  static Future<Map<String, dynamic>> checkTopUpOrderState({required String orderId}) async {
+    var response = await http.get('/app/pay/checkTopUpOrderState',
+        queryParameters: {"orderId": orderId},
+        options: Options(extra: {
+          "showLoading": false,
+        }));
+    return response.data;
+  }
 }

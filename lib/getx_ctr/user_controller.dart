@@ -96,7 +96,9 @@ class UserController extends BasePageController {
       ImSigModel userSig = await ImApi.login();
       if (userSig.token.isEmpty) return;
       flog("~~~~~~~~~${userSig.token}~~~~~~~~~~~~~");
-      await _coreInstance.login(userID: userSig.uid, userSig: userSig.token).then((value) async {
+      await _coreInstance
+          .login(userID: userSig.uid, userSig: userSig.token)
+          .then((value) async {
         flog("登录状态信息：${value.code}: ${value.desc}");
         if (value.code != 0) {
           showToast(value.desc);
@@ -106,8 +108,11 @@ class UserController extends BasePageController {
         //执行登录 IM 成功后调用。初始化push
         // initOfflinePush();
         // print("~~~~~~~~~im login done~~~~~~~~~~~~~");
-        TencentImSDKPlugin.v2TIMManager.getConversationManager().addConversationListener(
-                listener: V2TimConversationListener(onTotalUnreadMessageCountChanged: (count) {
+        TencentImSDKPlugin.v2TIMManager
+            .getConversationManager()
+            .addConversationListener(
+                listener: V2TimConversationListener(
+                    onTotalUnreadMessageCountChanged: (count) {
               flog(count, 'onTotalUnreadMessageCountChanged');
               unreadMsgCount.value = count;
               FlutterAppBadger.isAppBadgeSupported().then((value) {
@@ -115,7 +120,8 @@ class UserController extends BasePageController {
                 if (unreadMsgCount.value == 0) {
                   FlutterAppBadger.removeBadge();
                 } else {
-                  FlutterAppBadger.updateBadgeCount(unreadMsgCount.value, title: 'New Message');
+                  FlutterAppBadger.updateBadgeCount(unreadMsgCount.value,
+                      title: 'New Message');
                 }
               });
             }, onConversationChanged: (v) {
@@ -123,7 +129,10 @@ class UserController extends BasePageController {
             }, onNewConversation: (v) {
               flog(v.length, 'onNewConversation');
             }));
-        TencentImSDKPlugin.v2TIMManager.getMessageManager().addAdvancedMsgListener(listener: V2TimAdvancedMsgListener(onRecvNewMessage: (V2TimMessage msg) {
+        TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .addAdvancedMsgListener(listener:
+                V2TimAdvancedMsgListener(onRecvNewMessage: (V2TimMessage msg) {
           //播放提示音
           if (unreadMsgCount > 0) {
             unreadMsgCount.value -= 1;
@@ -154,7 +163,9 @@ class UserController extends BasePageController {
   }
 
   void _dealMsg(V2TimMessage msg) {
-    if (msg.customElem == null || msg.customElem?.data == null || msg.customElem?.data == "") {
+    if (msg.customElem == null ||
+        msg.customElem?.data == null ||
+        msg.customElem?.data == "") {
       return;
     }
 
@@ -173,7 +184,9 @@ class UserController extends BasePageController {
         // 拳头订单的通知
         dismissLoading();
         showToast(map['desc']);
-        TencentImSDKPlugin.v2TIMManager.getMessageManager().markC2CMessageAsRead(userID: msg.sender!);
+        TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .markC2CMessageAsRead(userID: msg.sender!);
         ChatTool.getUnreadMsgCount().then((value) {
           unreadMsgCount.value = value;
         });
@@ -313,7 +326,9 @@ class UserController extends BasePageController {
         }
 
         // 5. 弹窗已关闭，再处理页面跳转
-        if (orderResponse != null && orderResponse.code == 200 && orderResponse.data != null) {
+        if (orderResponse != null &&
+            orderResponse.code == 200 &&
+            orderResponse.data != null) {
           if (orderResponse.data!.needLogin) {
             // 需要登录 → 跳转到登录确认页
             await Get.to(
@@ -324,9 +339,9 @@ class UserController extends BasePageController {
             );
           } else {
             print("直接跳转到支付页");
-            if (orderResponse.data!.openOrder){
+            if (orderResponse.data!.openOrder) {
               await Get.to(PayOrderPage(orderData: orderResponse.data!));
-            }else {
+            } else {
               Get.snackbar(
                 'Error'.tr,
                 orderResponse?.msg ?? 'Order expired'.tr,
@@ -338,7 +353,6 @@ class UserController extends BasePageController {
               );
             }
             // 无需登录 → 直接跳转到支付页
-
           }
         } else {
           print("报错了，订单数据获取失败提示");
@@ -353,7 +367,6 @@ class UserController extends BasePageController {
             duration: const Duration(seconds: 2),
           );
         }
-
       } else {
         // 非订单二维码：内层捕获异常，避免冒泡到外层
         try {
@@ -388,9 +401,9 @@ class UserController extends BasePageController {
       );
     }
   }
+
 // 补全/修复原有扫码逻辑
   void _handleOriginalScanLogic(String scanResult) async {
-
     // final value = await Get.to(() => ScanPage());
     // flog('value $value');
     // if (value == null) {

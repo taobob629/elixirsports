@@ -242,7 +242,10 @@ const Map<String, String> zh_CN = {
   'Payment failed':'支付失败',
   'Payment failed. Please try again or check your order status.':'支付失败，请重试',
   'Check order status timeout. Please try again or check your order status later.':'支付状态检查超时，请重试或查看订单状态',
-  'Payment check cancelled. Please try again or check your order status later.':'取消支付检查，请重试或查看订单状态'
+  'Payment check cancelled. Please try again or check your order status later.':'取消支付检查，请重试或查看订单状态',
+  'Enter the recharge amount':'请输入充值金额',
+  'Total':'总价'
+
 
 
 };

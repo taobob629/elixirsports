@@ -8,7 +8,7 @@ import '../ui/dialog/top_up_confirm_dialog.dart';
 class TopUpCtr extends BasePageController {
   static TopUpCtr get find => Get.find();
 
-  var currentIndex = 0.obs;
+  var currentIndex = (-1).obs;
 
   TextEditingController inputMoneyCtr = TextEditingController();
   FocusNode inputMoneyFocusNode = FocusNode();
@@ -69,7 +69,7 @@ class TopUpCtr extends BasePageController {
     int money;
     if (currentIndex.value == -1) {
       if (inputMoneyCtr.text.isEmpty) {
-        showToast('Please Input The Recharge Amount'.tr);
+        showToast('Enter the recharge amount'.tr);
         return;
       } else {
         money = int.parse(inputMoneyCtr.text);

@@ -3,6 +3,7 @@ import 'package:elixir_esports/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:pgw_sdk/core/pgw_sdk_delegate.dart';
 import 'package:pgw_sdk/core/pgw_webview_navigation_delegate.dart';
 import 'package:pgw_sdk/enum/api_response_code.dart';
@@ -15,6 +16,7 @@ import '../../../config/icon_font.dart';
 import '../../../ui/widget/my_button_widget.dart';
 import '../../../utils/color_utils.dart';
 import '../../../utils/toast_utils.dart';
+import '../../../utils/logger_service.dart';
 
 class PGWWebViewPage extends StatefulWidget {
   const PGWWebViewPage({super.key});
@@ -27,10 +29,22 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
     with WidgetsBindingObserver {
   late WebViewController controller;
   late String redirectTarget;
-  Timer? _sdkPollingTimer;
-  int _sdkPollingAttempts = 0;
+
   bool _isSdkPollingActive = false;
-  bool _isPaymentInitiated = false; // 标记用户是否真正发起了支付请求
+  int _sdkPollingAttempts = 0;
+  Timer? _sdkPollingTimer;
+
+  // 标记用户是否真正发起了支付请求
+  bool _isPaymentInitiated = false;
+  // 标记用户是否点击了取消按钮
+  bool _isPaymentCancelled = false;
+
+  // 添加一个辅助方法来格式化带时间戳的打印
+  void _printWithTime(String message) {
+    final now = DateTime.now();
+    final timeString = DateFormat('HH:mm:ss.SSS').format(now);
+    print("$timeString $message");
+  }
 
   @override
   void initState() {
@@ -55,8 +69,15 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
     // 安全获取arguments
     final arguments = Get.arguments ?? {};
     String url = arguments["url"] ?? "";
+    String? orderId = arguments["orderId"];
+    String? paymentToken = arguments["paymentToken"];
     // 获取跳转目标，默认跳转到订单列表
     redirectTarget = arguments["redirectTarget"] ?? "orderList";
+
+    // 记录WebView初始化日志
+    logger.payment('WebViewInit', 'Initializing PGW WebView', orderId: orderId);
+    logger.payment('WebViewParams',
+        'URL: $url, OrderId: $orderId, PaymentToken: $paymentToken, RedirectTarget: $redirectTarget');
 
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -66,36 +87,54 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
           onNavigationRequest: (NavigationRequest request) async {
         try {
           final Uri uri = Uri.parse(request.url);
-          print("Navigation request: ${request.url}");
-          print("Scheme: ${uri.scheme}");
+          logger.payment('WebViewNavRequest',
+              'Navigation request: ${request.url}, Scheme: ${uri.scheme}',
+              orderId: orderId);
 
           // 处理APP链接（如alipays://, weixin://等）
           if (uri.scheme != 'http' && uri.scheme != 'https') {
             // 标记用户真正发起了支付请求
-            _isPaymentInitiated = true;
-            print("Payment initiated: External app URL detected");
+            if (!_isPaymentInitiated) {
+              _isPaymentInitiated = true;
+              print('=== 第一次设置 _isPaymentInitiated 为 true ===');
+              print('触发位置: 外部APP URL检测');
+              print('URL: ${request.url}');
+              print('时间: ${DateTime.now()}');
+            }
+            logger.payment(
+                'PaymentInitiated', 'External app URL detected: ${request.url}',
+                orderId: orderId);
 
             // 尝试打开外部APP，添加完整的错误处理
-            print("Opening external app: ${request.url}");
+            logger.payment(
+                'ExternalAppLaunch', 'Opening external app: ${request.url}',
+                orderId: orderId);
 
             // 特殊处理Alipay URLs - 绕过canLaunchUrl检查
             bool shouldBypassCheck = false;
             if (uri.scheme == 'alipays' ||
                 request.url.toLowerCase().contains('alipay')) {
               shouldBypassCheck = true;
-              print("Bypassing canLaunchUrl check for Alipay URL");
+              logger.payment('AlipaySpecialHandling',
+                  'Bypassing canLaunchUrl check for Alipay URL',
+                  orderId: orderId);
             }
 
             // 检查是否可以处理该URL，对Alipay URLs跳过检查
             final canLaunch =
                 shouldBypassCheck || await canLaunchUrl(Uri.parse(request.url));
             if (canLaunch) {
+              logger.payment('ExternalAppLaunchSuccess',
+                  'Successfully launched external app',
+                  orderId: orderId);
               await launchUrl(Uri.parse(request.url),
                   mode: LaunchMode.externalApplication,
                   webViewConfiguration:
                       const WebViewConfiguration(enableJavaScript: true));
             } else {
-              print("Cannot launch URL: ${request.url}");
+              logger.payment('ExternalAppLaunchFailed',
+                  'Cannot launch URL: ${request.url}',
+                  orderId: orderId);
               // 显示错误提示，不崩溃
               showToast(
                   "Cannot open the payment app. Please make sure the app is installed."
@@ -104,32 +143,61 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
             return NavigationDecision.prevent;
           }
 
-          // 处理https Alipay URLs with app_pay=Y parameter - 这些应该启动支付宝APP
-          if (uri.scheme == 'https' &&
-              request.url.toLowerCase().contains('alipay') &&
-              request.url.toLowerCase().contains('app_pay=y')) {
+          // 处理支付宝URL
+          if (request.url.toLowerCase().contains('alipay')) {
             // 标记用户真正发起了支付请求
-            _isPaymentInitiated = true;
-            print("Payment initiated: Alipay app_pay URL detected");
-
-            print("Alipay app_pay URL detected: ${request.url}");
-            // 尝试打开外部APP，添加完整的错误处理
-            try {
-              // 特殊处理Alipay URLs - 绕过canLaunchUrl检查
-              print("Bypassing canLaunchUrl check for Alipay app_pay URL");
-
-              await launchUrl(Uri.parse(request.url),
-                  mode: LaunchMode.externalApplication,
-                  webViewConfiguration:
-                      const WebViewConfiguration(enableJavaScript: true));
-            } catch (e) {
-              print("Error launching Alipay app: $e");
-              // 显示错误提示，不崩溃
-              showToast(
-                  "Cannot open Alipay. Please make sure the app is installed."
-                      .tr);
+            if (!_isPaymentInitiated) {
+              _isPaymentInitiated = true;
+              _printWithTime('=== 第一次设置 _isPaymentInitiated 为 true ===');
+              _printWithTime('触发位置: 支付宝URL检测');
+              _printWithTime('URL: ${request.url}');
             }
-            return NavigationDecision.prevent;
+            logger.payment(
+                'PaymentInitiated', 'Alipay URL detected: ${request.url}',
+                orderId: orderId);
+
+            // 处理带有app_pay=Y参数的支付宝URL，启动外部APP
+            if (request.url.toLowerCase().contains('app_pay=y')) {
+              logger.payment('AlipayAppLaunch',
+                  'Alipay app_pay URL detected: ${request.url}',
+                  orderId: orderId);
+              // 尝试打开外部APP，添加完整的错误处理
+              try {
+                // 特殊处理Alipay URLs - 绕过canLaunchUrl检查
+                logger.payment('AlipaySpecialHandling',
+                    'Bypassing canLaunchUrl check for Alipay app_pay URL',
+                    orderId: orderId);
+
+                await launchUrl(Uri.parse(request.url),
+                    mode: LaunchMode.externalApplication,
+                    webViewConfiguration:
+                        const WebViewConfiguration(enableJavaScript: true));
+              } catch (e) {
+                logger.e('AlipayLaunchError', 'Error launching Alipay app: $e',
+                    error: e, orderId: orderId);
+                // 显示错误提示，不崩溃
+                showToast(
+                    "Cannot open Alipay. Please make sure the app is installed."
+                        .tr);
+              }
+              return NavigationDecision.prevent;
+            }
+
+            // 处理支付宝H5支付URL（如mclient.alipay.com/h5pay）
+            if (request.url.contains('mclient.alipay.com') ||
+                request.url.toLowerCase().contains('h5pay')) {
+              logger.payment('AlipayH5Pay',
+                  'Alipay H5 payment URL detected: ${request.url}',
+                  orderId: orderId);
+              // 允许在WebView中加载支付宝H5支付页面
+              return NavigationDecision.navigate;
+            }
+
+            // 处理其他支付宝相关域名，允许在WebView中正常加载
+            logger.payment(
+                'AlipayDomain', 'Alipay domain detected: ${request.url}',
+                orderId: orderId);
+            return NavigationDecision.navigate;
           }
 
           // 处理微信支付URLs - 标记支付已发起
@@ -139,22 +207,22 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
             if (request.url.toLowerCase().contains('wx.tenpay.com') ||
                 request.url.toLowerCase().contains('weixin.qq.com') ||
                 request.url.toLowerCase().contains('wechatpay.com')) {
-              _isPaymentInitiated = true;
-              print("Payment initiated: WeChat payment URL detected");
+              if (!_isPaymentInitiated) {
+                _isPaymentInitiated = true;
+                _printWithTime('=== 第一次设置 _isPaymentInitiated 为 true ===');
+                _printWithTime('触发位置: 微信支付URL检测');
+                _printWithTime('URL: ${request.url}');
+              }
+              logger.payment('PaymentInitiated',
+                  'WeChat payment URL detected: ${request.url}',
+                  orderId: orderId);
             }
           }
 
-          // 特别处理支付宝相关域名
-          if (request.url.contains('alipay') ||
-              request.url.contains('mclient.alipay.com')) {
-            print("Alipay domain detected: ${request.url}");
-            // 允许导航，让支付宝页面正常加载
-            return NavigationDecision.navigate;
-          }
-
           return NavigationDecision.navigate;
-        } catch (e) {
-          print("Error in navigation request: $e");
+        } catch (e, stackTrace) {
+          logger.e('NavigationError', 'Error in navigation request: $e',
+              error: e, stackTrace: stackTrace, orderId: orderId);
           // 捕获所有异常，防止崩溃
           showToast(
               "Error handling payment request. Please try again or use another payment method."
@@ -162,23 +230,30 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
           return NavigationDecision.prevent;
         }
       }, onHttpAuthRequest: (HttpAuthRequest request) {
-        flog("PaymentPage = onHttpAuthRequest");
+        logger.payment('HttpAuthRequest', 'onHttpAuthRequest',
+            orderId: orderId);
       }, onProgress: (int progress) {
-        flog("PaymentPage = onProgress:$progress");
+        logger.payment('WebViewProgress', 'onProgress: $progress',
+            orderId: orderId);
       }, onPageStarted: (String url) {
+        logger.payment('PageStarted', 'onPageStarted: $url', orderId: orderId);
         showLoading();
       }, onPageFinished: (String url) {
+        logger.payment('PageFinished', 'onPageFinished: $url',
+            orderId: orderId);
         dismissLoading();
         // 页面加载完成后，检查页面内容中的关键字
         // showToast("----------onPageFinished---------------_checkPageContentForKeywords");
         _checkPageContentForKeywords();
       }, onWebResourceError: (WebResourceError error) {
-        flog("PaymentPage = onWebResourceError(${error.description})");
+        logger.e('WebResourceError', 'onWebResourceError: ${error.description}',
+            error: error, orderId: orderId);
       }, onUrlChange: (UrlChange change) {
-        print('change: $change');
+        logger.payment('UrlChange', 'URL changed: $change', orderId: orderId);
       }, onInquiry: (String paymentToken) {
         // Do transaction status inquiry
-        flog("PaymentPage = onInquiry");
+        logger.payment('SdkInquiry', 'onInquiry: $paymentToken',
+            orderId: orderId);
         queryTransaction(paymentToken);
       }))
       // 注入JavaScript通道，用于获取页面内容
@@ -188,13 +263,33 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
           _checkPaymentKeywords(message.message);
         },
       )
-      // 注入JavaScript通道，用于检测支付按钮点击
+      // 注入JavaScript通道，用于检测支付按钮点击和取消按钮点击
       ..addJavaScriptChannel(
         'PaymentInitiationDetector',
         onMessageReceived: (JavaScriptMessage message) {
-          // 收到支付按钮点击通知
-          _isPaymentInitiated = true;
-          print("Payment initiated: Button clicked - ${message.message}");
+          String msg = message.message.toLowerCase();
+          _printWithTime('Received button click: $msg');
+
+          // 检测是否是取消按钮点击
+          if (msg.contains('cancel') ||
+              msg.contains('back') ||
+              msg.contains('返回') ||
+              msg.contains('取消')) {
+            _isPaymentCancelled = true;
+            _printWithTime('=== 检测到取消按钮点击，设置 _isPaymentCancelled 为 true ===');
+            logger.payment('PaymentCancelled',
+                'Cancel button clicked - ${message.message}',
+                orderId: orderId);
+          } else if (!_isPaymentInitiated) {
+            // 收到支付按钮点击通知
+            _isPaymentInitiated = true;
+            _printWithTime('=== 第一次设置 _isPaymentInitiated 为 true ===');
+            _printWithTime('触发位置: 支付按钮点击检测');
+            _printWithTime('消息: ${message.message}');
+            logger.payment('PaymentInitiated',
+                'Payment button clicked - ${message.message}',
+                orderId: orderId);
+          }
         },
       )
       ..loadRequest(Uri.parse(url));
@@ -209,32 +304,64 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
         (function() {
           // 1. 获取页面内容（用于支付状态检测）
           function getPageContent() {
-            const pageText = document.body.innerText.toLowerCase();
-            const pageTitle = document.title.toLowerCase();
-            const combinedText = pageText + ' ' + pageTitle;
-            return combinedText;
+            // 尝试多种方式获取页面内容，确保能捕获到SPA应用的动态内容
+            let pageText = '';
+            
+            // 方法1：获取body文本内容
+            pageText += (document.body.innerText || '').toLowerCase();
+            
+            // 方法2：获取所有可见元素的文本
+            const allElements = document.querySelectorAll('*:not(script):not(style):not(link)');
+            allElements.forEach(element => {
+              if (element.offsetParent !== null) { // 只获取可见元素
+                pageText += ' ' + (element.textContent || element.innerText || '').toLowerCase();
+              }
+            });
+            
+            // 方法3：获取标题
+            pageText += ' ' + (document.title || '').toLowerCase();
+            
+            // 方法4：获取URL中的路径和参数，可能包含状态信息
+            pageText += ' ' + window.location.href.toLowerCase();
+            
+            return pageText;
           }
           PaymentStatusChecker.postMessage(getPageContent());
           
-          // 2. 检测所有按钮点击，特别是包含支付相关文本的按钮
+          // 2. 检测所有按钮点击，特别是包含支付相关和取消相关文本的按钮
           function detectPaymentButtons() {
             const allButtons = document.querySelectorAll('button, input[type="button"], input[type="submit"], a');
             
             // 定义支付相关关键词
             const paymentKeywords = [
               'pay', 'payment', 'buy', 'purchase', 'checkout', 'confirm',
-              'pay now', 'confirm payment', 'submit', '完成', '支付', '确认',
+              'pay now', 'confirm payment', 'submit', 'continue', '完成', '支付', '确认',
               '立即支付', '确认支付', '提交订单', '下单', '付款'
             ];
             
+            // 定义取消相关关键词
+            const cancelKeywords = [
+              'cancel', 'back', 'return', 'abort', 'exit', 'close',
+              '取消', '返回', '退出', '关闭', '放弃'
+            ];
+            
             allButtons.forEach(button => {
-              // 检查按钮文本或aria标签是否包含支付关键词
+              // 检查按钮文本或aria标签
               const buttonText = (button.textContent || button.innerText || button.value || button.getAttribute('aria-label') || '').toLowerCase();
+              
+              // 检查是否包含支付关键词
               const hasPaymentKeyword = paymentKeywords.some(keyword => buttonText.includes(keyword.toLowerCase()));
+              
+              // 检查是否包含取消关键词
+              const hasCancelKeyword = cancelKeywords.some(keyword => buttonText.includes(keyword.toLowerCase()));
               
               // 检查按钮是否有支付相关的类名或ID
               const hasPaymentClass = button.className && button.className.toLowerCase().match(/pay|payment|checkout|confirm|submit/);
               const hasPaymentId = button.id && button.id.toLowerCase().match(/pay|payment|checkout|confirm|submit/);
+              
+              // 检查按钮是否有取消相关的类名或ID
+              const hasCancelClass = button.className && button.className.toLowerCase().match(/cancel|back|return|abort|exit|close/);
+              const hasCancelId = button.id && button.id.toLowerCase().match(/cancel|back|return|abort|exit|close/);
               
               // 检查按钮是否指向支付相关URL
               const hasPaymentHref = button.tagName === 'A' && button.href && 
@@ -242,10 +369,28 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
                  button.href.toLowerCase().includes('payment') ||
                  button.href.toLowerCase().includes('checkout'));
               
+              // 检查按钮是否指向取消相关URL
+              const hasCancelHref = button.tagName === 'A' && button.href && 
+                (button.href.toLowerCase().includes('cancel') || 
+                 button.href.toLowerCase().includes('back') ||
+                 button.href.toLowerCase().includes('return') ||
+                 button.href.toLowerCase().includes('exit'));
+              
               // 如果是支付按钮，添加点击监听
               if (hasPaymentKeyword || hasPaymentClass || hasPaymentId || hasPaymentHref) {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function(e) {
+                  // 只检测用户主动点击，不检测自动触发的点击
+                  if (!e.isTrusted) return; // 过滤掉非用户主动触发的事件
                   PaymentInitiationDetector.postMessage('Payment button clicked: ' + buttonText);
+                });
+              }
+              
+              // 如果是取消按钮，添加点击监听
+              if (hasCancelKeyword || hasCancelClass || hasCancelId || hasCancelHref) {
+                button.addEventListener('click', function(e) {
+                  // 只检测用户主动点击，不检测自动触发的点击
+                  if (!e.isTrusted) return; // 过滤掉非用户主动触发的事件
+                  PaymentInitiationDetector.postMessage('Cancel button clicked: ' + buttonText);
                 });
               }
             });
@@ -254,6 +399,9 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
           // 3. 监听所有表单提交事件，特别是支付表单
           function detectFormSubmissions() {
             document.addEventListener('submit', function(e) {
+              // 只检测用户主动提交，不检测自动提交
+              if (!e.isTrusted) return; // 过滤掉非用户主动触发的事件
+              
               const form = e.target;
               // 检查表单是否有支付相关的属性
               const action = form.action.toLowerCase();
@@ -279,51 +427,16 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
             });
           }
           
-          // 4. 监听页面中的支付相关API调用
+          // 4. 移除API调用检测，避免误触发
           function detectPaymentApiCalls() {
-            // 保存原始的fetch和XMLHttpRequest
-            const originalFetch = window.fetch;
-            const originalXHROpen = window.XMLHttpRequest.prototype.open;
-            
-            // 重写fetch方法
-            window.fetch = function(url, options) {
-              // 检查URL是否包含支付相关关键词
-              if (typeof url === 'string' && 
-                  (url.toLowerCase().includes('pay') || 
-                   url.toLowerCase().includes('payment') ||
-                   url.toLowerCase().includes('transaction'))) {
-                PaymentInitiationDetector.postMessage('Payment API call: ' + url);
-              }
-              return originalFetch.apply(this, arguments);
-            };
-            
-            // 重写XMLHttpRequest.open方法
-            window.XMLHttpRequest.prototype.open = function(method, url) {
-              if (typeof url === 'string' && 
-                  (url.toLowerCase().includes('pay') || 
-                   url.toLowerCase().includes('payment') ||
-                   url.toLowerCase().includes('transaction'))) {
-                PaymentInitiationDetector.postMessage('Payment XHR call: ' + url);
-              }
-              return originalXHROpen.apply(this, arguments);
-            };
+            // 注释掉API调用检测，因为页面加载时的自动API请求会导致误触发
+            // 只保留用户主动操作的检测
           }
           
-          // 5. 监听页面中的支付状态变化
+          // 5. 移除URL变化检测，避免误触发
           function detectPaymentStatusChanges() {
-            // 监听URL变化，可能表示支付流程进展
-            let lastUrl = window.location.href;
-            setInterval(function() {
-              if (window.location.href !== lastUrl) {
-                lastUrl = window.location.href;
-                // 检查新URL是否包含支付相关状态
-                if (lastUrl.toLowerCase().includes('success') || 
-                    lastUrl.toLowerCase().includes('failed') ||
-                    lastUrl.toLowerCase().includes('status')) {
-                  PaymentInitiationDetector.postMessage('Payment status URL changed: ' + lastUrl);
-                }
-              }
-            }, 500);
+            // 注释掉URL变化检测，因为页面自动跳转可能导致误触发
+            // 只保留用户主动操作的检测
           }
           
           // 执行所有检测函数
@@ -350,84 +463,49 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
       ''';
       controller.runJavaScript(jsCode);
     } catch (e) {
-      print("Error checking page content and injecting payment detection: $e");
+      _printWithTime(
+          "Error checking page content and injecting payment detection: $e");
     }
   }
 
-  // 检查页面内容中是否包含支付成功关键字
+  // 检查页面内容中是否包含支付完成标识
   void _checkPaymentKeywords(String pageContent) {
-    print("Checking page content for payment keywords: $pageContent");
-    // showToast("Checking page content for payment keywords: $pageContent");
+    _printWithTime("检测页面内容，原始文件为: $pageContent");
 
-    // 定义支付成功的关键字列表
-    const successKeywords = [
-      'success',
-      'successful',
-      'transaction is successful',
-      'transaction is successful.',
-      'payment successful',
-      'payment completed',
-      'transaction successful',
-      'transaction completed',
-      'payment success',
-      '订单成功',
-      '支付成功',
-      '交易成功',
-      '完成支付',
-      'payment has been made',
-      'payment accepted'
-    ];
+    // 转换为小写，统一比较
+    pageContent = pageContent.toLowerCase();
 
-    // 检查是否包含任何成功关键字
-    for (final keyword in successKeywords) {
-      if (pageContent.contains(keyword.toLowerCase())) {
-        print("Found success keyword: $keyword");
-        // 支付成功，取消轮询并返回成功结果
-        // if (_pollingTimer != null && _pollingTimer!.isActive) {
-        //   _pollingTimer!.cancel();
-        //   _pollingTimer = null;
-        // }
-        showToast("Payment successful".tr);
-        Get.back(result: true);
+    // 检查URL是否包含支付完成标识（2C2P支付完成页面URL包含/info/路径）
+    if (pageContent.contains('/info/')) {
+      _printWithTime("检测到支付完成页面: URL包含/info/路径");
+      _stopSdkPolling(); // 停止SDK轮询
+
+      // 检查是否已取消支付
+      if (_isPaymentCancelled) {
+        _printWithTime("已检测到支付取消，不返回orderId，不触发轮询");
+        Get.back(result: null);
         return;
       }
-    }
 
-    // 检查是否包含失败关键字
-    const failureKeywords = [
-      'failed',
-      'failure',
-      'payment failed',
-      'transaction failed',
-      'payment error',
-      'transaction error',
-      'cancelled',
-      'canceled',
-      'payment cancelled',
-      'transaction cancelled',
-      '订单失败',
-      '支付失败',
-      '交易失败',
-      '取消支付',
-      'payment rejected'
-    ];
+      _printWithTime("退出WebView，返回订单支付页面，通过服务器接口轮询支付状态");
 
-    // 检查是否包含任何失败关键字
-    for (final keyword in failureKeywords) {
-      if (pageContent.contains(keyword.toLowerCase())) {
-        print("Found failure keyword: $keyword");
-        // 支付失败，取消轮询并返回失败结果
-        // if (_pollingTimer != null && _pollingTimer!.isActive) {
-        //   _pollingTimer!.cancel();
-        //   _pollingTimer = null;
-        // }
-        showInfo("Payment failed".tr);
-        Get.back(result: false);
-        return;
+      // 安全获取orderId
+      String orderId = "";
+      try {
+        final arguments = Get.arguments ?? {};
+        orderId = arguments["orderId"] ?? "";
+      } catch (e) {
+        _printWithTime("获取orderId失败: $e");
+        orderId = "";
       }
+      _printWithTime("订单${orderId}返回支付页面");
+
+      // 返回orderId，触发服务器接口轮询
+      Get.back(result: orderId.isNotEmpty ? orderId : null);
+      return;
     }
 
-    print("No payment status keywords found in page content");
+    _printWithTime("未检测到支付完成页面，继续在WebView中处理");
   }
 
   @override
@@ -440,7 +518,8 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
             return false;
           } else {
             // 如果已经是webview第一页，用户从webview回退到支付页面
-            print("User is exiting webview, returning to payment page");
+            _printWithTime(
+                "User is exiting webview, returning to payment page");
             // 停止SDK轮询
             _stopSdkPolling();
             // 获取orderId
@@ -449,16 +528,23 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
               final arguments = Get.arguments ?? {};
               orderId = arguments["orderId"] ?? "";
             } catch (e) {
-              print("Error getting orderId: $e");
+              _printWithTime("Error getting orderId: $e");
               orderId = "";
             }
 
-            // 只有当用户真正发起了支付请求时，才返回orderId进行轮询
-            // 否则返回null，不需要轮询订单状态
-            print("Payment initiated: $_isPaymentInitiated");
-            Get.back(
-                result:
-                    _isPaymentInitiated && orderId.isNotEmpty ? orderId : null);
+            // 打印调试信息
+            _printWithTime("Payment initiated: $_isPaymentInitiated");
+            _printWithTime("Payment cancelled: $_isPaymentCancelled");
+            _printWithTime("Order ID: $orderId");
+
+            // 只有当用户真正发起了支付请求且未取消支付时，才返回orderId进行轮询
+            // 如果用户点击了取消按钮，返回null，不需要轮询订单状态
+            bool shouldPoll = _isPaymentInitiated &&
+                !_isPaymentCancelled &&
+                orderId.isNotEmpty;
+            _printWithTime("Should poll: $shouldPoll");
+
+            Get.back(result: shouldPoll ? orderId : null);
             return true;
           }
         },
@@ -479,7 +565,7 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
                   await controller.goBack();
                 } else {
                   // 如果已经是webview第一页，用户从webview回退到支付页面
-                  print(
+                  _printWithTime(
                       "User is exiting webview via app bar button, returning to payment page");
                   // 停止SDK轮询
                   _stopSdkPolling();
@@ -489,17 +575,23 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
                     final arguments = Get.arguments ?? {};
                     orderId = arguments["orderId"] ?? "";
                   } catch (e) {
-                    print("Error getting orderId: $e");
+                    _printWithTime("Error getting orderId: $e");
                     orderId = "";
                   }
 
-                  // 只有当用户真正发起了支付请求时，才返回orderId进行轮询
-                  // 否则返回null，不需要轮询订单状态
-                  print("Payment initiated: $_isPaymentInitiated");
-                  Get.back(
-                      result: _isPaymentInitiated && orderId.isNotEmpty
-                          ? orderId
-                          : null);
+                  // 打印调试信息
+                  _printWithTime("Payment initiated: $_isPaymentInitiated");
+                  _printWithTime("Payment cancelled: $_isPaymentCancelled");
+                  _printWithTime("Order ID: $orderId");
+
+                  // 只有当用户真正发起了支付请求且未取消支付时，才返回orderId进行轮询
+                  // 如果用户点击了取消按钮，返回null，不需要轮询订单状态
+                  bool shouldPoll = _isPaymentInitiated &&
+                      !_isPaymentCancelled &&
+                      orderId.isNotEmpty;
+                  _printWithTime("Should poll: $shouldPoll");
+
+                  Get.back(result: shouldPoll ? orderId : null);
                 }
               },
             ),
@@ -528,11 +620,11 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
     try {
       orderId = Get.arguments?["orderId"] ?? "";
     } catch (e) {
-      print("Error getting orderId: $e");
+      _printWithTime("Error getting orderId: $e");
       orderId = "";
     }
 
-    print("-----------------------queryTransaction orderId:$orderId");
+    _printWithTime("-----------------------queryTransaction orderId:$orderId");
     // 开始SDK轮询
     _startSdkPolling(paymentToken);
   }
@@ -563,13 +655,16 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
   /// 执行单次SDK轮询
   void _performSdkPolling(String paymentToken, Map<String, dynamic> request) {
     _sdkPollingAttempts++;
-    print(
+    _printWithTime(
         "SDK Polling - Attempt $_sdkPollingAttempts/200 for paymentToken: $paymentToken");
 
     //Step 3: Retrieve transaction status inquiry response.
     PGWSDK().transactionStatus(request, (response) {
+      _printWithTime(
+          "-----------sdk检测开始，response code:${response['responseCode']}");
       if (response['responseCode'] == APIResponseCode.transactionCompleted) {
         // Payment successful
+        _printWithTime("SDK检测到支付成功");
         _stopSdkPolling();
         dismissLoading();
         showToast("Payment successful".tr);
@@ -592,7 +687,7 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
         // 轮询达到最大次数，停止轮询
         _stopSdkPolling();
         dismissLoading();
-        print("SDK Polling timed out after 200 attempts");
+        _printWithTime("SDK Polling timed out after 200 attempts");
       }
       // 其他状态，继续轮询
     }, (error) {
@@ -601,7 +696,8 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
         // 轮询达到最大次数，停止轮询
         _stopSdkPolling();
         dismissLoading();
-        print("SDK Polling timed out after 200 attempts due to API error");
+        _printWithTime(
+            "SDK Polling timed out after 200 attempts due to API error");
       }
     });
   }
@@ -614,6 +710,6 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
     }
     _isSdkPollingActive = false;
     _sdkPollingAttempts = 0;
-    print("SDK Polling stopped");
+    _printWithTime("SDK Polling stopped");
   }
 }

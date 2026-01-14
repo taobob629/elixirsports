@@ -72,10 +72,11 @@ class ApiInterceptor extends InterceptorsWrapper {
       showLoading();
     }
     log(
-      'api-request:${options.baseUrl}${options.path}' + ' queryParameters: ${options.queryParameters} data :${options.data} ',
+      'api-request:${options.baseUrl}${options.path}' +
+          ' queryParameters: ${options.queryParameters} data :${options.data} ',
       name: "WY_API",
     );
-    //debugPrint('---api-request--->data--->${options.data}');
+    // print('---api-request--->data--->${options.data}');
     handler.next(options);
   }
 
@@ -99,7 +100,7 @@ class ApiInterceptor extends InterceptorsWrapper {
         if (respData.msg.isEmpty) {
           showErrorWidget("Server Failure");
         } else {
-          showErrorWidget(respData.msg);
+          showInfo(respData.msg);
         }
 
         // response.data = respData.data;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:elixir_esports/models/order_model.dart';
 import 'package:elixir_esports/utils/toast_utils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -22,7 +23,8 @@ class PayOrderPage extends StatefulWidget {
   State<PayOrderPage> createState() => _PayOrderPageState();
 }
 
-class _PayOrderPageState extends State<PayOrderPage> {
+class _PayOrderPageState extends State<PayOrderPage>
+    with TickerProviderStateMixin {
   late SelectCouponModel _selectedCoupon = SelectCouponModel(
       couponId: "0", name: "", expireTime: "", couponDiscount: 0.0);
   late double _finalPayAmount;
@@ -32,6 +34,11 @@ class _PayOrderPageState extends State<PayOrderPage> {
   late double _service; //服务费
   late double _couponDiscount; //优惠券折扣
   late double _memberDiscountPrice; // 会员折扣
+
+  // 添加金额变化动画相关变量
+  late AnimationController _amountController;
+  late Animation<double> _amountAnimation;
+  double _oldPayAmount = 0.0;
   //
 //_finalPayAmount计算公式: _subTotal+（_service）+（_tax）-_couponDiscount-_memberDiscountPrice
   @override
@@ -49,6 +56,26 @@ class _PayOrderPageState extends State<PayOrderPage> {
     _discountAmount = 0.0;
     // 初始金额计算（带边界值校验）
     _finalPayAmount = _calculateFinalAmount();
+    _oldPayAmount = _finalPayAmount;
+
+    // 初始化金额变化动画控制器
+    _amountController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    // 初始化金额变化动画
+    _amountAnimation = Tween<double>(
+      begin: _oldPayAmount,
+      end: _finalPayAmount,
+    ).animate(_amountController);
+  }
+
+  @override
+  void dispose() {
+    // 释放动画控制器资源
+    _amountController.dispose();
+    super.dispose();
   }
 
   /// 核心：金额计算逻辑（抽离为独立方法，便于复用和维护）
@@ -65,8 +92,20 @@ class _PayOrderPageState extends State<PayOrderPage> {
     setState(() {
       _selectedCoupon = newCoupon;
       _discountAmount = newCoupon.couponDiscount;
-      // 使用统一的金额计算方法
+
+      // 保存旧金额用于动画
+      _oldPayAmount = _finalPayAmount;
+      // 计算新金额
       _finalPayAmount = _calculateFinalAmount();
+
+      // 更新并启动金额变化动画
+      _amountController.reset();
+      _amountAnimation = Tween<double>(
+        begin: _oldPayAmount,
+        end: _finalPayAmount,
+      ).animate(_amountController);
+      // 直接启动金额变化动画
+      _amountController.forward();
     });
   }
 
@@ -105,8 +144,19 @@ class _PayOrderPageState extends State<PayOrderPage> {
           _service = service;
           _subTotal = subTotal;
           _couponDiscount = couponDiscount;
+
+          // 保存旧金额用于动画
+          _oldPayAmount = _finalPayAmount;
           // 重新计算最终金额
           _finalPayAmount = _calculateFinalAmount();
+
+          // 重置并启动金额变化动画
+          _amountController.reset();
+          _amountAnimation = Tween<double>(
+            begin: _oldPayAmount,
+            end: _finalPayAmount,
+          ).animate(_amountController);
+          _amountController.forward();
           // 提示用户
           // showToast("已选择优惠券：抵扣¥${discountAmount.toStringAsFixed(2)}".tr);
         });
@@ -120,8 +170,19 @@ class _PayOrderPageState extends State<PayOrderPage> {
               name: "No coupon selected".tr,
               expireTime: "",
               couponDiscount: 0.0);
+
+          // 保存旧金额用于动画
+          _oldPayAmount = _finalPayAmount;
           // 重新计算最终金额
           _finalPayAmount = _calculateFinalAmount();
+
+          // 重置并启动金额变化动画
+          _amountController.reset();
+          _amountAnimation = Tween<double>(
+            begin: _oldPayAmount,
+            end: _finalPayAmount,
+          ).animate(_amountController);
+          _amountController.forward();
           // showToast("已取消选择优惠券".tr);
         });
       }
@@ -172,12 +233,11 @@ class _PayOrderPageState extends State<PayOrderPage> {
     if (keywords.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      width: double.infinity, // 确保容器宽度填满父组件
+      width: double.infinity, // 确保容器宽度填满父组件，让Wrap能正确换行
       child: Wrap(
         spacing: 6.w, // 水平间距
         runSpacing: 4.h, // 垂直间距（换行后）
-        alignment: WrapAlignment.start, // 从左到右对齐
-        crossAxisAlignment: WrapCrossAlignment.start, // 垂直对齐方式
+        alignment: WrapAlignment.start,
         children: keywords.map((keyword) {
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
@@ -191,8 +251,8 @@ class _PayOrderPageState extends State<PayOrderPage> {
                 fontSize: 12.sp,
                 color: const Color(0xff666666),
               ),
-              maxLines: 1, // 确保关键字不换行
-              overflow: TextOverflow.ellipsis, // 超长时显示省略号
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           );
         }).toList(),
@@ -363,7 +423,7 @@ class _PayOrderPageState extends State<PayOrderPage> {
                       children: [
                         Text(
                           widget.orderData.couponLength > 0
-                              ? "${widget.orderData.couponLength}${"coupons available".tr}"
+                              ? "${widget.orderData.couponLength}${" coupons available".tr}"
                               : "No coupons available".tr,
                           style: TextStyle(
                             fontSize: 14.sp,
@@ -399,7 +459,7 @@ class _PayOrderPageState extends State<PayOrderPage> {
                                 color: const Color(0xff333333)),
                           ),
                           Text(
-                            '-¥${_discountAmount.toStringAsFixed(2)}',
+                            '-S\$${_discountAmount.toStringAsFixed(2)}',
                             style: TextStyle(
                                 fontSize: 15.sp,
                                 color: const Color(0xffea0000)),
@@ -480,13 +540,18 @@ class _PayOrderPageState extends State<PayOrderPage> {
               ),
             ),
             onPressed: _doPay,
-            child: Text(
-              "${"Pay Now:".tr} S\$${_finalPayAmount.toStringAsFixed(2)}",
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
+            child: AnimatedBuilder(
+              animation: _amountAnimation,
+              builder: (context, child) {
+                return Text(
+                  "${"Pay Now:".tr} S\$${_amountAnimation.value.toStringAsFixed(2)}",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                );
+              },
             ),
           ),
         ),
