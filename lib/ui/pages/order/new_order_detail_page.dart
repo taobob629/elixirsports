@@ -190,7 +190,7 @@ class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
       double? amount =
           double.tryParse(value.replaceAll(RegExp(r'[^0-9.]'), ''));
       if (amount != null) {
-        formattedValue = "S${amount.toStringAsFixed(2)}";
+        formattedValue = "S\$${amount.toStringAsFixed(2)}";
       }
     }
 
