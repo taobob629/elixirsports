@@ -102,6 +102,8 @@ class OrderDetailPage extends BasePage<OrderDetailCtr> {
                     fontFamily: FONT_MEDIUM,
                   ),
                 ).paddingOnly(left: 10.w),
+                // 商品关键词标签
+                _buildGoodsKeywords(item.keywords),
                 Row(
                   children: [
                     Expanded(
@@ -129,6 +131,40 @@ class OrderDetailPage extends BasePage<OrderDetailCtr> {
           ),
         ],
       );
+
+  // 构建商品关键词标签Widget
+  Widget _buildGoodsKeywords(List<String> keywords) {
+    // 空列表直接返回空组件，不占用空间
+    if (keywords.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity, // 确保容器宽度填满父组件
+      child: Wrap(
+        spacing: 6.w, // 水平间距
+        runSpacing: 4.h, // 垂直间距（换行后）
+        alignment: WrapAlignment.start, // 从左到右对齐
+        crossAxisAlignment: WrapCrossAlignment.start, // 垂直对齐方式
+        children: keywords.map((keyword) {
+          return Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+            decoration: BoxDecoration(
+              color: const Color(0xfff5f5f5),
+              borderRadius: BorderRadius.circular(4.r),
+            ),
+            child: Text(
+              keyword,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: const Color(0xff666666),
+              ),
+              maxLines: 1, // 确保关键字不换行
+              overflow: TextOverflow.ellipsis, // 超长时显示省略号
+            ),
+          );
+        }).toList(),
+      ),
+    ).paddingOnly(left: 10.w, top: 8.h);
+  }
 
   Widget orderingInfoWidget(String name, String value) => Column(
         children: [

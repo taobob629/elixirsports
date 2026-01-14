@@ -43,7 +43,8 @@ class OrderApi {
     });
 
     // 修复：确保返回的是List，处理API可能返回String的情况
-    final data = response.data['data'];
+    // print("------------org response:${response.toString()}");
+    final data = response.data;
     if (data is List) {
       return data;
     } else if (data is String) {
@@ -66,6 +67,8 @@ class OrderApi {
       "orderId": orderId,
       "couponId": couponId,
     });
-    return response.data['data'] ?? {};
+    // 注释掉不必要的日志
+    // print("----------------respons:${response.toString()}");
+    return response.data?? {};
   }
 }

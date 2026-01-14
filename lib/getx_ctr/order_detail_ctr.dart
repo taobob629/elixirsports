@@ -21,7 +21,8 @@ class OrderDetailCtr extends BasePageController {
       }
     } catch (e) {
       // 处理API调用错误
-      print('Failed to get order detail: $e');
+      // 注释掉不必要的日志
+      // print('Failed to get order detail: $e');
       // 使用空的OrderDetailModel作为默认值
       orderDetailModel.value = OrderDetailModel(items: []);
     }

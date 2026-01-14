@@ -59,7 +59,12 @@ class OrderListPage extends BasePage<OrderListCtr> {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: toColor('#B4D8DB'),
+                      color: model.orderStatus == 1
+                          ? toColor('#E8F5E8') // Completed - Green background
+                          : model.orderStatus == 3
+                              ? toColor('#FFEBEE') // Refund - Red background
+                              : toColor(
+                                  '#FFF3E0'), // Unpaid - Orange background
                       borderRadius: BorderRadius.circular(1.5.r),
                     ),
                     padding: EdgeInsets.symmetric(
@@ -73,7 +78,11 @@ class OrderListPage extends BasePage<OrderListCtr> {
                               ? "Refund".tr
                               : "Unpaid".tr,
                       style: TextStyle(
-                        color: toColor('#396E80'),
+                        color: model.orderStatus == 1
+                            ? toColor('#388E3C') // Completed - Green text
+                            : model.orderStatus == 3
+                                ? toColor('#D32F2F') // Refund - Red text
+                                : toColor('#F57C00'), // Unpaid - Orange text
                         fontFamily: FONT_LIGHT,
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
