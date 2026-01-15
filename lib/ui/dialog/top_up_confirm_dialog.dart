@@ -528,17 +528,18 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
     _pollingAttempts = 0;
     _isPollingCancelled = false;
     _isPaymentProcessed = false;
-    logger.payment('PollingStart', 'Starting checkOrderState polling',
-        orderId: orderId);
+    ('PollingStart', 'Starting checkOrderState polling', orderId: orderId);
 
     // 显示带取消按钮的加载对话框 - 只显示一次，点击遮罩不关闭，按系统回退键也不关闭
     SmartDialog.show(
       builder: (context) => WillPopScope(
         onWillPop: () async {
           // 拦截系统回退键，阻止关闭对话框和停止轮询
-          logger.payment('BackButtonBlocked',
-              'System back button blocked during payment polling',
-              orderId: orderId);
+          (
+            'BackButtonBlocked',
+            'System back button blocked during payment polling',
+            orderId: orderId
+          );
           return false; // 返回false阻止回退
         },
         child: Container(
@@ -597,9 +598,11 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
                   btnText: "Cancel".tr,
                   onTap: () {
                     // 用户主动取消轮询，只关闭轮询对话框
-                    logger.payment(
-                        'PollingCancelled', 'User cancelled payment polling',
-                        orderId: orderId);
+                    (
+                      'PollingCancelled',
+                      'User cancelled payment polling',
+                      orderId: orderId
+                    );
                     _isPollingCancelled = true;
                     _isPaymentProcessed = true;
                     _pollingTimer?.cancel();
@@ -621,23 +624,22 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
 
     // 立即执行第一次轮询
     _pollingAttempts++;
-    logger.payment(
-        'PollingAttempt', 'Attempt $_pollingAttempts/$_maxPollingAttempts',
-        orderId: orderId);
+    (
+      'PollingAttempt',
+      'Attempt $_pollingAttempts/$_maxPollingAttempts',
+      orderId: orderId
+    );
 
     try {
       // 调用checkOrderState接口
-      logger.payment('ApiCall', 'Calling checkOrderState API',
-          orderId: orderId);
+      ('ApiCall', 'Calling checkOrderState API', orderId: orderId);
       final result = await WalletApi.checkTopUpOrderState(orderId: orderId);
-      logger.payment('ApiResponse', 'checkOrderState response: $result',
-          orderId: orderId);
+      ('ApiResponse', 'checkOrderState response: $result', orderId: orderId);
 
       if (result != null && !_isPollingCancelled && !_isPaymentProcessed) {
         if (result['state'] == 1) {
           // 支付成功，停止轮询
-          logger.payment('PaymentSuccess', 'Payment successful! State: 1',
-              orderId: orderId);
+          ('PaymentSuccess', 'Payment successful! State: 1', orderId: orderId);
           _isPaymentProcessed = true;
           SmartDialog.dismiss();
 
@@ -647,12 +649,14 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
           return; // 直接返回，不启动定时器
         } else if (result['state'] == 0) {
           // 支付中，继续轮询
-          logger.payment('PaymentProcessing', 'Payment in progress. State: 0',
-              orderId: orderId);
+          (
+            'PaymentProcessing',
+            'Payment in progress. State: 0',
+            orderId: orderId
+          );
         } else if (result['state'] == 2) {
           // 支付失败，停止轮询
-          logger.payment('PaymentFailed', 'Payment failed! State: 2',
-              orderId: orderId);
+          ('PaymentFailed', 'Payment failed! State: 2', orderId: orderId);
           _isPaymentProcessed = true;
           SmartDialog.dismiss();
           // 不关闭支付弹窗，停留在充值页面
@@ -660,9 +664,11 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
           return; // 直接返回，不启动定时器
         } else {
           // 其他状态，支付失败或异常
-          logger.payment('PaymentUnknownState',
-              'Payment failed with unknown state: ${result['state']}',
-              orderId: orderId);
+          (
+            'PaymentUnknownState',
+            'Payment failed with unknown state: ${result['state']}',
+            orderId: orderId
+          );
           _isPaymentProcessed = true;
           SmartDialog.dismiss();
           // 不关闭支付弹窗，停留在充值页面
@@ -679,9 +685,11 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
 
     // 检查是否达到最大尝试次数
     if (_pollingAttempts >= _maxPollingAttempts) {
-      logger.payment('PollingTimeout',
-          'Polling reached maximum attempts ($_maxPollingAttempts), stopping',
-          orderId: orderId);
+      (
+        'PollingTimeout',
+        'Polling reached maximum attempts ($_maxPollingAttempts), stopping',
+        orderId: orderId
+      );
       _isPaymentProcessed = true;
       SmartDialog.dismiss();
       // 不关闭支付弹窗，停留在充值页面
@@ -693,28 +701,30 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
 
     // 如果第一次轮询没有完成（状态不是1且未取消），启动定时器继续轮询
     if (!_isPollingCancelled && !_isPaymentProcessed) {
-      logger.payment('PollingTimerStart', 'Starting polling timer',
-          orderId: orderId);
+      ('PollingTimerStart', 'Starting polling timer', orderId: orderId);
       _pollingTimer = Timer.periodic(Duration(seconds: _pollingIntervalSeconds),
           (timer) async {
         // 检查状态，避免重复执行
         if (_isPollingCancelled || _isPaymentProcessed) {
           timer.cancel();
-          logger.payment('PollingTimerStop', 'Polling timer stopped',
-              orderId: orderId);
+          ('PollingTimerStop', 'Polling timer stopped', orderId: orderId);
           return;
         }
 
         _pollingAttempts++;
-        logger.payment(
-            'PollingAttempt', 'Attempt $_pollingAttempts/$_maxPollingAttempts',
-            orderId: orderId);
+        (
+          'PollingAttempt',
+          'Attempt $_pollingAttempts/$_maxPollingAttempts',
+          orderId: orderId
+        );
 
         // 检查是否达到最大尝试次数
         if (_pollingAttempts >= _maxPollingAttempts) {
-          logger.payment('PollingTimeout',
-              'Polling reached maximum attempts ($_maxPollingAttempts), stopping',
-              orderId: orderId);
+          (
+            'PollingTimeout',
+            'Polling reached maximum attempts ($_maxPollingAttempts), stopping',
+            orderId: orderId
+          );
           _isPaymentProcessed = true;
           SmartDialog.dismiss();
           // 不关闭支付弹窗，停留在充值页面
@@ -728,14 +738,20 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
         try {
           // 调用checkOrderState接口
           final result = await WalletApi.checkTopUpOrderState(orderId: orderId);
-          logger.payment('ApiResponse', 'checkOrderState response: $result',
-              orderId: orderId);
+          (
+            'ApiResponse',
+            'checkOrderState response: $result',
+            orderId: orderId
+          );
 
           if (result != null && !_isPollingCancelled && !_isPaymentProcessed) {
             if (result['state'] == 1) {
               // 支付成功，停止轮询
-              logger.payment('PaymentSuccess', 'Payment successful! State: 1',
-                  orderId: orderId);
+              (
+                'PaymentSuccess',
+                'Payment successful! State: 1',
+                orderId: orderId
+              );
               _isPaymentProcessed = true;
               timer.cancel();
               SmartDialog.dismiss();
@@ -743,9 +759,11 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
               // 获取充值金额和奖励金
               int money = result['money'] ?? 0;
               int point = result['point'] ?? 0;
-              logger.payment(
-                  'PaymentAmounts', 'Received money: $money, point: $point',
-                  orderId: orderId);
+              (
+                'PaymentAmounts',
+                'Received money: $money, point: $point',
+                orderId: orderId
+              );
 
               // 更新WalletModel，增加相应的金额
               if (money > 0 || point > 0) {
@@ -777,9 +795,11 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
                   cashRecord: walletCtr.walletModel.value.cashRecord,
                 );
 
-                logger.payment('WalletUpdated',
-                    'Updated wallet: cash=${cashValue.toStringAsFixed(2)}, reward=${rewardValue.toStringAsFixed(2)}',
-                    orderId: orderId);
+                (
+                  'WalletUpdated',
+                  'Updated wallet: cash=${cashValue.toStringAsFixed(2)}, reward=${rewardValue.toStringAsFixed(2)}',
+                  orderId: orderId
+                );
               }
 
               // 关闭支付弹窗
@@ -787,13 +807,14 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
               showSuccess("Payment successfully".tr);
             } else if (result['state'] == 0) {
               // 支付中，继续轮询
-              logger.payment(
-                  'PaymentProcessing', 'Payment in progress. State: 0',
-                  orderId: orderId);
+              (
+                'PaymentProcessing',
+                'Payment in progress. State: 0',
+                orderId: orderId
+              );
             } else if (result['state'] == 2) {
               // 支付失败，停止轮询
-              logger.payment('PaymentFailed', 'Payment failed! State: 2',
-                  orderId: orderId);
+              ('PaymentFailed', 'Payment failed! State: 2', orderId: orderId);
               _isPaymentProcessed = true;
               timer.cancel();
               SmartDialog.dismiss();
@@ -801,9 +822,11 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
               showInfo("Payment failed".tr);
             } else {
               // 其他状态，支付失败或异常
-              logger.payment('PaymentUnknownState',
-                  'Payment failed with unknown state: ${result['state']}',
-                  orderId: orderId);
+              (
+                'PaymentUnknownState',
+                'Payment failed with unknown state: ${result['state']}',
+                orderId: orderId
+              );
               _isPaymentProcessed = true;
               timer.cancel();
               SmartDialog.dismiss();
@@ -844,11 +867,16 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
     };
     final pgwModel = await WalletApi.getPGWPaymentTokenAndUrl(map: map);
 
-    logger.payment('PaymentInit', 'PGW Payment initialized',
-        orderId: pgwModel?.invoiceNo ?? '');
-    logger.payment('PaymentParams',
-        'URL: ${pgwModel?.webPaymentUrl}, Token: ${pgwModel?.paymentToken}, InvoiceNo: ${pgwModel?.invoiceNo}',
-        orderId: pgwModel?.invoiceNo ?? '');
+    (
+      'PaymentInit',
+      'PGW Payment initialized',
+      orderId: pgwModel?.invoiceNo ?? ''
+    );
+    (
+      'PaymentParams',
+      'URL: ${pgwModel?.webPaymentUrl}, Token: ${pgwModel?.paymentToken}, InvoiceNo: ${pgwModel?.invoiceNo}',
+      orderId: pgwModel?.invoiceNo ?? ''
+    );
 
     if (pgwModel?.webPaymentUrl != null && pgwModel!.webPaymentUrl.isNotEmpty) {
       // 使用内置WebView进行支付，设置跳转目标为钱包页面
@@ -862,18 +890,22 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
       // 根据WebView返回结果处理
       if (result == true) {
         // 支付成功（SDK轮询检测到）
-        logger.payment(
-            'PaymentSuccess', 'Third-party payment successful (SDK detected)',
-            orderId: pgwModel?.invoiceNo ?? '');
+        (
+          'PaymentSuccess',
+          'Third-party payment successful (SDK detected)',
+          orderId: pgwModel?.invoiceNo ?? ''
+        );
         dismissLoading();
         Get.back();
         showSuccess("Payment successfully".tr);
       } else if (result is String && result.isNotEmpty) {
         // 从webview返回orderId，需要轮询checkOrderState接口
         String returnedOrderId = result;
-        logger.payment('PollingTrigger',
-            'WebView returned orderId: $returnedOrderId, starting checkOrderState polling',
-            orderId: returnedOrderId);
+        (
+          'PollingTrigger',
+          'WebView returned orderId: $returnedOrderId, starting checkOrderState polling',
+          orderId: returnedOrderId
+        );
 
         dismissLoading();
 
@@ -881,15 +913,20 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
         await _startCheckOrderStatePolling(returnedOrderId);
       } else {
         // 支付失败或取消
-        logger.payment(
-            'PaymentCancelled', 'Third-party payment failed or cancelled',
-            orderId: pgwModel?.invoiceNo ?? '');
+        (
+          'PaymentCancelled',
+          'Third-party payment failed or cancelled',
+          orderId: pgwModel?.invoiceNo ?? ''
+        );
         dismissLoading();
         // 不显示失败提示，让用户自行决定后续操作
       }
     } else {
-      logger.payment('PaymentError', 'Invalid payment URL',
-          orderId: pgwModel?.invoiceNo ?? '');
+      (
+        'PaymentError',
+        'Invalid payment URL',
+        orderId: pgwModel?.invoiceNo ?? ''
+      );
       dismissLoading();
       showInfo("Payment failed7".tr);
       Get.back();

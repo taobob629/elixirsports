@@ -74,188 +74,142 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
     // 获取跳转目标，默认跳转到订单列表
     redirectTarget = arguments["redirectTarget"] ?? "orderList";
 
-    // 记录WebView初始化日志
-    logger.payment('WebViewInit', 'Initializing PGW WebView', orderId: orderId);
-    logger.payment('WebViewParams',
-        'URL: $url, OrderId: $orderId, PaymentToken: $paymentToken, RedirectTarget: $redirectTarget');
-
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent(
           "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.152 Mobile Safari/537.36")
       ..setNavigationDelegate(PGWNavigationDelegate(
           onNavigationRequest: (NavigationRequest request) async {
-        try {
-          final Uri uri = Uri.parse(request.url);
-          logger.payment('WebViewNavRequest',
-              'Navigation request: ${request.url}, Scheme: ${uri.scheme}',
-              orderId: orderId);
+            try {
+              final Uri uri = Uri.parse(request.url);
 
-          // 处理APP链接（如alipays://, weixin://等）
-          if (uri.scheme != 'http' && uri.scheme != 'https') {
-            // 标记用户真正发起了支付请求
-            if (!_isPaymentInitiated) {
-              _isPaymentInitiated = true;
-              print('=== 第一次设置 _isPaymentInitiated 为 true ===');
-              print('触发位置: 外部APP URL检测');
-              print('URL: ${request.url}');
-              print('时间: ${DateTime.now()}');
-            }
-            logger.payment(
-                'PaymentInitiated', 'External app URL detected: ${request.url}',
-                orderId: orderId);
+              // 处理APP链接（如alipays://, weixin://等）
+              if (uri.scheme != 'http' && uri.scheme != 'https') {
+                // 标记用户真正发起了支付请求
+                if (!_isPaymentInitiated) {
+                  _isPaymentInitiated = true;
+                  print('=== 第一次设置 _isPaymentInitiated 为 true ===');
+                  print('触发位置: 外部APP URL检测');
+                  print('URL: ${request.url}');
+                  print('时间: ${DateTime.now()}');
+                }
 
-            // 尝试打开外部APP，添加完整的错误处理
-            logger.payment(
-                'ExternalAppLaunch', 'Opening external app: ${request.url}',
-                orderId: orderId);
+                // 尝试打开外部APP，添加完整的错误处理
 
-            // 特殊处理Alipay URLs - 绕过canLaunchUrl检查
-            bool shouldBypassCheck = false;
-            if (uri.scheme == 'alipays' ||
-                request.url.toLowerCase().contains('alipay')) {
-              shouldBypassCheck = true;
-              logger.payment('AlipaySpecialHandling',
-                  'Bypassing canLaunchUrl check for Alipay URL',
-                  orderId: orderId);
-            }
-
-            // 检查是否可以处理该URL，对Alipay URLs跳过检查
-            final canLaunch =
-                shouldBypassCheck || await canLaunchUrl(Uri.parse(request.url));
-            if (canLaunch) {
-              logger.payment('ExternalAppLaunchSuccess',
-                  'Successfully launched external app',
-                  orderId: orderId);
-              await launchUrl(Uri.parse(request.url),
-                  mode: LaunchMode.externalApplication,
-                  webViewConfiguration:
-                      const WebViewConfiguration(enableJavaScript: true));
-            } else {
-              logger.payment('ExternalAppLaunchFailed',
-                  'Cannot launch URL: ${request.url}',
-                  orderId: orderId);
-              // 显示错误提示，不崩溃
-              showToast(
-                  "Cannot open the payment app. Please make sure the app is installed."
-                      .tr);
-            }
-            return NavigationDecision.prevent;
-          }
-
-          // 处理支付宝URL
-          if (request.url.toLowerCase().contains('alipay')) {
-            // 标记用户真正发起了支付请求
-            if (!_isPaymentInitiated) {
-              _isPaymentInitiated = true;
-              _printWithTime('=== 第一次设置 _isPaymentInitiated 为 true ===');
-              _printWithTime('触发位置: 支付宝URL检测');
-              _printWithTime('URL: ${request.url}');
-            }
-            logger.payment(
-                'PaymentInitiated', 'Alipay URL detected: ${request.url}',
-                orderId: orderId);
-
-            // 处理带有app_pay=Y参数的支付宝URL，启动外部APP
-            if (request.url.toLowerCase().contains('app_pay=y')) {
-              logger.payment('AlipayAppLaunch',
-                  'Alipay app_pay URL detected: ${request.url}',
-                  orderId: orderId);
-              // 尝试打开外部APP，添加完整的错误处理
-              try {
                 // 特殊处理Alipay URLs - 绕过canLaunchUrl检查
-                logger.payment('AlipaySpecialHandling',
-                    'Bypassing canLaunchUrl check for Alipay app_pay URL',
-                    orderId: orderId);
+                bool shouldBypassCheck = false;
+                if (uri.scheme == 'alipays' ||
+                    request.url.toLowerCase().contains('alipay')) {
+                  shouldBypassCheck = true;
+                }
 
-                await launchUrl(Uri.parse(request.url),
-                    mode: LaunchMode.externalApplication,
-                    webViewConfiguration:
-                        const WebViewConfiguration(enableJavaScript: true));
-              } catch (e) {
-                logger.e('AlipayLaunchError', 'Error launching Alipay app: $e',
-                    error: e, orderId: orderId);
-                // 显示错误提示，不崩溃
-                showToast(
-                    "Cannot open Alipay. Please make sure the app is installed."
-                        .tr);
+                // 检查是否可以处理该URL，对Alipay URLs跳过检查
+                final canLaunch = shouldBypassCheck ||
+                    await canLaunchUrl(Uri.parse(request.url));
+                if (canLaunch) {
+                  await launchUrl(Uri.parse(request.url),
+                      mode: LaunchMode.externalApplication,
+                      webViewConfiguration:
+                          const WebViewConfiguration(enableJavaScript: true));
+                } else {
+                  // 显示错误提示，不崩溃
+                  showToast(
+                      "Cannot open the payment app. Please make sure the app is installed."
+                          .tr);
+                }
+                return NavigationDecision.prevent;
               }
+
+              // 处理支付宝URL
+              if (request.url.toLowerCase().contains('alipay')) {
+                // 标记用户真正发起了支付请求
+                if (!_isPaymentInitiated) {
+                  _isPaymentInitiated = true;
+                  _printWithTime('=== 第一次设置 _isPaymentInitiated 为 true ===');
+                  _printWithTime('触发位置: 支付宝URL检测');
+                  _printWithTime('URL: ${request.url}');
+                }
+
+                // 处理带有app_pay=Y参数的支付宝URL，启动外部APP
+                if (request.url.toLowerCase().contains('app_pay=y')) {
+                  // 尝试打开外部APP，添加完整的错误处理
+                  try {
+                    // 特殊处理Alipay URLs - 绕过canLaunchUrl检查
+                    await launchUrl(Uri.parse(request.url),
+                        mode: LaunchMode.externalApplication,
+                        webViewConfiguration:
+                            const WebViewConfiguration(enableJavaScript: true));
+                  } catch (e) {
+                    logger.e(
+                        'AlipayLaunchError', 'Error launching Alipay app: $e',
+                        error: e, orderId: orderId);
+                    // 显示错误提示，不崩溃
+                    showToast(
+                        "Cannot open Alipay. Please make sure the app is installed."
+                            .tr);
+                  }
+                  return NavigationDecision.prevent;
+                }
+
+                // 处理支付宝H5支付URL（如mclient.alipay.com/h5pay）
+                if (request.url.contains('mclient.alipay.com') ||
+                    request.url.toLowerCase().contains('h5pay')) {
+                  // 允许在WebView中加载支付宝H5支付页面
+                  return NavigationDecision.navigate;
+                }
+
+                // 处理其他支付宝相关域名，允许在WebView中正常加载
+                return NavigationDecision.navigate;
+              }
+
+              // 处理微信支付URLs - 标记支付已发起
+              if (request.url.toLowerCase().contains('weixin') ||
+                  request.url.toLowerCase().contains('wechat')) {
+                // 检查是否是微信支付发起URL
+                if (request.url.toLowerCase().contains('wx.tenpay.com') ||
+                    request.url.toLowerCase().contains('weixin.qq.com') ||
+                    request.url.toLowerCase().contains('wechatpay.com')) {
+                  if (!_isPaymentInitiated) {
+                    _isPaymentInitiated = true;
+                    _printWithTime('=== 第一次设置 _isPaymentInitiated 为 true ===');
+                    _printWithTime('触发位置: 微信支付URL检测');
+                    _printWithTime('URL: ${request.url}');
+                  }
+                }
+              }
+
+              return NavigationDecision.navigate;
+            } catch (e, stackTrace) {
+              logger.e('NavigationError', 'Error in navigation request: $e',
+                  error: e, stackTrace: stackTrace, orderId: orderId);
+              // 捕获所有异常，防止崩溃
+              showToast(
+                  "Error handling payment request. Please try again or use another payment method."
+                      .tr);
               return NavigationDecision.prevent;
             }
-
-            // 处理支付宝H5支付URL（如mclient.alipay.com/h5pay）
-            if (request.url.contains('mclient.alipay.com') ||
-                request.url.toLowerCase().contains('h5pay')) {
-              logger.payment('AlipayH5Pay',
-                  'Alipay H5 payment URL detected: ${request.url}',
-                  orderId: orderId);
-              // 允许在WebView中加载支付宝H5支付页面
-              return NavigationDecision.navigate;
-            }
-
-            // 处理其他支付宝相关域名，允许在WebView中正常加载
-            logger.payment(
-                'AlipayDomain', 'Alipay domain detected: ${request.url}',
-                orderId: orderId);
-            return NavigationDecision.navigate;
-          }
-
-          // 处理微信支付URLs - 标记支付已发起
-          if (request.url.toLowerCase().contains('weixin') ||
-              request.url.toLowerCase().contains('wechat')) {
-            // 检查是否是微信支付发起URL
-            if (request.url.toLowerCase().contains('wx.tenpay.com') ||
-                request.url.toLowerCase().contains('weixin.qq.com') ||
-                request.url.toLowerCase().contains('wechatpay.com')) {
-              if (!_isPaymentInitiated) {
-                _isPaymentInitiated = true;
-                _printWithTime('=== 第一次设置 _isPaymentInitiated 为 true ===');
-                _printWithTime('触发位置: 微信支付URL检测');
-                _printWithTime('URL: ${request.url}');
-              }
-              logger.payment('PaymentInitiated',
-                  'WeChat payment URL detected: ${request.url}',
-                  orderId: orderId);
-            }
-          }
-
-          return NavigationDecision.navigate;
-        } catch (e, stackTrace) {
-          logger.e('NavigationError', 'Error in navigation request: $e',
-              error: e, stackTrace: stackTrace, orderId: orderId);
-          // 捕获所有异常，防止崩溃
-          showToast(
-              "Error handling payment request. Please try again or use another payment method."
-                  .tr);
-          return NavigationDecision.prevent;
-        }
-      }, onHttpAuthRequest: (HttpAuthRequest request) {
-        logger.payment('HttpAuthRequest', 'onHttpAuthRequest',
-            orderId: orderId);
-      }, onProgress: (int progress) {
-        logger.payment('WebViewProgress', 'onProgress: $progress',
-            orderId: orderId);
-      }, onPageStarted: (String url) {
-        logger.payment('PageStarted', 'onPageStarted: $url', orderId: orderId);
-        showLoading();
-      }, onPageFinished: (String url) {
-        logger.payment('PageFinished', 'onPageFinished: $url',
-            orderId: orderId);
-        dismissLoading();
-        // 页面加载完成后，检查页面内容中的关键字
-        // showToast("----------onPageFinished---------------_checkPageContentForKeywords");
-        _checkPageContentForKeywords();
-      }, onWebResourceError: (WebResourceError error) {
-        logger.e('WebResourceError', 'onWebResourceError: ${error.description}',
-            error: error, orderId: orderId);
-      }, onUrlChange: (UrlChange change) {
-        logger.payment('UrlChange', 'URL changed: $change', orderId: orderId);
-      }, onInquiry: (String paymentToken) {
-        // Do transaction status inquiry
-        logger.payment('SdkInquiry', 'onInquiry: $paymentToken',
-            orderId: orderId);
-        queryTransaction(paymentToken);
-      }))
+          },
+          onHttpAuthRequest: (HttpAuthRequest request) {},
+          onProgress: (int progress) {},
+          onPageStarted: (String url) {
+            showLoading();
+          },
+          onPageFinished: (String url) {
+            dismissLoading();
+            // 页面加载完成后，检查页面内容中的关键字
+            // showToast("----------onPageFinished---------------_checkPageContentForKeywords");
+            _checkPageContentForKeywords();
+          },
+          onWebResourceError: (WebResourceError error) {
+            logger.e(
+                'WebResourceError', 'onWebResourceError: ${error.description}',
+                error: error, orderId: orderId);
+          },
+          onUrlChange: (UrlChange change) {},
+          onInquiry: (String paymentToken) {
+            // Do transaction status inquiry
+            queryTransaction(paymentToken);
+          }))
       // 注入JavaScript通道，用于获取页面内容
       ..addJavaScriptChannel(
         'PaymentStatusChecker',
@@ -277,18 +231,12 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
               msg.contains('取消')) {
             _isPaymentCancelled = true;
             _printWithTime('=== 检测到取消按钮点击，设置 _isPaymentCancelled 为 true ===');
-            logger.payment('PaymentCancelled',
-                'Cancel button clicked - ${message.message}',
-                orderId: orderId);
           } else if (!_isPaymentInitiated) {
             // 收到支付按钮点击通知
             _isPaymentInitiated = true;
             _printWithTime('=== 第一次设置 _isPaymentInitiated 为 true ===');
             _printWithTime('触发位置: 支付按钮点击检测');
             _printWithTime('消息: ${message.message}');
-            logger.payment('PaymentInitiated',
-                'Payment button clicked - ${message.message}',
-                orderId: orderId);
           }
         },
       )

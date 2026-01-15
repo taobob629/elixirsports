@@ -309,20 +309,23 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
 
     try {
       // 记录轮询开始日志
-      logger.payment('PollingStart', 'Starting order state polling',
-          orderId: orderId);
-      logger.payment('PollingConfig',
-          'Interval: $intervalSeconds seconds, Max attempts: $maxAttempts',
-          orderId: orderId);
+      ('PollingStart', 'Starting order state polling', orderId: orderId);
+      (
+        'PollingConfig',
+        'Interval: $intervalSeconds seconds, Max attempts: $maxAttempts',
+        orderId: orderId
+      );
 
       // 显示带取消按钮的加载对话框 - 只显示一次，点击遮罩不关闭，按系统回退键也不关闭
       SmartDialog.show(
         builder: (context) => WillPopScope(
           onWillPop: () async {
             // 拦截系统回退键，阻止关闭对话框和停止轮询
-            logger.payment('BackButtonBlocked',
-                'System back button blocked during payment polling',
-                orderId: orderId);
+            (
+              'BackButtonBlocked',
+              'System back button blocked during payment polling',
+              orderId: orderId
+            );
             return false; // 返回false阻止回退
           },
           child: Container(
@@ -381,9 +384,11 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
                     btnText: "Cancel".tr,
                     onTap: () {
                       // 用户主动取消轮询，关闭弹窗并跳转到订单列表
-                      logger.payment(
-                          'PollingCancelled', 'User cancelled payment polling',
-                          orderId: orderId);
+                      (
+                        'PollingCancelled',
+                        'User cancelled payment polling',
+                        orderId: orderId
+                      );
                       _isPollingCancelled = true;
                       _isPaymentProcessed = true;
                       pollingTimer?.cancel();
@@ -391,9 +396,11 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
                       _dismissDialog(); // 关闭支付弹窗
                       // showInfo("Payment check cancelled. Redirecting to order list."
                       //     .tr); // 给出取消提示
-                      logger.payment(
-                          'NavigateToOrderList', 'Redirecting to order list',
-                          orderId: orderId);
+                      (
+                        'NavigateToOrderList',
+                        'Redirecting to order list',
+                        orderId: orderId
+                      );
                       Get.to(() => OrderListPage()); // 跳转到订单列表
                     },
                     height: 45.h,
@@ -411,22 +418,22 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
 
       // 立即执行第一次轮询
       attempts++;
-      logger.payment('PollingAttempt', 'Attempt $attempts/$maxAttempts',
-          orderId: orderId);
+      ('PollingAttempt', 'Attempt $attempts/$maxAttempts', orderId: orderId);
 
       try {
         // 调用checkOrderState接口
-        logger.payment('ApiCall', 'Calling checkOrderState API',
-            orderId: orderId);
+        ('ApiCall', 'Calling checkOrderState API', orderId: orderId);
         final result = await WalletApi.checkOrderState(orderId: orderId);
-        logger.payment('ApiResponse', 'checkOrderState response: $result',
-            orderId: orderId);
+        ('ApiResponse', 'checkOrderState response: $result', orderId: orderId);
 
         if (result != null && !_isPollingCancelled && !_isPaymentProcessed) {
           if (result['state'] == 1) {
             // 支付成功，停止轮询
-            logger.payment('PaymentSuccess', 'Payment successful! State: 1',
-                orderId: orderId);
+            (
+              'PaymentSuccess',
+              'Payment successful! State: 1',
+              orderId: orderId
+            );
             _isPaymentProcessed = true;
             SmartDialog.dismiss();
 
@@ -435,19 +442,24 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
 
             // 调用支付成功回调
             if (widget.onPaymentSuccess != null) {
-              logger.payment('CallbackCall', 'Calling payment success callback',
-                  orderId: orderId);
+              (
+                'CallbackCall',
+                'Calling payment success callback',
+                orderId: orderId
+              );
               widget.onPaymentSuccess!();
             }
             return; // 直接返回，不启动定时器
           } else if (result['state'] == 0) {
             // 支付中，继续轮询
-            logger.payment('PaymentProcessing', 'Payment in progress. State: 0',
-                orderId: orderId);
+            (
+              'PaymentProcessing',
+              'Payment in progress. State: 0',
+              orderId: orderId
+            );
           } else if (result['state'] == 2) {
             // 支付失败，停止轮询
-            logger.payment('PaymentFailed', 'Payment failed! State: 2',
-                orderId: orderId);
+            ('PaymentFailed', 'Payment failed! State: 2', orderId: orderId);
             _isPaymentProcessed = true;
             SmartDialog.dismiss();
             // 不关闭支付弹窗，停留在订单页面
@@ -455,9 +467,11 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
             return; // 直接返回，不启动定时器
           } else {
             // 其他状态，支付失败或异常
-            logger.payment('PaymentUnknownState',
-                'Payment failed with unknown state: ${result['state']}',
-                orderId: orderId);
+            (
+              'PaymentUnknownState',
+              'Payment failed with unknown state: ${result['state']}',
+              orderId: orderId
+            );
             _isPaymentProcessed = true;
             SmartDialog.dismiss();
             // 不关闭支付弹窗，停留在订单页面
@@ -474,9 +488,11 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
 
       // 检查是否达到最大尝试次数
       if (attempts >= maxAttempts) {
-        logger.payment('PollingTimeout',
-            'Polling reached maximum attempts ($maxAttempts), stopping',
-            orderId: orderId);
+        (
+          'PollingTimeout',
+          'Polling reached maximum attempts ($maxAttempts), stopping',
+          orderId: orderId
+        );
         _isPaymentProcessed = true;
         SmartDialog.dismiss();
         // 不关闭支付弹窗，停留在订单页面
@@ -488,27 +504,30 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
 
       // 如果第一次轮询没有完成（状态不是1且未取消），启动定时器继续轮询
       if (!_isPollingCancelled && !_isPaymentProcessed) {
-        logger.payment('PollingTimerStart', 'Starting polling timer',
-            orderId: orderId);
+        ('PollingTimerStart', 'Starting polling timer', orderId: orderId);
         pollingTimer =
             Timer.periodic(Duration(seconds: intervalSeconds), (timer) async {
           // 检查状态，避免重复执行
           if (_isPollingCancelled || _isPaymentProcessed) {
             timer.cancel();
-            logger.payment('PollingTimerStop', 'Polling timer stopped',
-                orderId: orderId);
+            ('PollingTimerStop', 'Polling timer stopped', orderId: orderId);
             return;
           }
 
           attempts++;
-          logger.payment('PollingAttempt', 'Attempt $attempts/$maxAttempts',
-              orderId: orderId);
+          (
+            'PollingAttempt',
+            'Attempt $attempts/$maxAttempts',
+            orderId: orderId
+          );
 
           // 检查是否达到最大尝试次数
           if (attempts >= maxAttempts) {
-            logger.payment('PollingTimeout',
-                'Polling reached maximum attempts ($maxAttempts), stopping',
-                orderId: orderId);
+            (
+              'PollingTimeout',
+              'Polling reached maximum attempts ($maxAttempts), stopping',
+              orderId: orderId
+            );
             _isPaymentProcessed = true;
             timer.cancel();
             SmartDialog.dismiss();
@@ -521,19 +540,24 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
 
           try {
             // 调用checkOrderState接口
-            logger.payment('ApiCall', 'Calling checkOrderState API',
-                orderId: orderId);
+            ('ApiCall', 'Calling checkOrderState API', orderId: orderId);
             final result = await WalletApi.checkOrderState(orderId: orderId);
-            logger.payment('ApiResponse', 'checkOrderState response: $result',
-                orderId: orderId);
+            (
+              'ApiResponse',
+              'checkOrderState response: $result',
+              orderId: orderId
+            );
 
             if (result != null &&
                 !_isPollingCancelled &&
                 !_isPaymentProcessed) {
               if (result['state'] == 1) {
                 // 支付成功，停止轮询
-                logger.payment('PaymentSuccess', 'Payment successful! State: 1',
-                    orderId: orderId);
+                (
+                  'PaymentSuccess',
+                  'Payment successful! State: 1',
+                  orderId: orderId
+                );
                 _isPaymentProcessed = true;
                 timer.cancel();
                 SmartDialog.dismiss();
@@ -543,20 +567,23 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
 
                 // 调用支付成功回调
                 if (widget.onPaymentSuccess != null) {
-                  logger.payment(
-                      'CallbackCall', 'Calling payment success callback',
-                      orderId: orderId);
+                  (
+                    'CallbackCall',
+                    'Calling payment success callback',
+                    orderId: orderId
+                  );
                   widget.onPaymentSuccess!();
                 }
               } else if (result['state'] == 0) {
                 // 支付中，继续轮询
-                logger.payment(
-                    'PaymentProcessing', 'Payment in progress. State: 0',
-                    orderId: orderId);
+                (
+                  'PaymentProcessing',
+                  'Payment in progress. State: 0',
+                  orderId: orderId
+                );
               } else if (result['state'] == 2) {
                 // 支付失败，停止轮询
-                logger.payment('PaymentFailed', 'Payment failed! State: 2',
-                    orderId: orderId);
+                ('PaymentFailed', 'Payment failed! State: 2', orderId: orderId);
                 _isPaymentProcessed = true;
                 timer.cancel();
                 SmartDialog.dismiss();
@@ -564,9 +591,11 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
                 showInfo("Payment failed".tr);
               } else {
                 // 其他状态，支付失败或异常
-                logger.payment('PaymentUnknownState',
-                    'Payment failed with unknown state: ${result['state']}',
-                    orderId: orderId);
+                (
+                  'PaymentUnknownState',
+                  'Payment failed with unknown state: ${result['state']}',
+                  orderId: orderId
+                );
                 _isPaymentProcessed = true;
                 timer.cancel();
                 SmartDialog.dismiss();
@@ -597,37 +626,34 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
   /// 处理支付点击事件
   void _handlePay() async {
     // 记录支付开始日志
-    logger.payment('PaymentStart', 'User clicked pay button',
-        orderId: widget.orderId);
-    logger.payment(
-        'PaymentMethod', 'Selected payment method: ${payMethod.value}',
-        orderId: widget.orderId);
+    ('PaymentStart', 'User clicked pay button', orderId: widget.orderId);
+    (
+      'PaymentMethod',
+      'Selected payment method: ${payMethod.value}',
+      orderId: widget.orderId
+    );
 
     // 关闭加载弹窗（防止重复显示）
     SmartDialog.dismiss(status: SmartStatus.loading);
 
     // 校验支付方式
     if (payMethod.value == 0) {
-      logger.payment('PaymentError', 'No payment method selected',
-          orderId: widget.orderId);
+      ('PaymentError', 'No payment method selected', orderId: widget.orderId);
       showToast("Please select a payment method".tr);
       return;
     }
     if (payMethod.value == 2) {
-      logger.payment('PaymentType', 'Balance payment selected',
-          orderId: widget.orderId);
+      ('PaymentType', 'Balance payment selected', orderId: widget.orderId);
       await _balancePay();
     } else {
-      logger.payment('PaymentType', 'Third-party payment selected',
-          orderId: widget.orderId);
+      ('PaymentType', 'Third-party payment selected', orderId: widget.orderId);
       await _thirdPay();
     }
   }
 
   Future<void> _balancePay() async {
     try {
-      logger.payment('BalancePayStart', 'Starting balance payment',
-          orderId: widget.orderId);
+      ('BalancePayStart', 'Starting balance payment', orderId: widget.orderId);
       SmartDialog.showLoading(msg: "Processing payment...".tr);
 
       // 构造请求参数
@@ -636,29 +662,39 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
         "orderId": widget.orderId,
         "way": payMethod.value, // 4:支付宝 5:微信 8:PayNow
       };
-      logger.payment('ApiRequest', 'Balance pay request params: $map',
-          orderId: widget.orderId);
+      (
+        'ApiRequest',
+        'Balance pay request params: $map',
+        orderId: widget.orderId
+      );
 
       // 调用支付接口
       final result = await WalletApi.balancePay(map: map);
-      logger.payment('ApiResponse', 'Balance pay response: $result',
-          orderId: widget.orderId);
+      ('ApiResponse', 'Balance pay response: $result', orderId: widget.orderId);
 
       if (result!.state) {
-        logger.payment('PaymentSuccess', 'Balance payment successful',
-            orderId: widget.orderId);
+        (
+          'PaymentSuccess',
+          'Balance payment successful',
+          orderId: widget.orderId
+        );
         _dismissDialog(); // 关闭支付弹窗
         showSuccess("Payment successfully".tr);
         // 调用支付成功回调，用于导航到订单列表
         if (widget.onPaymentSuccess != null) {
-          logger.payment('CallbackCall', 'Calling payment success callback',
-              orderId: widget.orderId);
+          (
+            'CallbackCall',
+            'Calling payment success callback',
+            orderId: widget.orderId
+          );
           widget.onPaymentSuccess!();
         }
       } else {
-        logger.payment(
-            'PaymentFailed', 'Balance payment failed: ${result!.msg}',
-            orderId: widget.orderId);
+        (
+          'PaymentFailed',
+          'Balance payment failed: ${result!.msg}',
+          orderId: widget.orderId
+        );
         showInfo(result!.msg);
       }
     } catch (e, stackTrace) {
@@ -673,8 +709,11 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
   /// 调用第三方支付
   Future<void> _thirdPay() async {
     try {
-      logger.payment('ThirdPayStart', 'Starting third-party payment',
-          orderId: widget.orderId);
+      (
+        'ThirdPayStart',
+        'Starting third-party payment',
+        orderId: widget.orderId
+      );
       SmartDialog.showLoading(msg: "Processing payment...".tr);
 
       // 构造请求参数
@@ -683,21 +722,25 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
         "orderId": widget.orderId,
         "way": payMethod.value, // 4:支付宝 5:微信 8:PayNow
       };
-      logger.payment('ApiRequest', 'Third-party pay request params: $map',
-          orderId: widget.orderId);
+      (
+        'ApiRequest',
+        'Third-party pay request params: $map',
+        orderId: widget.orderId
+      );
 
       // 调用支付接口
       final pgwModel =
           await WalletApi.getPGWPaymentTokenAndUrlScanPay(map: map);
-      logger.payment('ApiResponse',
-          'PGW API response - webPaymentUrl: ${pgwModel?.webPaymentUrl}, paymentToken: ${pgwModel?.paymentToken}, invoiceNo: ${pgwModel?.invoiceNo}',
-          orderId: widget.orderId);
+      (
+        'ApiResponse',
+        'PGW API response - webPaymentUrl: ${pgwModel?.webPaymentUrl}, paymentToken: ${pgwModel?.paymentToken}, invoiceNo: ${pgwModel?.invoiceNo}',
+        orderId: widget.orderId
+      );
 
       // 校验并使用内置WebView打开支付链接
       if (pgwModel?.webPaymentUrl != null &&
           pgwModel!.webPaymentUrl.isNotEmpty) {
-        logger.payment('WebViewOpen', 'Opening payment WebView',
-            orderId: widget.orderId);
+        ('WebViewOpen', 'Opening payment WebView', orderId: widget.orderId);
         // 使用内置WebView进行支付，添加跳转目标参数
         final result = await Get.to(() => PGWWebViewPage(), arguments: {
           "url": pgwModel.webPaymentUrl,
@@ -709,36 +752,44 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
         // 根据WebView返回结果处理
         if (result == true) {
           // 支付成功（SDK轮询检测到）
-          logger.payment(
-              'PaymentSuccess', 'Third-party payment successful (SDK detected)',
-              orderId: widget.orderId);
+          (
+            'PaymentSuccess',
+            'Third-party payment successful (SDK detected)',
+            orderId: widget.orderId
+          );
           _dismissDialog();
           showSuccess("Payment successfully".tr);
           // 调用支付成功回调
           if (widget.onPaymentSuccess != null) {
-            logger.payment('CallbackCall', 'Calling payment success callback',
-                orderId: widget.orderId);
+            (
+              'CallbackCall',
+              'Calling payment success callback',
+              orderId: widget.orderId
+            );
             widget.onPaymentSuccess!();
           }
         } else if (result is String && result.isNotEmpty) {
           // 从webview返回orderId，需要轮询checkOrderState接口
           String returnedOrderId = result;
-          logger.payment('PollingTrigger',
-              'WebView returned orderId: $returnedOrderId, starting checkOrderState polling',
-              orderId: widget.orderId);
+          (
+            'PollingTrigger',
+            'WebView returned orderId: $returnedOrderId, starting checkOrderState polling',
+            orderId: widget.orderId
+          );
 
           // 启动轮询checkOrderState接口
           await _startCheckOrderStatePolling(returnedOrderId);
         } else {
           // 支付失败或取消
-          logger.payment(
-              'PaymentCancelled', 'Third-party payment failed or cancelled',
-              orderId: widget.orderId);
+          (
+            'PaymentCancelled',
+            'Third-party payment failed or cancelled',
+            orderId: widget.orderId
+          );
           // showSuccess("Payment failed6".tr);
         }
       } else {
-        logger.payment('PaymentError', 'Invalid payment URL',
-            orderId: widget.orderId);
+        ('PaymentError', 'Invalid payment URL', orderId: widget.orderId);
         showInfo("Payment failed7".tr);
       }
     } catch (e, stackTrace) {
