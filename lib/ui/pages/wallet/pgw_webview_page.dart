@@ -16,7 +16,6 @@ import '../../../config/icon_font.dart';
 import '../../../ui/widget/my_button_widget.dart';
 import '../../../utils/color_utils.dart';
 import '../../../utils/toast_utils.dart';
-import '../../../utils/logger_service.dart';
 
 class PGWWebViewPage extends StatefulWidget {
   const PGWWebViewPage({super.key});
@@ -140,9 +139,7 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
                         webViewConfiguration:
                             const WebViewConfiguration(enableJavaScript: true));
                   } catch (e) {
-                    logger.e(
-                        'AlipayLaunchError', 'Error launching Alipay app: $e',
-                        error: e, orderId: orderId);
+
                     // 显示错误提示，不崩溃
                     showToast(
                         "Cannot open Alipay. Please make sure the app is installed."
@@ -180,8 +177,7 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
 
               return NavigationDecision.navigate;
             } catch (e, stackTrace) {
-              logger.e('NavigationError', 'Error in navigation request: $e',
-                  error: e, stackTrace: stackTrace, orderId: orderId);
+
               // 捕获所有异常，防止崩溃
               showToast(
                   "Error handling payment request. Please try again or use another payment method."
@@ -201,9 +197,7 @@ class _PGWWebViewPageState extends State<PGWWebViewPage>
             _checkPageContentForKeywords();
           },
           onWebResourceError: (WebResourceError error) {
-            logger.e(
-                'WebResourceError', 'onWebResourceError: ${error.description}',
-                error: error, orderId: orderId);
+
           },
           onUrlChange: (UrlChange change) {},
           onInquiry: (String paymentToken) {

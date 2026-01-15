@@ -4,7 +4,6 @@ import 'package:elixir_esports/config/icon_font.dart';
 import 'package:elixir_esports/ui/pages/order/new_order_detail_page.dart';
 import 'package:elixir_esports/utils/color_utils.dart';
 import 'package:elixir_esports/utils/toast_utils.dart';
-import 'package:elixir_esports/utils/logger_service.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -482,8 +481,7 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
           }
         }
       } catch (e, stackTrace) {
-        logger.e('PaymentPolling', 'Error in checkOrderState polling: $e',
-            error: e, stackTrace: stackTrace);
+
       }
 
       // 检查是否达到最大尝试次数
@@ -606,15 +604,13 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
               }
             }
           } catch (e, stackTrace) {
-            logger.e('PaymentPolling', 'Error in checkOrderState polling: $e',
-                error: e, stackTrace: stackTrace);
+
             // 网络错误，继续轮询，直到达到最大尝试次数
           }
         });
       }
     } catch (e, stackTrace) {
-      logger.e('PaymentPolling', 'Error starting polling: $e',
-          error: e, stackTrace: stackTrace);
+
       _isPaymentProcessed = true;
       pollingTimer?.cancel();
       SmartDialog.dismiss();
@@ -698,8 +694,7 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
         showInfo(result!.msg);
       }
     } catch (e, stackTrace) {
-      logger.e('PaymentError', 'Balance payment error: $e',
-          error: e, stackTrace: stackTrace);
+
       showInfo("Payment failed5".tr);
     } finally {
       SmartDialog.dismiss(status: SmartStatus.loading);
@@ -793,8 +788,7 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
         showInfo("Payment failed7".tr);
       }
     } catch (e, stackTrace) {
-      logger.e('PaymentError', 'Third-party payment error: $e',
-          error: e, stackTrace: stackTrace);
+
     } finally {
       SmartDialog.dismiss(status: SmartStatus.loading);
     }

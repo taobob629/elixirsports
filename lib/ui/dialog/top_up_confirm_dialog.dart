@@ -5,7 +5,6 @@ import 'package:elixir_esports/getx_ctr/wallet_ctr.dart';
 import 'package:elixir_esports/ui/pages/banks/bank_cards_page.dart';
 import 'package:elixir_esports/utils/color_utils.dart';
 import 'package:elixir_esports/utils/toast_utils.dart';
-import 'package:elixir_esports/utils/logger_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -679,8 +678,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
         }
       }
     } catch (e, stackTrace) {
-      logger.e('PaymentPolling', 'Error in checkOrderState polling: $e',
-          error: e, stackTrace: stackTrace);
+
     }
 
     // 检查是否达到最大尝试次数
@@ -837,8 +835,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
             }
           }
         } catch (e, stackTrace) {
-          logger.e('PaymentPolling', 'Error in checkOrderState polling: $e',
-              error: e, stackTrace: stackTrace);
+
         }
       });
     }
