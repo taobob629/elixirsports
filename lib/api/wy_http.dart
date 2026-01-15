@@ -47,7 +47,7 @@ class HeaderInterceptor extends InterceptorsWrapper {
     // options.headers['phoneModel'] =Platform.isIOS? deviceInfo['name']:  '${deviceInfo['manufacturer']}-${deviceInfo['brand']}';
     // options.headers['longitude'] = LocationService().position?.longitude ?? 0;
     // options.headers['latitude'] = LocationService().position?.latitude ?? 0;
-    log(jsonEncode(options.headers), name: 'options.headers');
+    // log(jsonEncode(options.headers), name: 'options.headers');
     handler.next(options);
   }
 }
@@ -71,11 +71,11 @@ class ApiInterceptor extends InterceptorsWrapper {
     if (options.extra["showLoading"] == null) {
       showLoading();
     }
-    log(
-      'api-request:${options.baseUrl}${options.path}' +
-          ' queryParameters: ${options.queryParameters} data :${options.data} ',
-      name: "WY_API",
-    );
+    // log(
+    //   'api-request:${options.baseUrl}${options.path}' +
+    //       ' queryParameters: ${options.queryParameters} data :${options.data} ',
+    //   name: "WY_API",
+    // );
     // print('---api-request--->data--->${options.data}');
     handler.next(options);
   }
@@ -86,7 +86,7 @@ class ApiInterceptor extends InterceptorsWrapper {
       dismissLoading(status: SmartStatus.loading);
     }
     String requestPath = response.requestOptions.path;
-    flog(' requestPath:$requestPath onResponse api-response ${response}');
+    // flog(' requestPath:$requestPath onResponse api-response ${response}');
     ResponseData respData = ResponseData.fromJson(response.data);
     if (respData.success) {
       response.data = respData.data;
@@ -114,7 +114,7 @@ class ApiInterceptor extends InterceptorsWrapper {
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
     super.onError(err, handler);
-    log(' onError: ${err.message}');
+    // log(' onError: ${err.message}');
     dismissLoading(status: SmartStatus.loading);
     showToast("Networking Failure");
   }
