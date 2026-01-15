@@ -123,7 +123,7 @@ class RegisterNextCtr extends BasePageController {
       StorageManager.setPassword(params['password']);
       StorageManager.setToken(model.token!);
       UserController.find.requestProfileData();
-      UserController.find.imLogin();
+      // UserController.find.imLogin();
 
       Get.deleteAll();
 

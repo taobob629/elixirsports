@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 
 import '../ui/dialog/input_dialog.dart';
 import '../ui/pages/developer/developer_page.dart';
-import '../ui/pages/online/conversation_list_page.dart';
 import '../ui/pages/store/select_store_page.dart';
 import '../ui/pages/wallet/wallet_page.dart';
 
@@ -14,14 +13,6 @@ class MineCtr extends BasePageController {
 
   @override
   void requestData() {}
-
-  void jumpChat() async {
-    if (UserController.find.profileModel.value.isServiceAccount == false) {
-      Get.to(() => SelectStorePage(), arguments: true);
-      return;
-    }
-    Get.to(() => ConversationListPage());
-  }
 
   void toWalletPage() async {
     await Get.to(() => WalletPage());

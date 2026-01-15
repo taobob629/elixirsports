@@ -55,7 +55,7 @@ class LoginCtr extends BasePageController {
         StorageManager.setPassword(passwordCtr.text.toString());
         StorageManager.setToken(model.token!);
         UserController.find.requestProfileData();
-        UserController.find.imLogin();
+        // UserController.find.imLogin();
         Get.deleteAll();
 
         Get.offAll(() => MainPage());

@@ -324,15 +324,15 @@ class TabMinePage extends BasePage<MineCtr> {
                         "Contact us".tr,
                         onTap: () => Get.to(() => ContactUsPage()),
                       ),
-                      Obx(() => menuWidget(
-                            AssetsUtils.icon_online,
-                            "Online".tr,
-                            onTap: controller.jumpChat,
-                            showBadge:
-                                UserController.find.unreadMsgCount.value > 0,
-                            showBadgeContent:
-                                UserController.find.unreadMsgCount.value,
-                          )),
+                      // Obx(() => menuWidget(
+                      //       AssetsUtils.icon_online,
+                      //       "Online".tr,
+                      //       onTap: controller.jumpChat,
+                      //       showBadge:
+                      //           UserController.find.unreadMsgCount.value > 0,
+                      //       showBadgeContent:
+                      //           UserController.find.unreadMsgCount.value,
+                      //     )),
                       const Spacer(),
                       const Spacer(),
                       15.horizontalSpace,
