@@ -300,104 +300,107 @@ class _PayOrderPageState extends State<PayOrderPage>
                 borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
               child: Column(
-                children: widget.orderData.goodsList.map((goods) {
-                  // 核心修改：直接使用商品模型的keyWord字段（List<String>），移除模拟逻辑
+                children: widget.orderData.goodsList.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  GoodsModel goods = entry.value;
                   List<String> goodsKeywords = goods.keyWord ?? [];
 
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12.h),
-                    // 2. 重构商品项布局：图片左，内容右，垂直分布
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 商品图片
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(6.r),
-                          child: Image.network(
-                            goods.goodsImage,
-                            width: 80.w,
-                            height: 80.h,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
+                  return Column(
+                    children: [
+                      if (index > 0)
+                        Divider(
+                          height: 1.h,
+                          color: const Color(0xffe0e0e0),
+                        ).paddingSymmetric(vertical: 8.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(6.r),
+                              child: Image.network(
+                                goods.goodsImage,
                                 width: 80.w,
                                 height: 80.h,
-                                color: const Color(0xfff5f5f5),
-                                child: const Center(child: Text('图片加载失败')),
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        // 商品内容（占满剩余空间）
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // 商品名称
-                              Text(
-                                goods.goodsName,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  color: const Color(0xff333333),
-                                  height: 1.3,
-                                ),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 80.w,
+                                    height: 80.h,
+                                    color: const Color(0xfff5f5f5),
+                                    child: const Center(child: Text('图片加载失败')),
+                                  );
+                                },
                               ),
-                              SizedBox(height: 4.h),
-                              // 商品关键词标签（使用模型的keyWord字段）
-                              _buildGoodsKeywords(goodsKeywords),
-                              SizedBox(height: 8.h),
-                              // 价格行：价格+折扣标签左，数量右
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                            ),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Text(
+                                    goods.goodsName,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 15.sp,
+                                      color: const Color(0xff333333),
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  _buildGoodsKeywords(goodsKeywords),
+                                  SizedBox(height: 8.h),
                                   Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        'S\$${goods.goodsPrice.toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          fontSize: 15.sp,
-                                          fontWeight: FontWeight.w600,
-                                          color: const Color(0xffff4d4f),
-                                        ),
-                                      ),
-                                      SizedBox(width: 8.w),
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 6.w, vertical: 2.h),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xfffff7e6),
-                                          borderRadius:
-                                              BorderRadius.circular(4.r),
-                                        ),
-                                        child: Text(
-                                          goods.discountType,
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                            color: const Color(0xffff7a45),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'S\$${goods.goodsPrice.toStringAsFixed(2)}',
+                                            style: TextStyle(
+                                              fontSize: 15.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: const Color(0xffff4d4f),
+                                            ),
                                           ),
+                                          SizedBox(width: 8.w),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 6.w, vertical: 2.h),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xfffff7e6),
+                                              borderRadius:
+                                                  BorderRadius.circular(4.r),
+                                            ),
+                                            child: Text(
+                                              goods.discountType,
+                                              style: TextStyle(
+                                                fontSize: 12.sp,
+                                                color: const Color(0xffff7a45),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        'x${goods.count}',
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          color: const Color(0xff666666),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  // 商品数量（靠右）
-                                  Text(
-                                    'x${goods.count}',
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      color: const Color(0xff666666),
-                                    ),
-                                  ),
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   );
                 }).toList(),
               ),

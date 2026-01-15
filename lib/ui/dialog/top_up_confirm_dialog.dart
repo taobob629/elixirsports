@@ -42,6 +42,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
   var couponList = <CouponsRow>[].obs;
   var discount = 0.obs; // 目标折扣值
   var cardNo = "".obs;
+  var isLoading = false.obs;
 
   // 支付方式：9：银行卡 4：支付宝 5：微信  8：PayNow
   var payMethod = 4.obs;
@@ -360,11 +361,12 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
                   vertical: 14.h,
                 ),
               ),
-              MyButtonWidget(
-                btnText: "PAYMENT".tr,
-                marginBottom: 10.h,
-                onTap: topUp,
-              ),
+              Obx(() => MyButtonWidget(
+                    btnText: "PAYMENT".tr,
+                    marginBottom: 10.h,
+                    onTap: topUp,
+                    isLoading: isLoading.value,
+                  )),
             ],
           ),
         ),
@@ -677,9 +679,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
           return; // 直接返回，不启动定时器
         }
       }
-    } catch (e, stackTrace) {
-
-    }
+    } catch (e, stackTrace) {}
 
     // 检查是否达到最大尝试次数
     if (_pollingAttempts >= _maxPollingAttempts) {
@@ -834,9 +834,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
                       .tr);
             }
           }
-        } catch (e, stackTrace) {
-
-        }
+        } catch (e, stackTrace) {}
       });
     }
   }
@@ -853,6 +851,7 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
   }
 
   thirdPay() async {
+    isLoading.value = true;
     showLoading();
     Map<String, dynamic> map = {
       "amount": widget.money,
@@ -928,5 +927,6 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
       showInfo("Payment failed7".tr);
       Get.back();
     }
+    isLoading.value = false;
   }
 }

@@ -61,6 +61,8 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
     with SingleTickerProviderStateMixin {
   // 支付方式：4：支付宝 5：微信  8：PayNow,2:balance 9：银行卡
   final RxInt payMethod = 2.obs;
+  // 加载状态
+  final RxBool isLoading = false.obs;
 
   // 动画相关
   late AnimationController _animationController;
@@ -271,11 +273,12 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
                   )),
 
               // 支付按钮
-              MyButtonWidget(
-                btnText: "PAYMENT".tr,
-                marginBottom: 10.h,
-                onTap: _handlePay,
-              ),
+              Obx(() => MyButtonWidget(
+                    btnText: "PAYMENT".tr,
+                    marginBottom: 10.h,
+                    onTap: _handlePay,
+                    isLoading: isLoading.value,
+                  )),
             ],
           ),
         ),
@@ -480,9 +483,7 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
             return; // 直接返回，不启动定时器
           }
         }
-      } catch (e, stackTrace) {
-
-      }
+      } catch (e, stackTrace) {}
 
       // 检查是否达到最大尝试次数
       if (attempts >= maxAttempts) {
@@ -604,13 +605,11 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
               }
             }
           } catch (e, stackTrace) {
-
             // 网络错误，继续轮询，直到达到最大尝试次数
           }
         });
       }
     } catch (e, stackTrace) {
-
       _isPaymentProcessed = true;
       pollingTimer?.cancel();
       SmartDialog.dismiss();
@@ -649,6 +648,7 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
 
   Future<void> _balancePay() async {
     try {
+      isLoading.value = true;
       ('BalancePayStart', 'Starting balance payment', orderId: widget.orderId);
       SmartDialog.showLoading(msg: "Processing payment...".tr);
 
@@ -694,16 +694,17 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
         showInfo(result!.msg);
       }
     } catch (e, stackTrace) {
-
       showInfo("Payment failed5".tr);
     } finally {
       SmartDialog.dismiss(status: SmartStatus.loading);
+      isLoading.value = false;
     }
   }
 
   /// 调用第三方支付
   Future<void> _thirdPay() async {
     try {
+      isLoading.value = true;
       (
         'ThirdPayStart',
         'Starting third-party payment',
@@ -788,9 +789,9 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
         showInfo("Payment failed7".tr);
       }
     } catch (e, stackTrace) {
-
     } finally {
       SmartDialog.dismiss(status: SmartStatus.loading);
+      isLoading.value = false;
     }
   }
 }

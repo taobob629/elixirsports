@@ -12,6 +12,7 @@ class MyButtonWidget extends StatelessWidget {
   final double? marginBottom;
   final double? marginLeft;
   final double? marginRight;
+  final bool isLoading;
 
   const MyButtonWidget({
     super.key,
@@ -22,11 +23,12 @@ class MyButtonWidget extends StatelessWidget {
     this.marginBottom,
     this.marginLeft,
     this.marginRight,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) => InkWell(
-        onTap: () => onTap?.call(),
+        onTap: isLoading ? null : () => onTap?.call(),
         child: Container(
           height: height ?? 40.h,
           decoration: BoxDecoration(
@@ -40,14 +42,23 @@ class MyButtonWidget extends StatelessWidget {
             right: marginRight ?? 0,
           ),
           alignment: Alignment.center,
-          child: Text(
-            btnText,
-            style: TextStyle(
-              color: toColor('ffffff'),
-              fontFamily: FONT_MEDIUM,
-              fontSize: 14.sp,
-            ),
-          ),
+          child: isLoading
+              ? SizedBox(
+                  width: 20.w,
+                  height: 20.w,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2.w,
+                  ),
+                )
+              : Text(
+                  btnText,
+                  style: TextStyle(
+                    color: toColor('ffffff'),
+                    fontFamily: FONT_MEDIUM,
+                    fontSize: 14.sp,
+                  ),
+                ),
         ),
       );
 }

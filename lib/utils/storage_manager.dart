@@ -144,7 +144,7 @@ class StorageManager {
     if (value == null) {
       return default_server;
     }
-    if (packageInfo!.version == '0.2.10') return default_server;
+    // 移除对packageInfo的依赖，避免空值检查错误
     return value;
   }
 
