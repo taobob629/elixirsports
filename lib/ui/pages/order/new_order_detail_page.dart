@@ -58,8 +58,23 @@ class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
                     ),
                     child: Column(
                       children: controller.orderDetailModel.value.items
-                          .map((e) => _itemInfoWidget(e))
-                          .toList(),
+                          .asMap()
+                          .entries
+                          .map((entry) {
+                        int index = entry.key;
+                        OrderDetailItem item = entry.value;
+
+                        return Column(
+                          children: [
+                            if (index > 0)
+                              Divider(
+                                height: 1.h,
+                                color: const Color(0xffe0e0e0),
+                              ).paddingSymmetric(vertical: 8.h),
+                            _itemInfoWidget(item),
+                          ],
+                        );
+                      }).toList(),
                     ),
                   ),
 
@@ -235,27 +250,31 @@ class NewOrderDetailPage extends BasePage<OrderDetailCtr> {
     if (keywords.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      width: double.infinity, // 确保容器宽度填满父组件
+      width: double.infinity, // 确保容器宽度填满父组件，让Wrap能正确换行
       child: Wrap(
-        spacing: 6.w, // 水平间距
-        runSpacing: 4.h, // 垂直间距（换行后）
-        alignment: WrapAlignment.start, // 从左到右对齐
-        crossAxisAlignment: WrapCrossAlignment.start, // 垂直对齐方式
+        spacing: 4.w, // 减小水平间距，让标签更紧凑
+        runSpacing: 4.h, // 减小垂直间距
+        alignment: WrapAlignment.start,
         children: keywords.map((keyword) {
           return Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+            // 减小内边距，让标签更紧凑
+            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
             decoration: BoxDecoration(
               color: const Color(0xfff5f5f5),
-              borderRadius: BorderRadius.circular(4.r),
+              borderRadius: BorderRadius.circular(3.r),
             ),
+            // 不允许标签内换行，保持标签为单行
+            // 让Wrap组件处理标签级别的换行，确保每个标签完整显示
             child: Text(
               keyword,
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 11.sp, // 适当减小字体大小
                 color: const Color(0xff666666),
+                height: 1.2, // 调整行高
               ),
-              maxLines: 1, // 确保关键字不换行
-              overflow: TextOverflow.ellipsis, // 超长时显示省略号
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+              maxLines: 1,
             ),
           );
         }).toList(),

@@ -235,24 +235,34 @@ class _PayOrderPageState extends State<PayOrderPage>
     return Container(
       width: double.infinity, // 确保容器宽度填满父组件，让Wrap能正确换行
       child: Wrap(
-        spacing: 6.w, // 水平间距
-        runSpacing: 4.h, // 垂直间距（换行后）
+        spacing: 4.w, // 减小水平间距，让标签更紧凑
+        runSpacing: 4.h, // 减小垂直间距
         alignment: WrapAlignment.start,
         children: keywords.map((keyword) {
           return Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+            // 减小内边距，让标签更紧凑
+            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
             decoration: BoxDecoration(
               color: const Color(0xfff5f5f5),
-              borderRadius: BorderRadius.circular(4.r),
+              borderRadius: BorderRadius.circular(3.r),
+            ),
+            // 移除最大宽度限制，让标签根据内容自适应
+            // 只设置最小宽度，确保标签有一定的显示空间
+            constraints: BoxConstraints(
+              minWidth: 40.w,
             ),
             child: Text(
               keyword,
               style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 11.sp, // 适当减小字体大小
                 color: const Color(0xff666666),
+                height: 1.2, // 调整行高
               ),
-              maxLines: 1,
+              // 不允许标签内换行，保持标签为单行
+              // 让Wrap组件处理标签级别的换行，确保每个标签完整显示
               overflow: TextOverflow.ellipsis,
+              softWrap: false,
+              maxLines: 1,
             ),
           );
         }).toList(),
