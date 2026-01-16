@@ -47,6 +47,7 @@ class OrderData {
   final List<GoodsModel> goodsList;
   final AmountInfo amountInfo;
   final int couponLength;
+  final List<String> way; // 支付方式列表：balance, alipay, wechat, paynow
 
   OrderData({
     required this.needLogin,
@@ -57,12 +58,20 @@ class OrderData {
     required this.goodsList,
     required this.amountInfo,
     required this.couponLength,
+    this.way = const [],
   });
 
   factory OrderData.fromJson(Map<String, dynamic> json) {
     var goodsListJson = json['goodsList'] as List? ?? [];
     List<GoodsModel> goodsList =
         goodsListJson.map((i) => GoodsModel.fromJson(i)).toList();
+    
+    // 解析支付方式列表
+    List<String> way = [];
+    if (json['way'] != null && json['way'] is List) {
+      way = (json['way'] as List).map((e) => e.toString()).toList();
+    }
+    
     try {
       OrderData(
         needLogin: json['needLogin'] as bool? ?? false,
@@ -73,6 +82,7 @@ class OrderData {
         orderTitle: json['orderTitle'] ?? '',
         goodsList: goodsList,
         amountInfo: AmountInfo.fromJson(json['amountInfo'] ?? {}),
+        way: way,
       );
     } catch (e) {
       print("OrderData failed:$e");
@@ -86,6 +96,7 @@ class OrderData {
       orderTitle: json['orderTitle'] ?? '',
       goodsList: goodsList,
       amountInfo: AmountInfo.fromJson(json['amountInfo'] ?? {}),
+      way: way,
     );
   }
 }

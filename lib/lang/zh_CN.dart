@@ -233,7 +233,7 @@ const Map<String, String> zh_CN = {
   "coupons available":"张优惠券可用",
   "Payment successfully":"支付成功",
   "Order expired":"订单已关闭(超时未支付)",
-  'Please wait while we check your payment status':'支付结果获取中，请等待',
+  'Please wait while we check your payment status.':'支付结果获取中，请等待',
   'Checking payment status':'获取支付结果',
   'Payment cancelled':'已取消支付',
   'Cannot open the payment app. Please make sure the app is installed.':'拉起支付软件失败，请确保已经安装支付软件',

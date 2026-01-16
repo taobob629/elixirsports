@@ -208,6 +208,7 @@ class _PayOrderPageState extends State<PayOrderPage>
         couponId: _selectedCoupon.couponId ?? "0",
         discountAmount: _discountAmount,
         payAmount: _finalPayAmount,
+        way: widget.orderData.way,
         onPaymentSuccess: () {
           // 支付成功后跳转到订单列表页面
           // 使用Get.to()而不是Get.off()，确保可以正常回退

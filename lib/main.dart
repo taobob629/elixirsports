@@ -15,6 +15,7 @@ import 'package:ume/ume.dart';
 
 import 'api/wy_http.dart';
 import 'config/app_config.dart';
+import 'services/deeplink_service.dart';
 
 PackageInfo? packageInfo;
 
@@ -36,6 +37,9 @@ void main() async {
   await AppConfig.init("default");
   await getAppPackageInfo();
 
+  // 初始化深度链接服务
+  await deeplinkService.init();
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -48,7 +52,9 @@ void main() async {
   PaintingBinding.instance.imageCache.maximumSizeBytes = 1000 << 20;
   String env = StorageManager.getEnv();
 
-  Map<String, dynamic> pgwsdkParams = {'apiEnvironment': APIEnvironment.sandbox};
+  Map<String, dynamic> pgwsdkParams = {
+    'apiEnvironment': APIEnvironment.sandbox
+  };
 
   await PGWSDK().initialize(pgwsdkParams, (error) {
     //Get error response and display error.

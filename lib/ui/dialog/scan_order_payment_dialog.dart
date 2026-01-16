@@ -38,6 +38,9 @@ class ScanOrderPaymentDialog extends StatefulWidget {
   /// 折扣金额（必填，≥0）
   final double discountAmount;
 
+  /// 可用支付方式列表
+  final List<String> way;
+
   /// 支付成功回调
   final Function()? onPaymentSuccess;
 
@@ -47,6 +50,7 @@ class ScanOrderPaymentDialog extends StatefulWidget {
     required this.couponId,
     required this.discountAmount,
     required this.payAmount,
+    this.way = const [],
     this.onPaymentSuccess,
   })  :
         // 参数校验：防止传入非法值
@@ -227,50 +231,8 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
                 ),
               ).paddingOnly(bottom: 20.h),
 
-              // 支付方式选择
-              Obx(() => PayMethodWidget(
-                    name: "Elixirs".tr,
-                    icon: SvgPicture.asset(
-                      AssetsUtils.icon_balance,
-                      width: 20.w,
-                      height: 20.w,
-                    ),
-                    isSelect: payMethod.value == 2,
-                    callback: () => payMethod.value = 2,
-                  )),
-              _divider(),
-              Obx(() => PayMethodWidget(
-                    name: "Alipay".tr,
-                    icon: SvgPicture.asset(
-                      AssetsUtils.icon_alipay,
-                      width: 20.w,
-                      height: 20.w,
-                    ),
-                    isSelect: payMethod.value == 4,
-                    callback: () => payMethod.value = 4,
-                  )),
-              _divider(),
-              Obx(() => PayMethodWidget(
-                    name: "Wechat Pay".tr,
-                    icon: Image.asset(
-                      "assets/images/icon_wechat.png",
-                      width: 20.w,
-                      height: 20.w,
-                    ),
-                    isSelect: payMethod.value == 5,
-                    callback: () => payMethod.value = 5,
-                  )),
-              _divider(),
-              Obx(() => PayMethodWidget(
-                    name: "PayNow".tr,
-                    icon: Image.asset(
-                      "assets/images/icon_paynow.png",
-                      width: 20.w,
-                      height: 20.w,
-                    ),
-                    isSelect: payMethod.value == 8,
-                    callback: () => payMethod.value = 8,
-                  )),
+              // 支付方式选择：根据way数组动态显示
+              _buildPaymentMethods(),
 
               // 支付按钮
               Obx(() => MyButtonWidget(
@@ -290,6 +252,88 @@ class _ScanOrderPaymentDialogState extends State<ScanOrderPaymentDialog>
       height: 1.h,
       color: toColor('#EEEEEE'),
       margin: EdgeInsets.symmetric(vertical: 14.h),
+    );
+  }
+
+  /// 根据way数组动态生成支付方式选项
+  Widget _buildPaymentMethods() {
+    // 支付方式映射关系
+    // key: way数组中的字符串, value: (支付方式ID, 显示名称, 图标组件)
+    final Map<String, (int, String, Widget)> paymentMethodsMap = {
+      'balance': (
+        2,
+        "Elixirs".tr,
+        SvgPicture.asset(
+          AssetsUtils.icon_balance,
+          width: 20.w,
+          height: 20.w,
+        )
+      ),
+      'alipay': (
+        4,
+        "Alipay".tr,
+        SvgPicture.asset(
+          AssetsUtils.icon_alipay,
+          width: 20.w,
+          height: 20.w,
+        )
+      ),
+      'wechat': (
+        5,
+        "Wechat Pay".tr,
+        Image.asset(
+          "assets/images/icon_wechat.png",
+          width: 20.w,
+          height: 20.w,
+        )
+      ),
+      'paynow': (
+        8,
+        "PayNow".tr,
+        Image.asset(
+          "assets/images/icon_paynow.png",
+          width: 20.w,
+          height: 20.w,
+        )
+      ),
+    };
+
+    // 根据way数组生成支付方式列表
+    final List<Widget> paymentMethodWidgets = [];
+
+    // 默认选择第一个可用支付方式
+    if (widget.way.isNotEmpty &&
+        payMethod.value == 2 &&
+        !widget.way.contains('balance')) {
+      final firstWay = widget.way.first;
+      if (paymentMethodsMap.containsKey(firstWay)) {
+        payMethod.value = paymentMethodsMap[firstWay]!.$1;
+      }
+    }
+
+    // 遍历way数组，生成对应的支付方式选项
+    for (int i = 0; i < widget.way.length; i++) {
+      final way = widget.way[i];
+      if (paymentMethodsMap.containsKey(way)) {
+        final (methodId, name, icon) = paymentMethodsMap[way]!;
+
+        // 添加支付方式选项
+        paymentMethodWidgets.add(Obx(() => PayMethodWidget(
+              name: name,
+              icon: icon,
+              isSelect: payMethod.value == methodId,
+              callback: () => payMethod.value = methodId,
+            )));
+
+        // 添加分割线（最后一个选项后不添加）
+        if (i < widget.way.length - 1) {
+          paymentMethodWidgets.add(_divider());
+        }
+      }
+    }
+
+    return Column(
+      children: paymentMethodWidgets,
     );
   }
 
