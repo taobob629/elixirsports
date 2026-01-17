@@ -1,5 +1,6 @@
 import 'package:elixir_esports/assets_utils.dart';
 import 'package:elixir_esports/config/icon_font.dart';
+import 'package:elixir_esports/ui/pages/auth/singpass_login_page.dart';
 import 'package:elixir_esports/ui/pages/login/forgot_password_page.dart';
 import 'package:elixir_esports/ui/pages/login/privacy_check.dart';
 import 'package:elixir_esports/ui/pages/login/register_page.dart';
@@ -15,7 +16,6 @@ import '../../../getx_ctr/login_ctr.dart';
 import '../../widget/my_textfield_widget.dart';
 
 class LoginPage extends BasePage<LoginCtr> {
-
   @override
   LoginCtr createController() => LoginCtr();
 
@@ -100,52 +100,56 @@ class LoginPage extends BasePage<LoginCtr> {
                 marginRight: 15.w,
                 marginTop: 25.h,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 85.w,
-                    height: 1.h,
-                    color: toColor('#D8D8D8'),
-                  ),
-                  Text(
-                    'OR'.tr,
-                    style: TextStyle(
-                      color: toColor('#1A1A1A'),
-                      fontSize: 13.sp,
+              // 隐藏 OR 分割线和文本
+              Visibility(
+                visible: false,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 85.w,
+                      height: 1.h,
+                      color: toColor('#D8D8D8'),
                     ),
-                  ).paddingSymmetric(horizontal: 15.w),
-                  Container(
-                    width: 85.w,
-                    height: 1.h,
-                    color: toColor('#D8D8D8'),
-                  ),
-                ],
+                    Text(
+                      'OR'.tr,
+                      style: TextStyle(
+                        color: toColor('#1A1A1A'),
+                        fontSize: 13.sp,
+                      ),
+                    ).paddingSymmetric(horizontal: 15.w),
+                    Container(
+                      width: 85.w,
+                      height: 1.h,
+                      color: toColor('#D8D8D8'),
+                    ),
+                  ],
+                ),
               ),
-              InkWell(
-                onTap: () => Get.to(() => RegisterPage()),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.r),
-                    border: Border.all(
-                      color: toColor('#141517'),
-                      width: 1.w,
+              // 隐藏 Singpass 登录按钮
+              Visibility(
+                visible: false,
+                child: InkWell(
+                  onTap: () => Get.to(() => SingpassLoginPage()),
+                  child: Container(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: 15.w,
+                      vertical: 25.h,
                     ),
-                  ),
-                  margin: EdgeInsets.symmetric(
-                    horizontal: 15.w,
-                    vertical: 25.h,
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 15.w),
-                  height: 40.h,
-                  width: 1.sw,
-                  alignment: Alignment.center,
-                  child: Text(
-                    "CREATE AN ACCOUNT".tr,
-                    style: TextStyle(
-                      color: toColor('#141517'),
-                      fontSize: 14.sp,
-                      fontFamily: FONT_MEDIUM,
+                    height: 45.h,
+                    width: 1.sw,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(25.r),
+                    ),
+                    child: Text(
+                      "Log in with singpass",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),

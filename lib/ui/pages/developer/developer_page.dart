@@ -92,6 +92,36 @@ class DeveloperPage extends StatelessWidget {
                     Radio<String>(
                         activeColor: toColor('e33e45'),
                         fillColor: MaterialStateProperty.all(Colors.black),
+                        value: "dev180",
+                        groupValue: controller.env.value,
+                        onChanged: (value) {
+                          controller.env.value = value!;
+                        }),
+                    RichText(
+                      text: TextSpan(
+                        text: "dev180: \n",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: Colors.black,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "http://43.159.57.180:8091/",
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.red,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Radio<String>(
+                        activeColor: toColor('e33e45'),
+                        fillColor: MaterialStateProperty.all(Colors.black),
                         value: "prod",
                         groupValue: controller.env.value,
                         onChanged: (value) {

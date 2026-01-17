@@ -15,6 +15,8 @@ class AppConfig {
   static String? name;
 
   static const String _devServer = 'http://146.56.192.175:8091/';
+  static const String _devServer2 = 'http://43.159.57.180:8091/';
+
   static const String _prodServer = 'http://www.elixiresports.com:8091/';
 
   static const isProd = bool.fromEnvironment('dart.vm.product');
@@ -38,6 +40,9 @@ class AppConfig {
     String env = StorageManager.getEnv();
     if (env == "dev175") {
       return _devServer;
+    }
+    if (env == "dev180") {
+      return _devServer2;
     }
     return _prodServer;
   }

@@ -76,11 +76,10 @@ dependencies:
   open_file: ^3.5.10
   file_picker: ^6.1.1
   photo_manager: ^3.0.0
+  http: ^1.2.1
+  app_links: ^3.0.0
 
-  tencent_cloud_chat_uikit:
-    path: plugins/tencent_cloud_chat_uikit
-  flutter_app_badger:
-    path: plugins/flutter_app_badger
+  
   catcher_2:
     path: plugins/catcher_2
   intl_phone_number_input:

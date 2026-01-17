@@ -20,6 +20,12 @@ class SingpassService {
   static const String appTokenExchangeEndpoint =
       '$appBackendBaseUrl/singpass/token-exchange';
 
+  /// 启动 Singpass 登录流程
+  /// 返回认证 URL，用于在 OAuthWebView 中加载
+  static String login() {
+    return buildAuthUrl();
+  }
+
   /// 构建 Singpass 认证 URL
   static String buildAuthUrl() {
     final params = {

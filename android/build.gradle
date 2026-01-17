@@ -37,7 +37,37 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-
+// 为所有子项目配置统一的JVM目标版本
+subprojects {
+    // 为Android模块配置
+    if (hasProperty('android')) {
+        android {
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+            }
+            
+            // 配置Kotlin选项
+            kotlinOptions {
+                jvmTarget = '17'
+            }
+            
+            // 配置Kotlin JVM工具链
+            kotlin {
+                jvmToolchain(17)
+            }
+        }
+    }
+    
+    // 为纯Kotlin模块配置
+    if (plugins.hasPlugin('kotlin')) {
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+            kotlinOptions {
+                jvmTarget = '17'
+            }
+        }
+    }
+}
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
