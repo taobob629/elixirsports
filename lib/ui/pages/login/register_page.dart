@@ -1,5 +1,6 @@
 import 'package:elixir_esports/assets_utils.dart';
 import 'package:elixir_esports/config/icon_font.dart';
+import 'package:elixir_esports/ui/pages/auth/singpass_login_page.dart';
 import 'package:elixir_esports/ui/pages/login/privacy_check.dart';
 import 'package:elixir_esports/ui/widget/my_button_widget.dart';
 import 'package:elixir_esports/utils/color_utils.dart';

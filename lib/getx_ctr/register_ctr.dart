@@ -27,6 +27,11 @@ class RegisterCtr extends BasePageController {
   CountDownUtil? countDownUtil;
 
   @override
+  void onInit() {
+    super.onInit();
+  }
+
+  @override
   void requestData() async {
     controller = PrivacyCheckController();
 

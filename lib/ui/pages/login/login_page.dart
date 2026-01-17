@@ -100,56 +100,50 @@ class LoginPage extends BasePage<LoginCtr> {
                 marginRight: 15.w,
                 marginTop: 25.h,
               ),
-              // 隐藏 OR 分割线和文本
-              Visibility(
-                visible: false,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 85.w,
-                      height: 1.h,
-                      color: toColor('#D8D8D8'),
+              // OR 分割线和文本
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 85.w,
+                    height: 1.h,
+                    color: toColor('#D8D8D8'),
+                  ),
+                  Text(
+                    'OR'.tr,
+                    style: TextStyle(
+                      color: toColor('#1A1A1A'),
+                      fontSize: 13.sp,
                     ),
-                    Text(
-                      'OR'.tr,
-                      style: TextStyle(
-                        color: toColor('#1A1A1A'),
-                        fontSize: 13.sp,
-                      ),
-                    ).paddingSymmetric(horizontal: 15.w),
-                    Container(
-                      width: 85.w,
-                      height: 1.h,
-                      color: toColor('#D8D8D8'),
-                    ),
-                  ],
-                ),
+                  ).paddingSymmetric(horizontal: 15.w),
+                  Container(
+                    width: 85.w,
+                    height: 1.h,
+                    color: toColor('#D8D8D8'),
+                  ),
+                ],
               ),
-              // 隐藏 Singpass 登录按钮
-              Visibility(
-                visible: false,
-                child: InkWell(
-                  onTap: () => Get.to(() => SingpassLoginPage()),
-                  child: Container(
-                    margin: EdgeInsets.symmetric(
-                      horizontal: 15.w,
-                      vertical: 25.h,
-                    ),
-                    height: 45.h,
-                    width: 1.sw,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(25.r),
-                    ),
-                    child: Text(
-                      "Log in with singpass",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
+              // Singpass 登录按钮
+              InkWell(
+                onTap: () => Get.to(() => SingpassLoginPage()),
+                child: Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 15.w,
+                    vertical: 25.h,
+                  ),
+                  height: 45.h,
+                  width: 1.sw,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(25.r),
+                  ),
+                  child: Text(
+                    "Log in with singpass",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
