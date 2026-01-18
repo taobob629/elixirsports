@@ -11,12 +11,15 @@ abstract class BasePage<C extends BasePageController> extends GetView<C> {
 
   @override
   Widget build(BuildContext context) {
+    // 确保控制器在build开始时就被注册
     if (!Get.isRegistered<C>()) {
       Get.put<C>(createController());
     }
 
     return Obx(() {
-      int pageState = controller.pageState;
+      // 使用find方法获取控制器，确保控制器已注册
+      final C ctrl = Get.find<C>();
+      int pageState = ctrl.pageState;
       switch (pageState) {
         case PageState.empty:
           return EmptyView();

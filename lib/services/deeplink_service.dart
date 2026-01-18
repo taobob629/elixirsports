@@ -1,14 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:app_links/app_links.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'singpass_service.dart';
+import 'package:elixir_esports/utils/toast_utils.dart';
 import '../utils/storage_manager.dart';
 
 // 导入页面组件
 import '../ui/pages/login/login_page.dart';
 import '../ui/pages/main_page.dart';
+
+// 导入对话框组件
+import '../ui/dialog/register_success_dialog.dart';
 
 /// 深度链接处理服务
 class DeeplinkService {
@@ -124,26 +129,29 @@ class DeeplinkService {
         // 关闭加载对话框
         Get.back();
 
-        // 提示需要注册
-        Get.snackbar('Tips', 'Please register first'.tr,
-            backgroundColor: Colors.blue, colorText: Colors.white);
+        // 根据新需求：后台会直接redirect到MyInfo登录界面，不再需要我们处理
+        // 显示提示信息，告诉用户正在处理
+        Get.snackbar(
+            'Redirecting'.tr, 'Redirecting to MyInfo registration...'.tr,
+            backgroundColor: Colors.blue[700]!, colorText: Colors.white);
 
-        try {
-          // 调用SingpassService获取MyInfo授权URL
-          final myinfoAuthUrl = await SingpassService.getMyInfoAuthUrl();
+        // 跳回登录页面，等待用户完成MyInfo流程后返回
+        Get.offAll(() => LoginPage());
+      } else if (appState == 'newUser') {
+        // 关闭加载对话框
+        Get.back();
 
-          // 打开MyInfo授权页面
-          final uri = Uri.parse(myinfoAuthUrl);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          } else {
-            throw Exception('Could not launch MyInfo auth URL');
-          }
-        } catch (e) {
-          print('Error launching MyInfo auth URL: $e');
-          Get.snackbar('Error', 'Error launching MyInfo auth URL',
-              backgroundColor: Colors.red[700]!, colorText: Colors.white);
+        // 保存token到StorageManager
+        if (token != null && token.isNotEmpty) {
+          StorageManager.setToken(token);
         }
+
+        // 跳转到主页
+        Get.offAll(() => MainPage());
+
+        // 显示注册成功对话框
+        await showCustom(RegisterSuccessDialog());
+
       } else {
         // 传统流程：没有appState参数时的处理
         if (code == null || state == null) {

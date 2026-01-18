@@ -250,7 +250,8 @@ const Map<String, String> zh_CN = {
   'Login failed':'登录失败,请重试',
   'Failed':'失败了',
   'Please register first':'请先注册会员再登录',
-  'Tips':'提示'
+  'Tips':'提示',
+  'Redirecting to Singpass...':'转跳至SINGPASS'
 
 
 

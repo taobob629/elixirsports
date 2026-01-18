@@ -1,6 +1,6 @@
 import 'package:elixir_esports/assets_utils.dart';
 import 'package:elixir_esports/config/icon_font.dart';
-import 'package:elixir_esports/ui/pages/auth/singpass_login_page.dart';
+import 'package:elixir_esports/services/singpass_service.dart';
 import 'package:elixir_esports/ui/pages/login/forgot_password_page.dart';
 import 'package:elixir_esports/ui/pages/login/privacy_check.dart';
 import 'package:elixir_esports/ui/pages/login/register_page.dart';
@@ -10,14 +10,83 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../base/base_page.dart';
 import '../../../getx_ctr/login_ctr.dart';
 import '../../widget/my_textfield_widget.dart';
 
 class LoginPage extends BasePage<LoginCtr> {
+  // 使用GetX响应式状态管理登录状态
+  final RxBool _isLoading = false.obs;
+
   @override
   LoginCtr createController() => LoginCtr();
+
+  /// 直接处理 Singpass 登录
+  Future<void> _handleSingpassLogin() async {
+    if (_isLoading.value) return;
+
+    // 检查隐私条款
+    if (!controller.controller.check()) {
+      return;
+    }
+
+    _isLoading.value = true;
+
+    // 显示全屏加载对话框，去掉黑色转圈loading
+    Get.dialog(
+      Center(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'Redirecting to Singpass...'.tr,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+
+    try {
+      // 获取 Singpass 认证 URL
+      final authUrl = await SingpassService.login();
+
+      // 关闭加载对话框
+      Get.back();
+
+      // 使用 url_launcher 打开 Singpass 认证页面
+      final uri = Uri.parse(authUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      // 关闭加载对话框
+      Get.back();
+
+      // 捕获异常，显示错误信息
+      Get.snackbar('Error'.tr, 'An error occurred: ${e.toString()}',
+          backgroundColor: Colors.red[700]!, colorText: Colors.white);
+    } finally {
+      _isLoading.value = false;
+    }
+  }
 
   @override
   Widget buildBody(BuildContext context) => KeyboardDismissOnTap(
@@ -124,30 +193,41 @@ class LoginPage extends BasePage<LoginCtr> {
                 ],
               ),
               // Singpass 登录按钮
-              InkWell(
-                onTap: () => Get.to(() => SingpassLoginPage()),
-                child: Container(
-                  margin: EdgeInsets.symmetric(
-                    horizontal: 15.w,
-                    vertical: 25.h,
-                  ),
-                  height: 45.h,
-                  width: 1.sw,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(25.r),
-                  ),
-                  child: Text(
-                    "Log in with singpass",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
+              Obx(() => InkWell(
+                    onTap: _handleSingpassLogin,
+                    child: Container(
+                      margin: EdgeInsets.only(
+                        top: 25.h,
+                        bottom: 30.h,
+                        left: 15.w,
+                        right: 15.w,
+                      ),
+                      height: 40.h,
+                      width: 1.sw,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: _isLoading.value ? Colors.red[600] : Colors.red,
+                        borderRadius: BorderRadius.circular(5.r),
+                      ),
+                      child: _isLoading.value
+                          ? SizedBox(
+                              width: 20.w,
+                              height: 20.w,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.w,
+                              ),
+                            )
+                          : Text(
+                              "Log in with singpass",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: FONT_MEDIUM,
+                                fontSize: 14.sp,
+                              ),
+                            ),
                     ),
-                  ),
-                ),
-              ),
+                  )),
               PrivacyCheck(controller: controller.controller)
             ],
           ),
