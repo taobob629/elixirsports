@@ -33,7 +33,7 @@ class CouponListPage extends BasePage<CouponListCtr> {
                 tabs: controller.tabs,
                 // isScrollable: false,
                 indicatorSize: TabBarIndicatorSize.label,
-                overlayColor: MaterialStateProperty.all(Colors.transparent),
+                overlayColor: WidgetStateProperty.all(Colors.transparent),
                 onTap: (index) => controller.changeStatus(index),
                 dividerColor: Colors.transparent,
                 indicator: ContainerTabIndicator(
@@ -45,22 +45,34 @@ class CouponListPage extends BasePage<CouponListCtr> {
             ),
             Expanded(
               child: Obx(() => controller.list.isNotEmpty
-                  ? SmartRefresher(
-                      controller: controller.refreshController,
-                      onRefresh: () => controller.onRefresh(),
-                      onLoading: () => controller.loadMore(),
-                      enablePullUp: true,
-                      enablePullDown: true,
-                      child: ListView.separated(
-                        itemBuilder: (c, i) => itemWidget(controller.list[i]),
-                        separatorBuilder: (c, i) => 10.verticalSpace,
-                        itemCount: controller.list.length,
-                      ))
+                  ? _buildSmartRefresher()
                   : EmptyView()),
             ),
           ],
         ),
       );
+
+  Widget _buildSmartRefresher() {
+    final RefreshController refreshController =
+        RefreshController(initialRefresh: false);
+    return SmartRefresher(
+        controller: refreshController,
+        onRefresh: () async {
+          await controller.onRefresh();
+          refreshController.refreshCompleted();
+        },
+        onLoading: () async {
+          await controller.loadMore();
+          refreshController.loadComplete();
+        },
+        enablePullUp: true,
+        enablePullDown: true,
+        child: ListView.separated(
+          itemBuilder: (c, i) => itemWidget(controller.list[i]),
+          separatorBuilder: (c, i) => 10.verticalSpace,
+          itemCount: controller.list.length,
+        ));
+  }
 
   Widget itemWidget(CouponsRow item) => SizedBox(
         height: 120.h,

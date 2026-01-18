@@ -46,6 +46,20 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="elixiresports" />
             </intent-filter>
+            <!-- App Links 配置 - 支持多个域名 -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- 第一个域名 -->
+                <data
+                    android:scheme="https"
+                    android:host="sinbob.elixiresports.com" />
+                <!-- 第二个域名 -->
+                <data
+                    android:scheme="https"
+                    android:host="www.elixiresports.com" />
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.elixir.esports",
+      "sha256_cert_fingerprints": [
+        "7E:B2:B1:AB:F0:B9:7E:AF:39:CF:34:92:6A:01:DB:AC:94:35:DF:84:F0:32:7B:14:7D:4F:FF:8C:AE:77:6D:14",
+        "6C:73:D1:59:A9:60:62:BF:73:10:3B:0F:28:7C:3F:8F:D8:66:42:79:E5:3D:A9:1F:04:39:A7:87:E7:90:38:42"
+      ]
+    }
+  }
+]

@@ -21,19 +21,30 @@ class OrderListPage extends BasePage<OrderListCtr> {
   Widget buildBody(BuildContext context) => BaseScaffold(
         title: "Order".tr,
         body: Obx(() => controller.list.isNotEmpty
-            ? SmartRefresher(
-                controller: controller.refreshController,
-                onRefresh: () => controller.onRefresh(),
-                onLoading: () => controller.loadMore(),
-                enablePullUp: true,
-                enablePullDown: true,
-                child: ListView.separated(
-                  itemBuilder: (c, i) => itemWidget(controller.list[i]),
-                  separatorBuilder: (c, i) => 10.verticalSpace,
-                  itemCount: controller.list.length,
-                )).marginAll(15.r)
+            ? _buildSmartRefresher()
             : EmptyView()),
       );
+
+  Widget _buildSmartRefresher() {
+    final RefreshController refreshController = RefreshController(initialRefresh: false);
+    return SmartRefresher(
+      controller: refreshController,
+      onRefresh: () async {
+        await controller.onRefresh();
+        refreshController.refreshCompleted();
+      },
+      onLoading: () async {
+        await controller.loadMore();
+        refreshController.loadComplete();
+      },
+      enablePullUp: true,
+      enablePullDown: true,
+      child: ListView.separated(
+        itemBuilder: (c, i) => itemWidget(controller.list[i]),
+        separatorBuilder: (c, i) => 10.verticalSpace,
+        itemCount: controller.list.length,
+      )).marginAll(15.r);
+  }
 
   Widget itemWidget(OrderRow model) => InkWell(
         onTap: () => Get.to(() => NewOrderDetailPage(), arguments: model.id),

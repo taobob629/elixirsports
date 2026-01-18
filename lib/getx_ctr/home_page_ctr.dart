@@ -29,9 +29,6 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
 
   LocationService locationService = LocationService();
 
-  var currentIndex = 0.obs;
-  List<Widget> bodys = [];
-
   // 位置监听的变量，收到LocationService里面的Getx的position的回调
   late Worker everPosition;
 
@@ -43,11 +40,8 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
 
   @override
   void requestData() async {
-    bodys.add(TabHomePage());
-    bodys.add(TabServicesPage());
-    bodys.add(TabMinePage());
-
-    everPosition = ever(locationService.position, (Position? pos) => list.refresh());
+    everPosition =
+        ever(locationService.position, (Position? pos) => list.refresh());
 
     checkVersion();
     checkAdPromote();
@@ -104,7 +98,10 @@ class HomePageCtr extends GetxRefreshController<StoreModel> {
                     if (state.extendedImageLoadState == LoadState.loading) {
                       return AspectRatio(
                         aspectRatio: 0.75,
-                        child: Container(color: Colors.white, alignment: Alignment.center, child: const CircularProgressIndicator()),
+                        child: Container(
+                            color: Colors.white,
+                            alignment: Alignment.center,
+                            child: const CircularProgressIndicator()),
                       );
                     }
                     return null;

@@ -23,7 +23,6 @@ import '../../widget/search_widget.dart';
 import '../booking/book_seat_page.dart';
 
 class TabHomePage extends BasePage<HomePageCtr> {
-
   @override
   HomePageCtr createController() => HomePageCtr();
 
@@ -204,26 +203,36 @@ class TabHomePage extends BasePage<HomePageCtr> {
               ).paddingOnly(left: 30.w, top: 15.h, bottom: 15.h),
               Expanded(
                 child: Obx(() => controller.list.isNotEmpty
-                    ? SmartRefresher(
-                        controller: controller.refreshController,
-                        onRefresh: () => controller.onRefresh(),
-                        onLoading: () => controller.loadMore(),
-                        enablePullUp: true,
-                        enablePullDown: true,
-                        child: ListView.separated(
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (c, i) =>
-                              itemWidget(controller.list[i]),
-                          separatorBuilder: (c, i) => 15.verticalSpace,
-                          itemCount: controller.list.length,
-                        ),
-                      )
+                    ? _buildSmartRefresher()
                     : EmptyView()),
               ),
             ],
           ),
         ),
       );
+
+  Widget _buildSmartRefresher() {
+    final RefreshController refreshController = RefreshController(initialRefresh: false);
+    return SmartRefresher(
+      controller: refreshController,
+      onRefresh: () async {
+        await controller.onRefresh();
+        refreshController.refreshCompleted();
+      },
+      onLoading: () async {
+        await controller.loadMore();
+        refreshController.loadComplete();
+      },
+      enablePullUp: true,
+      enablePullDown: true,
+      child: ListView.separated(
+        padding: EdgeInsets.zero,
+        itemBuilder: (c, i) => itemWidget(controller.list[i]),
+        separatorBuilder: (c, i) => 15.verticalSpace,
+        itemCount: controller.list.length,
+      ),
+    );
+  }
 
   Widget itemWidget(StoreModel model) => InkWell(
         onTap: () => Get.to(() => BookSeatPage(), arguments: model),

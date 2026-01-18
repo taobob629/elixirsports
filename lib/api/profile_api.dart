@@ -57,7 +57,7 @@ class ProfileApi {
 
   static Future<AdModel> checkAdPromote() async {
     var response = await http.get('app/home/checkAdPromote');
-    return AdModel.fromJson(response.data);
+    return AdModel.fromJson(response.data ?? {});
   }
   static Future<void> clickPromote(AdModel model) async {
     // http.get('app/home/clickPromote?type='+model.type+"&id="+model.id);

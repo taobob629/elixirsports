@@ -18,7 +18,7 @@ class _SingpassLoginPageState extends State<SingpassLoginPage> {
   String? _errorMessage;
 
   /// 处理 Singpass 登录
-  void _handleSingpassLogin() {
+  Future<void> _handleSingpassLogin() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -26,15 +26,19 @@ class _SingpassLoginPageState extends State<SingpassLoginPage> {
 
     try {
       // 获取 Singpass 认证 URL
-      final authUrl = SingpassService.login();
+      final authUrl = await SingpassService.login();
 
       // 使用 url_launcher 打开 Singpass 认证页面（会自动使用 In-App Browsers）
-      _launchSingpassAuthUrl(authUrl);
+      await _launchSingpassAuthUrl(authUrl);
     } catch (e) {
       // 捕获异常，显示错误信息
       setState(() {
         _isLoading = false;
         _errorMessage = 'An error occurred: ${e.toString()}';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
   }

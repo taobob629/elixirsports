@@ -207,6 +207,31 @@ class RegisterPage extends BasePage<RegisterCtr> {
                   ],
                 ),
                 InkWell(
+                  onTap: () => Get.to(() => SingpassLoginPage()),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: toColor('#D32F2F'),
+                      borderRadius: BorderRadius.circular(5.r),
+                    ),
+                    margin: EdgeInsets.symmetric(
+                      horizontal: 15.w,
+                      vertical: 25.h,
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 15.w),
+                    height: 40.h,
+                    width: 1.sw,
+                    alignment: Alignment.center,
+                    child: Text(
+                      "LOG IN WITH SINGPASS".tr,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.sp,
+                        fontFamily: FONT_MEDIUM,
+                      ),
+                    ),
+                  ),
+                ),
+                InkWell(
                   onTap: () => Get.back(),
                   child: Container(
                     decoration: BoxDecoration(
@@ -218,7 +243,7 @@ class RegisterPage extends BasePage<RegisterCtr> {
                     ),
                     margin: EdgeInsets.symmetric(
                       horizontal: 15.w,
-                      vertical: 25.h,
+                      vertical: 0.h,
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 15.w),
                     height: 40.h,

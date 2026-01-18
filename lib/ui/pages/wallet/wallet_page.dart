@@ -17,7 +17,6 @@ import '../../widget/animated_value_widget.dart';
 import '../../widget/cash_animator/animated_text_switcher.dart';
 
 class WalletPage extends BasePage<WalletCtr> {
-
   @override
   WalletCtr createController() => WalletCtr();
 
@@ -53,7 +52,6 @@ class WalletPage extends BasePage<WalletCtr> {
                                 'Elixir Wallet'.tr,
                                 style: TextStyle(
                                   color: Colors.white,
-
                                   fontSize: 12.sp,
                                   fontFamily: FONT_MEDIUM,
                                 ),
@@ -79,9 +77,12 @@ class WalletPage extends BasePage<WalletCtr> {
                               child: Obx(() => Align(
                                     alignment: Alignment.centerLeft,
                                     child: AnimatedValueWidget(
-                                      oldValue: controller.oldWalletModel.value.cash,
-                                      newValue: controller.walletModel.value.cash,
-                                      showAnimation: controller.showAnimator.value,
+                                      oldValue:
+                                          controller.oldWalletModel.value.cash,
+                                      newValue:
+                                          controller.walletModel.value.cash,
+                                      showAnimation:
+                                          controller.showAnimator.value,
                                       currencySymbol: 'S\$',
                                       style: TextStyle(
                                         color: Colors.white,
@@ -94,9 +95,12 @@ class WalletPage extends BasePage<WalletCtr> {
                             Obx(() => Align(
                                   alignment: Alignment.centerLeft,
                                   child: AnimatedValueWidget(
-                                    oldValue: controller.oldWalletModel.value.reward,
-                                    newValue: controller.walletModel.value.reward,
-                                    showAnimation: controller.showAnimator.value,
+                                    oldValue:
+                                        controller.oldWalletModel.value.reward,
+                                    newValue:
+                                        controller.walletModel.value.reward,
+                                    showAnimation:
+                                        controller.showAnimator.value,
                                     currencySymbol: 'S\$',
                                     style: TextStyle(
                                       color: Colors.white,
@@ -167,22 +171,7 @@ class WalletPage extends BasePage<WalletCtr> {
                           ).marginOnly(top: 15.h),
                           Expanded(
                             child: Obx(() => controller.list.isNotEmpty
-                                ? SmartRefresher(
-                                    controller: controller.refreshController,
-                                    onRefresh: () => controller.onRefresh(),
-                                    onLoading: () => controller.loadMore(),
-                                    enablePullUp: true,
-                                    enablePullDown: true,
-                                    child: ListView.separated(
-                                      itemBuilder: (c, i) =>
-                                          itemWidget(controller.list[i]),
-                                      separatorBuilder: (c, i) => Divider(
-                                        color: toColor("EEEEEE"),
-                                        height: 1.h,
-                                      ),
-                                      itemCount: controller.list.length,
-                                    ),
-                                  )
+                                ? _buildSmartRefresher()
                                 : EmptyView()),
                           ),
                         ],
@@ -192,6 +181,32 @@ class WalletPage extends BasePage<WalletCtr> {
                 ],
               ).paddingOnly(bottom: 15.h)),
       );
+
+  Widget _buildSmartRefresher() {
+    final RefreshController refreshController =
+        RefreshController(initialRefresh: false);
+    return SmartRefresher(
+      controller: refreshController,
+      onRefresh: () async {
+        await controller.onRefresh();
+        refreshController.refreshCompleted();
+      },
+      onLoading: () async {
+        await controller.loadMore();
+        refreshController.loadComplete();
+      },
+      enablePullUp: true,
+      enablePullDown: true,
+      child: ListView.separated(
+        itemBuilder: (c, i) => itemWidget(controller.list[i]),
+        separatorBuilder: (c, i) => Divider(
+          color: toColor("EEEEEE"),
+          height: 1.h,
+        ),
+        itemCount: controller.list.length,
+      ),
+    );
+  }
 
   Widget itemWidget(WalletRow model) => Column(
         children: [

@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:elixir_esports/api/wy_http.dart';
+import 'package:elixir_esports/utils/storage_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Singpass v5 认证服务类
@@ -11,91 +12,123 @@ class SingpassService {
   static const String redirectUri = 'elixiresports://callback'; // 应用的回调 URI
   static const String authorizationEndpoint =
       'https://stg-id.singpass.gov.sg/auth';
-  static const String tokenEndpoint = 'https://stg-id.singpass.gov.sg/token';
-  static const String userInfoEndpoint =
-      'https://stg-id.singpass.gov.sg/userinfo';
 
   // 应用后台接口
-  static const String appBackendBaseUrl = 'https://your-app-backend.com/api';
-  static const String appTokenExchangeEndpoint =
-      '$appBackendBaseUrl/singpass/token-exchange';
+  static const String authUrlEndpoint = '/web/api/singpass/login/auth-url';
+  static const String callbackEndpoint = '/web/api/singpass/callback';
+  static const String myinfoAuthUrlEndpoint =
+      '/web/api/singpass/myinfo/auth-url';
+
+  // 保存临时会话ID
+  static String? _tempSessionId;
 
   /// 启动 Singpass 登录流程
-  /// 返回认证 URL，用于在 OAuthWebView 中加载
-  static String login() {
-    return buildAuthUrl();
+  /// 返回认证 URL，用于在 In-App Browser 中加载
+  static Future<String> login() async {
+    final result = await getAuthUrl();
+    return result;
   }
 
-  /// 构建 Singpass 认证 URL
-  static String buildAuthUrl() {
-    final params = {
-      'response_type': 'code',
-      'client_id': clientId,
-      'redirect_uri': redirectUri,
-      'scope': 'openid myinfo.name myinfo.passport_number', // 根据需要添加其他 scope
-      'state': _generateRandomState(),
-      'nonce': _generateRandomNonce(),
-      'code_challenge': _generateCodeChallenge(),
-      'code_challenge_method': 'S256',
-    };
-
-    final uri =
-        Uri.parse(authorizationEndpoint).replace(queryParameters: params);
-    return uri.toString();
-  }
-
-  /// 生成随机 state
-  static String _generateRandomState() {
-    // 实际项目中应使用更安全的随机生成方法
-    return DateTime.now().millisecondsSinceEpoch.toString();
-  }
-
-  /// 生成随机 nonce
-  static String _generateRandomNonce() {
-    // 实际项目中应使用更安全的随机生成方法
-    return DateTime.now().millisecondsSinceEpoch.toString() + 'nonce';
-  }
-
-  /// 生成 code challenge
-  static String _generateCodeChallenge() {
-    // Singpass v5 使用 PKCE 流程，需要生成 code challenge
-    // 实际项目中应使用正确的 PKCE 算法生成 code challenge
-    // 这里简化处理，实际应实现完整的 PKCE 流程
-    return 'sample-code-challenge';
-  }
-
-  /// 将授权码发送到应用后台进行令牌交换
-  static Future<Map<String, dynamic>?> exchangeCodeWithBackend(
-      String code) async {
+  /// 从后台获取 Singpass 认证 URL
+  static Future<String> getAuthUrl() async {
     try {
-      final response = await http.post(
-        Uri.parse(appTokenExchangeEndpoint),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
-          'code': code,
-          'redirect_uri': redirectUri,
-        }),
-      );
+      // 调用后台生成认证URL接口
+      final response = await http.post(authUrlEndpoint);
 
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
+      print("auth response:${response}");
+      if (response.data != null) {
+        String authUrl;
+        String tempSessionId;
+
+        // 检查响应格式：后台可能直接返回数据，或包装在'data'字段中
+        if (response.data.containsKey('data')) {
+          // 格式1：{"data": {"authUrl": "...", "tempSessionId": "..."}}
+          authUrl = response.data['data']['authUrl'] as String;
+          tempSessionId = response.data['data']['tempSessionId'] as String;
+        } else {
+          // 格式2：{"authUrl": "...", "tempSessionId": "..."}
+          authUrl = response.data['authUrl'] as String;
+          tempSessionId = response.data['tempSessionId'] as String;
+        }
+
+        _tempSessionId = tempSessionId;
+
+        print('Using original auth URL from backend: $authUrl');
+
+        // 直接使用后台提供的authUrl，后台会处理重定向
+        return authUrl;
       } else {
-        print(
-            'Backend token exchange error: ${response.statusCode} ${response.body}');
-        return null;
+        throw Exception('Failed to get auth URL from backend');
       }
     } catch (e) {
-      print('Backend token exchange network error: $e');
+      print('Error getting Singpass auth URL: $e');
+      rethrow;
+    }
+  }
+
+  /// 处理 Singpass 回调
+  static Future<Map<String, dynamic>?> handleSingpassCallback(
+      String code, String state) async {
+    try {
+      if (_tempSessionId == null) {
+        throw Exception('Temp session ID not found');
+      }
+
+      // 调用后台回调接口
+      final response = await http.post(
+        callbackEndpoint,
+        data: {
+          'code': code,
+          'state': state,
+          'tempSessionId': _tempSessionId,
+        },
+      );
+
+      if (response.data != null) {
+        // 存储应用内令牌
+        await saveTokens(response.data);
+        return response.data;
+      } else {
+        throw Exception('Failed to handle Singpass callback');
+      }
+    } catch (e) {
+      print('Singpass callback handling error: $e');
       return null;
+    } finally {
+      // 清除临时会话ID
+      _tempSessionId = null;
+    }
+  }
+
+  /// 获取 MyInfo 授权 URL（新用户）
+  static Future<String> getMyInfoAuthUrl() async {
+    try {
+      // 调用后台生成 MyInfo 认证URL接口
+      final response = await http.post(myinfoAuthUrlEndpoint);
+
+      if (response.data != null && response.data.containsKey('data')) {
+        return response.data['data']['authUrl'] as String;
+      } else {
+        throw Exception('Failed to get MyInfo auth URL from backend');
+      }
+    } catch (e) {
+      print('Error getting MyInfo auth URL: $e');
+      rethrow;
     }
   }
 
   /// 保存应用内令牌
   static Future<void> saveTokens(Map<String, dynamic> tokens) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('app_access_token', tokens['access_token'] ?? '');
+    final accessToken = tokens['access_token'] ?? '';
+
+    // 使用现有的StorageManager保存token，与其他登录流程保持一致
+    if (accessToken.isNotEmpty) {
+      StorageManager.setToken(accessToken);
+    }
+
+    // 保存到SharedPreferences（SingPass特定的令牌存储）
+    await prefs.setString('app_access_token', accessToken);
     await prefs.setString('app_refresh_token', tokens['refresh_token'] ?? '');
     await prefs.setString('app_id_token', tokens['id_token'] ?? '');
 
@@ -106,28 +139,15 @@ class SingpassService {
     await prefs.setInt('app_token_expires_at', expiresAt);
   }
 
-  /// 处理 Singpass 回调
-  static Future<Map<String, dynamic>?> handleSingpassCallback(
-      String code) async {
-    try {
-      // 将授权码发送到应用后台进行令牌交换
-      final tokenResponse = await exchangeCodeWithBackend(code);
-      if (tokenResponse == null) {
-        throw Exception('Failed to exchange code with backend');
-      }
-
-      // 存储应用内令牌
-      await saveTokens(tokenResponse);
-
-      return tokenResponse;
-    } catch (e) {
-      print('Singpass callback handling error: $e');
-      return null;
-    }
-  }
-
   /// 检查用户是否已登录
   static Future<bool> isLoggedIn() async {
+    // 优先检查StorageManager中的token，与其他登录流程保持一致
+    final storageToken = StorageManager.getToken();
+    if (storageToken.isNotEmpty) {
+      return true;
+    }
+
+    // 同时检查SingPass特定的令牌存储
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('app_access_token');
     final expiresAt = prefs.getInt('app_token_expires_at') ?? 0;
@@ -140,6 +160,10 @@ class SingpassService {
 
   /// 用户登出
   static Future<void> logout() async {
+    // 清除StorageManager中的token，与其他登录流程保持一致
+    StorageManager.clear(StorageManager.kToken);
+
+    // 清除SingPass特定的令牌存储
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('app_access_token');
     await prefs.remove('app_refresh_token');
@@ -183,18 +207,14 @@ class SingpassService {
 
     try {
       final response = await http.post(
-        Uri.parse('$appBackendBaseUrl/singpass/refresh-token'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({
+        '/web/api/singpass/refresh-token',
+        data: {
           'refresh_token': refreshToken,
-        }),
+        },
       );
 
-      if (response.statusCode == 200) {
-        final tokenResponse = json.decode(response.body);
-        await saveTokens(tokenResponse);
+      if (response.data != null) {
+        await saveTokens(response.data);
         return true;
       }
 
