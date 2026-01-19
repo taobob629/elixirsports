@@ -3,7 +3,8 @@ import 'package:elixir_esports/ui/pages/login/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
-
+import 'package:elixir_esports/ui/pages/settings/password_page.dart';
+import 'package:elixir_esports/ui/pages/settings/password_page_newUser.dart';
 import '../api/login_api.dart';
 import '../api/profile_api.dart';
 import '../models/version_model.dart';
@@ -95,7 +96,24 @@ class SettingsCtr extends BasePageController {
       showToast("Incorrect password".tr);
 
   }
+  void setPassword() async {
+    if (newPsdCtr.text.isEmpty) {
+      showToast("Please input password".tr);
+      return;
+    }
+    if (repeatPsdCtr.text.isEmpty) {
+      showToast("Please repeat password".tr);
+      return;
+    }
+    if (newPsdCtr.text != repeatPsdCtr.text) {
+      showToast("The passwords you entered twice do not match".tr);
+      return;
+    }
+    await LoginApi.setPassword(password: newPsdCtr.text);
+    Get.back();
 
+
+  }
   void checkVersion() async {
     showLoading();
     VersionModel model = await ProfileApi.checkVersion();
@@ -108,6 +126,26 @@ class SettingsCtr extends BasePageController {
         clickMaskDismiss: !model.force,
         backType: SmartBackType.block,
       );
+    }
+  }
+
+  void handlePasswordTap() async {
+    showLoading();
+    try {
+      final bool hasPassword = await LoginApi.checkPassword();
+      dismissLoading();
+      if (hasPassword) {
+        // 如果接口返回true，打开PasswordPageNewuser
+        Get.to(() => PasswordPageNewuser());
+      } else {
+        // 其他情况打开PasswordPage
+        Get.to(() => PasswordPage());
+      }
+    } catch (e) {
+      dismissLoading();
+      showToast("Failed to check password status".tr);
+      // 发生错误时默认打开PasswordPage
+      Get.to(() => PasswordPage());
     }
   }
 }

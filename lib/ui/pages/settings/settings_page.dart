@@ -1,5 +1,3 @@
-import 'package:elixir_esports/ui/pages/login/register_page.dart';
-import 'package:elixir_esports/ui/pages/settings/password_page.dart';
 import 'package:elixir_esports/ui/pages/settings/update_name_page.dart';
 import 'package:elixir_esports/utils/image_util.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +11,7 @@ import '../../../base/base_page.dart';
 import '../../../base/base_scaffold.dart';
 import '../../../getx_ctr/user_controller.dart';
 import '../../../getx_ctr/settings_ctr.dart';
-import '../../dialog/confirm_dialog.dart';
 import '../../widget/my_button_widget.dart';
-import '../banks/bank_cards_page.dart';
 
 class SettingsPage extends BasePage<SettingsCtr> {
   @override
@@ -100,7 +96,7 @@ class SettingsPage extends BasePage<SettingsCtr> {
                     color: toColor('EEEEEE'),
                   ).marginSymmetric(vertical: 15.h),
                   InkWell(
-                    onTap: () => Get.to(() => PasswordPage()),
+                    onTap: () => controller.handlePasswordTap(),
                     child: Row(
                       children: [
                         Expanded(

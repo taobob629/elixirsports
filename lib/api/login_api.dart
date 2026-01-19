@@ -78,6 +78,18 @@ class LoginApi {
 
     return response.data["validated"];
   }
+
+  static Future<void> setPassword({
+    required String password,
+  }) async {
+    var response = await http.post(
+      'app/user/setPassword',
+      data: {
+        "password": password,
+      },
+    );
+  }
+
   /// 校验用户是否存在
   static Future<bool?> appCheckMember({
     required String code,
@@ -105,6 +117,7 @@ class LoginApi {
 
     return response.data["validated"];
   }
+
   /// 注册
   static Future<LoginModel> appRegister({
     required Map<String, dynamic> map,
@@ -135,5 +148,19 @@ class LoginApi {
     List<String> list = listArr.cast<String>();
 
     return list;
+  }
+
+  /// 检查密码是否设置
+  static Future<bool> checkPassword() async {
+    var response = await http.get('app/user/checkPassword');
+    print("check password data:${response.data}");
+    return response.data;
+    // 检查返回数据结构是否正确
+    if (response.data != null && response.data['code'] == 200) {
+      return response.data['data'] == true;
+    } else {
+      // 如果返回结构不正确，默认为false
+      return false;
+    }
   }
 }

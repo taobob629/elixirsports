@@ -111,7 +111,7 @@ const Map<String, String> en_US = {
   'User nickname': 'Nickname',
   'Password': 'Password',
   'CHANGE PASSWORD': 'CHANGE PASSWORD',
-  'For an improved account security': 'For an improved account security',
+  'For an improved account security': 'For your account security, we recommend changing your password every three months.',
   'Old Password': 'Current password',
   'New Password': 'New Password',
   'Repeat New Password': 'Repeat New Password',

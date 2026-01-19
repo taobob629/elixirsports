@@ -119,7 +119,7 @@ const Map<String, String> zh_CN = {
   'User nickname': '昵称',
   'Password': '密码',
   'CHANGE PASSWORD': '更改密码',
-  'For an improved account security': '为了提高帐户安全性',
+  'For an improved account security': '为了您的账户安全建议每三个月修改一次密码',
   'Old Password': '当前密码',
   'New Password': '新密码',
   'Repeat New Password': '重复新密码',
@@ -251,7 +251,12 @@ const Map<String, String> zh_CN = {
   'Failed':'失败了',
   'Please register first':'请先注册会员再登录',
   'Tips':'提示',
-  'Redirecting to Singpass...':'转跳至SINGPASS'
+  'Redirecting to Singpass...':'转跳至SINGPASS',
+  'Password set successfully':'密码设置成功',
+  'Repeat Password':'请再次输入密码',
+  'Please repeat password':'请再次输入密码',
+  'Set your password':'设置你的密码',
+  // 'Set your password':'设置你的密码',
 
 
 
