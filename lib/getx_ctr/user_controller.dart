@@ -80,8 +80,10 @@ class UserController extends BasePageController {
     StorageManager.clear(StorageManager.kUser);
     StorageManager.clear(StorageManager.kPassword);
     StorageManager.clear(StorageManager.kLoginTime);
-    done?.call();
     StorageManager.clear(StorageManager.kToken);
+    // 清空用户信息模型
+    profileModel.value = ProfileModel(memberShip: []);
+    done?.call();
   }
 
   Future<void> appLogout() async {

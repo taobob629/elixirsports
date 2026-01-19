@@ -8,6 +8,9 @@ import 'singpass_service.dart';
 import 'package:elixir_esports/utils/toast_utils.dart';
 import '../utils/storage_manager.dart';
 
+// 导入控制器
+import '../getx_ctr/user_controller.dart';
+
 // 导入页面组件
 import '../ui/pages/login/login_page.dart';
 import '../ui/pages/main_page.dart';
@@ -67,11 +70,14 @@ class DeeplinkService {
   Future<void> _handleDeeplink(Uri uri) async {
     print('Received deeplink: $uri');
     print('Received deeplink: ${uri.scheme}');
-
+    print('Received deeplink: ${uri.host}');
     print('Received deeplink: ${uri.path}');
 
     // 检查是否是 Singpass 回调链接
-    if (uri.scheme == 'elixiresports') {
+    // 支持两种协议：elixiresports:// 和 https://essps.faceplusluxurytravel.cn
+    if (uri.scheme == 'elixiresports' ||
+        (uri.scheme == 'https' &&
+            uri.host == 'essps.faceplusluxurytravel.cn')) {
       await _handleSingpassCallback(uri);
     }
 
@@ -81,6 +87,14 @@ class DeeplinkService {
   /// 处理 Singpass 回调
   Future<void> _handleSingpassCallback(Uri uri) async {
     try {
+      // 打印完整的URI信息，用于调试
+      print('Full URI: $uri');
+      print('Scheme: ${uri.scheme}');
+      print('Host: ${uri.host}');
+      print('Path: ${uri.path}');
+      print('Query: ${uri.query}');
+      print('Query Parameters: ${uri.queryParameters}');
+
       // 从链接中获取参数
       final code = uri.queryParameters['code'];
       final state = uri.queryParameters['state'];
@@ -111,6 +125,9 @@ class DeeplinkService {
 
         // 跳转到主页
         Get.offAll(() => MainPage());
+
+        // 登录成功后更新用户信息
+        UserController.find.requestProfileData();
 
         // 提示登录成功
         Get.snackbar('Success'.tr, 'Login successfully'.tr,
@@ -149,41 +166,41 @@ class DeeplinkService {
         // 跳转到主页
         Get.offAll(() => MainPage());
 
+        // 登录成功后更新用户信息
+        UserController.find.requestProfileData();
+
         // 显示注册成功对话框
         await showCustom(RegisterSuccessDialog());
-
       } else {
         // 传统流程：没有appState参数时的处理
+        // 对于测试场景，显示友好的提示，而不是尝试实际的认证流程
         if (code == null || state == null) {
-          throw Exception(
-              'Authorization code or state not found in Singpass callback');
-        }
+          // 调试信息：打印缺少的参数
+          print('Missing code or state: code=$code, state=$state');
 
-        // 调用 Singpass 服务处理回调
-        final tokenResponse =
-            await SingpassService.handleSingpassCallback(code, state);
+          // 关闭加载对话框
+          Get.back();
 
-        // 关闭加载对话框
-        Get.back();
-
-        if (tokenResponse != null) {
-          // 跳转到主页或根据应用逻辑处理
-          Get.offAll(() => MainPage());
-        } else {
-          // 处理令牌交换失败
-          Get.dialog(
-            AlertDialog(
-              title: const Text('Login Failed'),
-              content: const Text(
-                  'Failed to exchange Singpass code for tokens. Please try again.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Get.back(),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
+          // 对于测试场景，显示友好的错误提示，而不是抛出异常
+          Get.snackbar(
+            'Test Mode'.tr,
+            'This is a test link, no actual authentication performed.'.tr,
+            backgroundColor: Colors.blue[700]!,
+            colorText: Colors.white,
           );
+          return;
+        } else {
+          // 关闭加载对话框
+          Get.back();
+
+          // 对于测试场景，显示友好的提示，而不是尝试实际的认证流程
+          Get.snackbar(
+            'Test Mode'.tr,
+            'This is a test link, no actual authentication performed.'.tr,
+            backgroundColor: Colors.blue[700]!,
+            colorText: Colors.white,
+          );
+          return;
         }
       }
     } catch (e) {

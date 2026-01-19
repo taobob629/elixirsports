@@ -37,6 +37,9 @@ class TopUpCtr extends BasePageController {
   }
 
   void _onTextChanged() {
+    // 当用户修改输入框文本时，清除预设金额选择状态
+    currentIndex.value = -1;
+    
     // Remove any leading or trailing spaces
     String text = inputMoneyCtr.text.trim();
 
