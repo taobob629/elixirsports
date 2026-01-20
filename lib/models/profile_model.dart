@@ -3,8 +3,11 @@ class ProfileModel {
   String? balance;
   int? coupon;
   int? level;
+  String? email;
+  String? phone;
   String? uk;
   String? name;
+  String? countryCode;
   List<MemberShip> memberShip;
   String? avatar;
   bool? isServiceAccount;
@@ -13,7 +16,10 @@ class ProfileModel {
   ProfileModel({
     this.reward,
     this.balance,
+    this.countryCode,
     this.coupon,
+    this.phone,
+    this.email,
     this.level,
     this.uk,
     this.name,
@@ -25,6 +31,10 @@ class ProfileModel {
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
         reward: json["reward"],
+        email: json["email"],
+        phone: json["phone"],
+    countryCode: json["countryCode"],
+
         balance: json["balance"],
         coupon: json["coupon"],
         level: json["level"],
@@ -41,6 +51,10 @@ class ProfileModel {
 
   Map<String, dynamic> toJson() => {
         "reward": reward,
+        "email": email,
+        "phone": phone,
+        "countryCode": countryCode,
+
         "balance": balance,
         "coupon": coupon,
         "level": level,

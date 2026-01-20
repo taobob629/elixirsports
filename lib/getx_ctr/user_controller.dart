@@ -39,6 +39,7 @@ class UserController extends BasePageController {
   DateTime lastLoginTime = DateTime.parse("1970-01-01 00:00:00");
 
   var profileModel = ProfileModel(memberShip: []).obs;
+  var userModel = UserModel().obs;
 
   late Timer _timer;
 
@@ -72,6 +73,9 @@ class UserController extends BasePageController {
     LoginModel model = await LoginApi.login(username, password);
     if (model.token != null) {
       StorageManager.setToken(model.token!);
+      if (model.user != null) {
+        userModel.value = model.user!;
+      }
       UserController.find.requestProfileData();
     }
   }
@@ -83,6 +87,7 @@ class UserController extends BasePageController {
     StorageManager.clear(StorageManager.kToken);
     // 清空用户信息模型
     profileModel.value = ProfileModel(memberShip: []);
+    userModel.value = UserModel();
     done?.call();
   }
 

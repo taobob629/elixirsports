@@ -31,6 +31,7 @@ class UserModel {
   DateTime? createTime;
   String? memberPhoto;
   String? nickName;
+  String? countryCode;
 
   UserModel({
     this.id,
@@ -40,6 +41,7 @@ class UserModel {
     this.birth,
     this.memberCode,
     this.memberLevel,
+    this.countryCode,
     this.balance,
     this.points,
     this.createTime,
@@ -52,6 +54,8 @@ class UserModel {
     sex: json["sex"],
     phone: json["phone"],
     email: json["email"],
+    countryCode: json["countryCode"],
+
     birth: json["birth"] == null ? null : DateTime.parse(json["birth"]),
     memberCode: json["memberCode"],
     memberLevel: json["memberLevel"],
@@ -71,6 +75,8 @@ class UserModel {
     "memberCode": memberCode,
     "memberLevel": memberLevel,
     "balance": balance,
+    "countryCode": countryCode,
+
     "points": points,
     "createTime": createTime?.toIso8601String(),
     "memberPhoto": memberPhoto,

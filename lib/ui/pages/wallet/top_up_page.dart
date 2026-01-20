@@ -27,7 +27,7 @@ class TopUpPage extends BasePage<TopUpCtr> {
   @override
   Widget buildBody(BuildContext context) => _TopUpPageBody(
     message: message,
-    controller: createController(),
+    controller: controller,
   );
 }
 
@@ -125,26 +125,33 @@ class _TopUpPageBodyState extends State<_TopUpPageBody> {
                         childAspectRatio: 95.w / 55.w,
                       ),
                       itemBuilder: (context, index) => Obx(() => InkWell(
-                        onTap: () {
-                          widget.controller.currentIndex.value = index;
-                          widget.controller.inputMoneyCtr.text = widget.controller.moneyList[index].toString();
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: widget.controller.currentIndex.value == index ? toColor('#18CBE6') : toColor('#F4FAFA'),
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            "S\$${widget.controller.moneyList[index]}",
-                            style: TextStyle(
-                              color: widget.controller.currentIndex.value == index ? Colors.white : toColor('333333'),
-                              fontFamily: FONT_MEDIUM,
-                              fontSize: 14.sp,
+                            onTap: () {
+                              // Use the new method to update input field programmatically
+                              widget.controller.updateInputMoney(
+                                  widget.controller.moneyList[index], index);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: widget.controller.currentIndex.value ==
+                                        index
+                                    ? toColor('#18CBE6')
+                                    : toColor('#F4FAFA'),
+                                borderRadius: BorderRadius.circular(10.r),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                "S${widget.controller.moneyList[index]}",
+                                style: TextStyle(
+                                  color: widget.controller.currentIndex.value ==
+                                          index
+                                      ? Colors.white
+                                      : toColor('333333'),
+                                  fontFamily: FONT_MEDIUM,
+                                  fontSize: 14.sp,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      )),
+                          )),
                       itemCount: widget.controller.moneyList.length,
                     ),
                     MyButtonWidget(
