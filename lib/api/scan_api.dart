@@ -15,10 +15,15 @@ class ScanApi {
   static Future<ScanModel> scanLogin({
     String? ip,
     int? storeId,
+    String? type,
+    String? deviceKey,
   }) async {
     var response = await http.get('app/service/scanLogin', queryParameters: {
       "ip": ip,
       "storeId": storeId,
+      "type": type,
+      "deviceKey":deviceKey,
+
     });
     return ScanModel.fromJson(response.data);
   }

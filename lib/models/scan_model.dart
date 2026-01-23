@@ -11,9 +11,13 @@ class ScanModel {
   int? storeId;
   String? cash;
   String? msg;
+  String? type;
+  String? deviceKey;
 
   ScanModel({
     this.reward,
+    this.deviceKey,
+    this.type,
     this.price,
     this.ip,
     this.freeTime,
@@ -30,6 +34,8 @@ class ScanModel {
   factory ScanModel.fromJson(Map<String, dynamic> json) => ScanModel(
     reward: json["reward"],
     price: json["price"],
+    type: json["type"],
+
     ip: json["ip"],
     freeTime: json["freeTime"],
     pcName: json["pcName"],
@@ -45,6 +51,8 @@ class ScanModel {
 
   Map<String, dynamic> toJson() => {
     "reward": reward,
+    "type": type,
+    "deviceKey": deviceKey,
     "price": price,
     "ip": ip,
     "freeTime": freeTime,
@@ -104,6 +112,7 @@ class StoreInfo {
   factory StoreInfo.fromJson(Map<String, dynamic> json) => StoreInfo(
     id: json["id"],
     name: json["name"],
+
     address: json["address"],
     telephone: json["telephone"],
     headImage: json["headImage"],
@@ -141,5 +150,6 @@ class StoreInfo {
     "map": map,
     "album": album,
     "taxRate": taxRate,
+
   };
 }

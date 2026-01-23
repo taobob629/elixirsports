@@ -15,6 +15,9 @@ class TopUpCtr extends BasePageController {
 
   List<int> moneyList = [5, 10, 20, 30, 50, 100];
 
+  // Add a flag to track if the text is being updated programmatically
+  bool _isProgrammaticUpdate = false;
+
   @override
   void requestData() {
     inputMoneyCtr.addListener(_onTextChanged);
@@ -33,22 +36,43 @@ class TopUpCtr extends BasePageController {
   void _onTextFocus() {
     if (inputMoneyFocusNode.hasFocus) {
       currentIndex.value = -1;
+      // Select all text when input field gets focus, so typing replaces existing text
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        inputMoneyCtr.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: inputMoneyCtr.text.length,
+        );
+      });
     }
   }
 
+  // Method to update input field programmatically
+  void updateInputMoney(int amount, int index) {
+    _isProgrammaticUpdate = true;
+    inputMoneyCtr.text = amount.toString();
+    currentIndex.value = index;
+    _isProgrammaticUpdate = false;
+  }
+
   void _onTextChanged() {
-    // 当用户修改输入框文本时，清除预设金额选择状态
-    currentIndex.value = -1;
-    
+    // Only clear selection if it's a user input, not a programmatic update
+    if (!_isProgrammaticUpdate) {
+      // 当用户修改输入框文本时，清除预设金额选择状态
+      currentIndex.value = -1;
+    }
+
     // Remove any leading or trailing spaces
     String text = inputMoneyCtr.text.trim();
 
     // Ensure the input is a valid number
     if (text.isEmpty || int.tryParse(text) == null) {
-      inputMoneyCtr.value = const TextEditingValue(
-        text: '',
-        selection: TextSelection.collapsed(offset: 0),
-      );
+      // Don't update if it's a programmatic update
+      if (!_isProgrammaticUpdate) {
+        inputMoneyCtr.value = const TextEditingValue(
+          text: '',
+          selection: TextSelection.collapsed(offset: 0),
+        );
+      }
       return;
     }
 
@@ -56,20 +80,25 @@ class TopUpCtr extends BasePageController {
 
     // Ensure the number is within the range 1 to 1000
     if (value < 1) {
-      inputMoneyCtr.value = const TextEditingValue(
-        text: '1',
-        selection: TextSelection.collapsed(offset: 1),
-      );
+      if (!_isProgrammaticUpdate) {
+        inputMoneyCtr.value = const TextEditingValue(
+          text: '1',
+          selection: TextSelection.collapsed(offset: 1),
+        );
+      }
     } else if (value > 1000) {
-      inputMoneyCtr.value = const TextEditingValue(
-        text: '1000',
-        selection: TextSelection.collapsed(offset: 4),
-      );
+      if (!_isProgrammaticUpdate) {
+        inputMoneyCtr.value = const TextEditingValue(
+          text: '1000',
+          selection: TextSelection.collapsed(offset: 4),
+        );
+      }
     }
   }
 
   void confirm() async {
     int money;
+    // Always prioritize the input field value when currentIndex is -1
     if (currentIndex.value == -1) {
       if (inputMoneyCtr.text.isEmpty) {
         showToast('Enter the recharge amount'.tr);

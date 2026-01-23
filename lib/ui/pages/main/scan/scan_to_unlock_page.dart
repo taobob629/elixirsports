@@ -186,27 +186,29 @@ class ScanToUnlockPage extends BasePage<ScanToUnlockCtr> {
             ],
           ),
         ),
-        bottomNavigationBar: InkWell(
-          onTap: () => controller.loginNext(),
-          child: Container(
-            height: 40.h,
-            decoration: BoxDecoration(
-              color: toColor('#141517'),
-              borderRadius: BorderRadius.circular(5.r),
-            ),
-            margin: EdgeInsets.only(
-              top: 10.h,
-              bottom: 30.h,
-              left: 15.w,
-              right: 15.w,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              "LOG IN".tr,
-              style: TextStyle(
-                color: toColor('ffffff'),
-                fontFamily: FONT_LIGHT,
-                fontSize: 14.sp,
+        bottomNavigationBar: SafeArea(
+          child: InkWell(
+            onTap: () => controller.loginNext(),
+            child: Container(
+              height: 40.h,
+              decoration: BoxDecoration(
+                color: toColor('#141517'),
+                borderRadius: BorderRadius.circular(5.r),
+              ),
+              margin: EdgeInsets.only(
+                top: 10.h,
+                bottom: 15.h,
+                left: 15.w,
+                right: 15.w,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                "LOG IN".tr,
+                style: TextStyle(
+                  color: toColor('ffffff'),
+                  fontFamily: FONT_LIGHT,
+                  fontSize: 14.sp,
+                ),
               ),
             ),
           ),

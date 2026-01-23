@@ -9,7 +9,19 @@ import '../../../../../utils/storage_manager.dart';
 import '../../../../config/icon_font.dart';
 import '../../../../getx_ctr/user_controller.dart';
 
-class MyQrCodePage extends StatelessWidget {
+class MyQrCodePage extends StatefulWidget {
+  @override
+  State<MyQrCodePage> createState() => _MyQrCodePageState();
+}
+
+class _MyQrCodePageState extends State<MyQrCodePage> {
+  @override
+  void initState() {
+    super.initState();
+    // 在进入页面时重新初始化profile数据，确保avatar和name有值
+    UserController.find.requestProfileData();
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: const Color(0xFF0A0A0A),
