@@ -174,8 +174,8 @@ class ScanToUnlockPage extends BasePage<ScanToUnlockCtr> {
                         'Price'.tr, controller.scanModel.price ?? ''),
                     orderingInfoWidget('Available for caming Free Time'.tr,
                         controller.scanModel.freeTime ?? ''),
-                    orderingInfoWidget('Discount'.tr,
-                        controller.scanModel.discount ?? ''),
+                    orderingInfoWidget(
+                        'Discount'.tr, controller.scanModel.discount ?? ''),
                     orderingInfoWidget('Remaining Balance'.tr,
                         controller.scanModel.cash ?? ''),
                     orderingInfoWidget('Remaining Reward'.tr,
@@ -187,31 +187,47 @@ class ScanToUnlockPage extends BasePage<ScanToUnlockCtr> {
           ),
         ),
         bottomNavigationBar: SafeArea(
-          child: InkWell(
-            onTap: () => controller.loginNext(),
-            child: Container(
-              height: 40.h,
-              decoration: BoxDecoration(
-                color: toColor('#141517'),
-                borderRadius: BorderRadius.circular(5.r),
-              ),
-              margin: EdgeInsets.only(
-                top: 10.h,
-                bottom: 15.h,
-                left: 15.w,
-                right: 15.w,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                "LOG IN".tr,
-                style: TextStyle(
-                  color: toColor('ffffff'),
-                  fontFamily: FONT_LIGHT,
-                  fontSize: 14.sp,
+          child: Obx(() => InkWell(
+                onTap: () {
+                  if (!controller.isLoading.value) {
+                    controller.loginNext();
+                  }
+                },
+                child: Container(
+                  height: 40.h,
+                  decoration: BoxDecoration(
+                    color: controller.isLoading.value
+                        ? toColor('#767676')
+                        : toColor('#141517'),
+                    borderRadius: BorderRadius.circular(5.r),
+                  ),
+                  margin: EdgeInsets.only(
+                    top: 10.h,
+                    bottom: 15.h,
+                    left: 15.w,
+                    right: 15.w,
+                  ),
+                  alignment: Alignment.center,
+                  child: controller.isLoading.value
+                      ? SizedBox(
+                          width: 20.w,
+                          height: 20.w,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.w,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          "LOG IN".tr,
+                          style: TextStyle(
+                            color: toColor('ffffff'),
+                            fontFamily: FONT_LIGHT,
+                            fontSize: 14.sp,
+                          ),
+                        ),
                 ),
-              ),
-            ),
-          ),
+              )),
         ),
       );
 

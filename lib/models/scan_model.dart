@@ -12,10 +12,12 @@ class ScanModel {
   String? cash;
   String? msg;
   String? type;
+  int? code;
   String? deviceKey;
 
   ScanModel({
     this.reward,
+    this.code,
     this.deviceKey,
     this.type,
     this.price,
@@ -47,6 +49,7 @@ class ScanModel {
     storeId: json["storeId"],
     cash: json["cash"],
     msg: json["msg"],
+    code:json["code"],
 
   );
 
