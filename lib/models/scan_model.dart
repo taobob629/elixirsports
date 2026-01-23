@@ -35,6 +35,7 @@ class ScanModel {
     reward: json["reward"],
     price: json["price"],
     type: json["type"],
+    deviceKey: json["deviceKey"],
 
     ip: json["ip"],
     freeTime: json["freeTime"],
