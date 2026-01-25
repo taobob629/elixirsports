@@ -49,6 +49,71 @@ class CouponListCtr extends GetxRefreshController<CouponsRow> {
     tabController = TabController(length: tabs.length, vsync: this);
   }
 
+  // 展开/折叠状态管理
+  Map<int, bool> _expandedStatus = {};
+
+  // 检查优惠券类型是否已展开
+  bool isExpanded(int couponType) {
+    return _expandedStatus[couponType] ?? false;
+  }
+
+  // 切换优惠券类型的展开/折叠状态
+  void toggleExpanded(int couponType) {
+    _expandedStatus[couponType] = !isExpanded(couponType);
+    // 重新加载数据以更新 UI
+    onRefresh(init: true);
+  }
+
+  // 折叠优惠券列表，根据 couponType 分组，每个类型只保留一条数据
+  List<dynamic> collapseCoupons(List<CouponsRow> coupons) {
+    // 首先按照 couponType 分组
+    Map<int, List<CouponsRow>> groupedCoupons = {};
+
+    for (var coupon in coupons) {
+      int? couponType = coupon.couponType;
+      if (couponType != null) {
+        if (!groupedCoupons.containsKey(couponType)) {
+          groupedCoupons[couponType] = [];
+        }
+        groupedCoupons[couponType]!.add(coupon);
+      }
+    }
+
+    // 转换为列表并保持原有顺序
+    List<dynamic> result = [];
+    Set<int> processedTypes = {};
+
+    for (var coupon in coupons) {
+      int? couponType = coupon.couponType;
+      if (couponType != null && !processedTypes.contains(couponType)) {
+        processedTypes.add(couponType);
+
+        if (groupedCoupons.containsKey(couponType)) {
+          var typeCoupons = groupedCoupons[couponType];
+          if (typeCoupons != null) {
+            // 检查是否展开
+            if (isExpanded(couponType)) {
+              // 展开状态，添加该类型的所有优惠券
+              result.addAll(typeCoupons);
+            } else {
+              // 折叠状态，只添加一条优惠券并显示数量
+              result.add({
+                'coupon': typeCoupons[0],
+                'count': typeCoupons.length,
+                'couponType': couponType
+              });
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
+  // 折叠后的优惠券列表
+  var collapsedList = <dynamic>[].obs;
+
   @override
   Future<List<CouponsRow>> loadData({int pageNum = 1}) async {
     final model = await CouponApi.list(
@@ -57,13 +122,19 @@ class CouponListCtr extends GetxRefreshController<CouponsRow> {
       pageSize: pageSize,
     );
     if (model.coupons != null) {
-      return model.coupons!.rows;
+      List<CouponsRow> coupons = model.coupons!.rows;
+      // 对优惠券进行折叠处理
+      collapsedList.value = collapseCoupons(coupons);
+      return coupons;
     }
+    collapsedList.value = [];
     return [];
   }
 
   void changeStatus(int index) {
     status = index;
+    // 切换 tab 时，重置所有优惠券的展开状态，确保自动折叠
+    _expandedStatus.clear();
     onRefresh(init: true);
   }
 }

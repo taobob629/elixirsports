@@ -10,8 +10,8 @@ class CouponApi {
   }) async {
     var response = await http.get('app/user/myCoupons', queryParameters: {
       "available": status,
-      "pageNum": pageNum,
-      "pageSize": pageSize,
+      "pageNum": 1,
+      "pageSize": 1000,
     });
     return CouponListModel.fromJson(response.data);
   }

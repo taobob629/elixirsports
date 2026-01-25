@@ -44,7 +44,7 @@ class CouponListPage extends BasePage<CouponListCtr> {
               ),
             ),
             Expanded(
-              child: Obx(() => controller.list.isNotEmpty
+              child: Obx(() => controller.collapsedList.isNotEmpty
                   ? _buildSmartRefresher()
                   : EmptyView()),
             ),
@@ -68,13 +68,42 @@ class CouponListPage extends BasePage<CouponListCtr> {
         enablePullUp: true,
         enablePullDown: true,
         child: ListView.separated(
-          itemBuilder: (c, i) => itemWidget(controller.list[i]),
+          itemBuilder: (c, i) => itemWidget(controller.collapsedList[i]),
           separatorBuilder: (c, i) => 10.verticalSpace,
-          itemCount: controller.list.length,
+          itemCount: controller.collapsedList.length,
         ));
   }
 
-  Widget itemWidget(CouponsRow item) => SizedBox(
+  Widget itemWidget(dynamic itemData) {
+    CouponsRow item;
+    int count = 1;
+    int? couponType;
+    bool isCollapsed = false;
+    
+    // 检查 itemData 类型，判断是折叠的优惠券数据还是原始的优惠券对象
+    if (itemData is Map<String, dynamic>) {
+      // 折叠状态的数据
+      item = itemData['coupon'] as CouponsRow;
+      count = itemData['count'] as int;
+      couponType = itemData['couponType'] as int;
+      isCollapsed = true;
+    } else if (itemData is CouponsRow) {
+      // 展开状态的原始优惠券数据
+      item = itemData;
+      couponType = item.couponType;
+    } else {
+      // 未知类型，返回空容器
+      return Container();
+    }
+    
+    return InkWell(
+      onTap: () {
+        // 无论是折叠还是展开状态，都可以切换展开/折叠
+        if (couponType != null) {
+          controller.toggleExpanded(couponType);
+        }
+      },
+      child: SizedBox(
         height: 120.h,
         child: Stack(
           children: [
@@ -91,6 +120,48 @@ class CouponListPage extends BasePage<CouponListCtr> {
                 fit: BoxFit.fill,
               ),
             ),
+            // 优惠券数量标签
+            if (isCollapsed && count > 1)
+              Positioned(
+                top: 5.h,
+                right: 25.w,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 2,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    'x$count',
+                    style: TextStyle(
+                      color: toColor('#1A1A1A'),
+                      fontFamily: FONT_MEDIUM,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            // 展开/折叠指示器
+            if (isCollapsed && count > 1 && couponType != null)
+              Positioned(
+                top: 15.h,
+                right: 30.w,
+                child: Icon(
+                  controller.isExpanded(couponType)
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: Colors.white,
+                  size: 16.w,
+                ),
+              ),
             Positioned(
               left: 30.w,
               top: 15.h,
@@ -152,5 +223,7 @@ class CouponListPage extends BasePage<CouponListCtr> {
             )
           ],
         ),
-      );
+      ),
+    );
+  }
 }
