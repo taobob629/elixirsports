@@ -78,22 +78,42 @@ class ImageUtil {
     bool clearMemoryCacheWhenDispose = true,
     bool lowMemory = true,
     Widget? errorWidget,
-  }) =>
-      border == 0
-          ? CachedNetworkImage(
+  }) {
+    // 修复 url 为 null 或空字符串时的错误
+    if (url == null || url.isEmpty) {
+      return errorWidget ?? error(width: width, height: height);
+    }
+    
+    return border == 0
+        ? CachedNetworkImage(
+            imageUrl: url,
+            width: width,
+            height: height,
+            fit: fit,
+            progressIndicatorBuilder: (context, url, progress) => Container(
+              width: 10.0,
+              height: 10.0,
+              child: loadProgress
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.5,
+                        value: progress.progress ?? 0,
+                      ),
+                    )
+                  : null,
+            ),
+            errorWidget: (_, url, er) =>
+                errorWidget ?? error(width: width, height: height),
+          )
+        : Card(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusDirectional.circular(border)),
+            clipBehavior: Clip.antiAlias,
+            child: CachedNetworkImage(
               imageUrl: url,
               width: width,
               height: height,
               fit: fit,
-              // memCacheWidth: _calculateCacheWidth(width),
-              // memCacheHeight: _calculateCacheHeight(height),
-              // placeholder: (context,index){
-              //   return Center(
-              //     child: CircularProgressIndicator(
-              //       strokeWidth: 1.5,
-              //     ),
-              //   );
-              // },
               progressIndicatorBuilder: (context, url, progress) => Container(
                 width: 10.0,
                 height: 10.0,
@@ -108,35 +128,9 @@ class ImageUtil {
               ),
               errorWidget: (_, url, er) =>
                   errorWidget ?? error(width: width, height: height),
-            )
-          : Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusDirectional.circular(border)),
-              clipBehavior: Clip.antiAlias,
-              child: CachedNetworkImage(
-                imageUrl: url,
-                width: width,
-                height: height,
-                fit: fit,
-                // memCacheWidth: _calculateCacheWidth(width),
-                // memCacheHeight: _calculateCacheHeight(height),
-                // placeholder: placeholder,
-                progressIndicatorBuilder: (context, url, progress) => Container(
-                  width: 10.0,
-                  height: 10.0,
-                  child: loadProgress
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.5,
-                            value: progress.progress ?? 0,
-                          ),
-                        )
-                      : null,
-                ),
-                errorWidget: (_, url, er) =>
-                    errorWidget ?? error(width: width, height: height),
-              ),
-            );
+            ),
+          );
+  }
 
   static Widget error({
     double? width,
