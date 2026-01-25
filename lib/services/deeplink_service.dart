@@ -32,11 +32,15 @@ class DeeplinkService {
 
   /// 初始化深度链接监听
   Future<void> init() async {
+    print('=== DeeplinkService.init() started ===');
+
     // 处理应用启动时的初始链接
     await _handleInitialUri();
 
     // 监听应用运行时的深度链接
     _listenToUriChanges();
+
+    print('=== DeeplinkService.init() completed ===');
   }
 
   /// 处理应用启动时的初始链接
@@ -73,11 +77,15 @@ class DeeplinkService {
     print('Received deeplink: ${uri.host}');
     print('Received deeplink: ${uri.path}');
 
-    // 检查是否是 Singpass 回调链接
-    // 支持两种协议：elixiresports:// 和 https://essps.faceplusluxurytravel.cn
+    // 检查是否是 Singpass 相关链接
+    // 支持三种协议：
+    // 1. elixiresports:// (自定义协议)
+    // 2. https://essps.faceplusluxurytravel.cn (回调域名)
+    // 3. https://login.stg-id.singpass.gov.sg (SingPass登录域名)
     if (uri.scheme == 'elixiresports' ||
         (uri.scheme == 'https' &&
-            uri.host == 'essps.faceplusluxurytravel.cn')) {
+            (uri.host == 'essps.faceplusluxurytravel.cn' ||
+                uri.host == 'login.stg-id.singpass.gov.sg'))) {
       await _handleSingpassCallback(uri);
     }
 
