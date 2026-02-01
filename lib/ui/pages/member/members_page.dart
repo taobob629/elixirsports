@@ -201,29 +201,32 @@ class MemberPage extends BasePage<MemberCtr> {
           visible: UserController.find.profileModel.value.level !=
               UserController.find.profileModel.value
                   .memberShip[controller.currentIndex.value].level,
-          child: GestureDetector(
-            onTap: () => controller.payment(),
-            child: Container(
-              height: 44.h,
-              decoration: BoxDecoration(
-                color: UserController.find.profileModel.value.topup == true
-                    ? toColor('#141517')
-                    : Colors.grey.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(5.r),
-              ),
-              margin: EdgeInsets.only(
-                bottom: 20.h,
-                left: 15.w,
-                right: 15.w,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                "S\$${UserController.find.profileModel.value.memberShip[controller.currentIndex.value].price}",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: FONT_MEDIUM,
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
+          child: Container(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 20.h),
+            child: GestureDetector(
+              onTap: () => controller.payment(),
+              child: Container(
+                height: 44.h,
+                decoration: BoxDecoration(
+                  color: UserController.find.profileModel.value.topup == true
+                      ? toColor('#141517')
+                      : Colors.grey.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(5.r),
+                ),
+                margin: EdgeInsets.only(
+                  bottom: 0.h,
+                  left: 15.w,
+                  right: 15.w,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  "S\$${UserController.find.profileModel.value.memberShip[controller.currentIndex.value].price}",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: FONT_MEDIUM,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),

@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:elixir_esports/api/wy_http.dart';
 import 'package:elixir_esports/models/ad_model.dart';
 import 'package:elixir_esports/utils/platform_utils.dart';
+import 'package:elixir_esports/utils/toast_utils.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 import '../models/version_model.dart';
 
@@ -10,6 +13,16 @@ class ProfileApi {
     required String filePath,
     Function(int, int)? sendCallback,
   }) async {
+    // 检查文件大小
+    File file = File(filePath);
+    int fileSize = await file.length();
+    int maxSize = 10 * 1024 * 1024; // 10MB
+    
+    if (fileSize > maxSize) {
+      showInfo('The image size cannot exceed 10MB'.tr);
+      return '';
+    }
+    
     var name = filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length);
     FormData formData = FormData.fromMap({
       //这里写其他需要传递的参数

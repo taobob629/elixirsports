@@ -256,6 +256,7 @@ const Map<String, String> zh_CN = {
   'Repeat Password':'请再次输入密码',
   'Please repeat password':'请再次输入密码',
   'Set your password':'设置你的密码',
+  'The image size cannot exceed 10MB':'图片大小不能超过10MB'
   // 'Set your password':'设置你的密码',
 
 
