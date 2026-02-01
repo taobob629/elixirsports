@@ -34,7 +34,10 @@ class CustomToastWidgetState extends State<CustomToastWidget>
       _controller.forward();
     });
     Future.delayed(const Duration(seconds: 2), () {
-      _controller.reverse();
+      // 修复 AnimationController 被 dispose 后调用 reverse() 的错误
+      if (mounted) {
+        _controller.reverse();
+      }
     });
   }
 
