@@ -11,6 +11,7 @@ import '../models/seat_model.dart';
 import '../models/store_model.dart';
 import '../ui/dialog/confirm_dialog.dart';
 import '../ui/pages/booking/book_detail_page.dart';
+import '../ui/pages/booking/per_booking_page.dart';
 
 class BookSeatCtr extends BasePageController {
   static BookSeatCtr get find => Get.find();
@@ -208,4 +209,35 @@ class BookSeatCtr extends BasePageController {
       );
     }
   }
+
+
+  void preBookSeat(BuildContext context) async {
+    if (selectSeatList.isEmpty) {
+      showToast("Please select a seat".tr);
+      return;
+    }
+
+
+
+    List<String> idsArr = selectSeatList.map((computer) => computer.id.toString()).toList();
+
+    final BookingPreModel = await BookingApi.appPreBookingInfo(
+      storeId: storeModel.id,
+      areaId: selectSeatList[0].areaId.toString(),
+      computers: idsArr,
+    );
+    if (BookingPreModel != null) {
+      // 使用await等待PerBookingPage返回
+      await Get.to(() => PerBookingPage(), arguments: BookingPreModel);
+
+      // 当从PerBookingPage返回时，刷新数据
+      requestData();
+
+      if (Get.isRegistered<ServiceCtr>()) {
+        ServiceCtr.find.requestData();
+      }
+
+    }
+  }
+
 }

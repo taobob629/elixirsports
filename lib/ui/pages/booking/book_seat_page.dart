@@ -274,7 +274,7 @@ class BookSeatPage extends BasePage<BookSeatCtr> {
                           ),
                   )),
               InkWell(
-                onTap: () => controller.bookASeat(context),
+                onTap: () => controller.preBookSeat(context),
                 child: Container(
                   height: 40.h,
                   decoration: BoxDecoration(

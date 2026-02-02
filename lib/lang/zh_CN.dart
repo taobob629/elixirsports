@@ -92,7 +92,7 @@ const Map<String, String> zh_CN = {
   'Pending payment': '待付款',
   'Remaining Balance': '余额',
   'Are you sure you want to delete this bank card?': '您确定要删除这张银行卡吗?',
-  'Available for caming Free Time': '预计可上网时长',
+  'Available for gaming Free Time': '预计可上网时长',
   'Remaining caming Free Time': '预计可上网时长',
   'Remaining Credit Duration': '剩余信用期限',
   'Estimated Exhausted Time': '预计耗尽时间',
@@ -256,7 +256,10 @@ const Map<String, String> zh_CN = {
   'Repeat Password':'请再次输入密码',
   'Please repeat password':'请再次输入密码',
   'Set your password':'设置你的密码',
-  'The image size cannot exceed 10MB':'图片大小不能超过10MB'
+  'The image size cannot exceed 10MB':'图片大小不能超过10MB',
+  'Booking Seats':'预定座位',
+  'Area':'区域',
+  'Booking Retention Till':'预定保留至'
   // 'Set your password':'设置你的密码',
 
 

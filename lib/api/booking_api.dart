@@ -1,5 +1,7 @@
 import 'package:elixir_esports/api/wy_http.dart';
 import 'package:elixir_esports/base/base_http.dart';
+import 'package:elixir_esports/models/booking_pre_model.dart';
+import 'package:elixir_esports/utils/toast_utils.dart';
 
 import '../models/booking_detail_model.dart';
 import '../models/booking_list_model.dart';
@@ -39,7 +41,19 @@ class BookingApi {
     });
     return BookingDetailModel.fromJson(response.data);
   }
-
+  // 提交预定1
+  static Future<BookingPreModel> appPreBookingInfo({
+    int? storeId,
+    String? areaId,
+    required List<String> computers,
+  }) async {
+    var response = await http.post('app/booking/appPreBookingInfo', data: {
+      "storeId": storeId,
+      "areaId": areaId,
+      "computers": computers,
+    });
+      return BookingPreModel.fromJson(response.data);
+  }
   // 取消预定
   static Future<void> cancelBooking({int? id}) async {
     await http.get('app/booking/cancalBooking', queryParameters: {
