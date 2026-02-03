@@ -227,11 +227,8 @@ class BookSeatCtr extends BasePageController {
       computers: idsArr,
     );
     if (BookingPreModel != null) {
-      // 使用await等待PerBookingPage返回
-      await Get.to(() => PerBookingPage(), arguments: BookingPreModel);
-
-      // 当从PerBookingPage返回时，刷新数据
-      requestData();
+      // 导航到PerBookingPage，但不等待返回
+      Get.to(() => PerBookingPage(), arguments: BookingPreModel);
 
       if (Get.isRegistered<ServiceCtr>()) {
         ServiceCtr.find.requestData();

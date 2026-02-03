@@ -9,6 +9,7 @@ import '../../../../base/base_scaffold.dart';
 import '../../../../config/icon_font.dart';
 import '../../../../getx_ctr/scan_to_unlock_ctr.dart';
 import '../../../../getx_ctr/user_controller.dart';
+import '../../../../ui/pages/wallet/top_up_page.dart';
 import '../../../../utils/color_utils.dart';
 import '../../../../utils/image_util.dart';
 
@@ -144,13 +145,13 @@ class PerBookingPage extends BasePage<PreBookingPageCtr> {
                         context, 'Price'.tr, controller.preModel.price ?? ''),
                     orderingInfoWidget(context, 'Discount'.tr,
                         controller.preModel.discount ?? ''),
-                    orderingInfoWidget(context, 'Area'.tr,
-                        controller.preModel.areaName ?? ''),
+                    orderingInfoWidget(
+                        context, 'Area'.tr, controller.preModel.areaName ?? ''),
                     orderingInfoWidget(context, 'Remaining Balance'.tr,
                         controller.preModel.balance ?? ''),
-                    orderingInfoWidget(context, 'Remaining Reward'.tr,
-                        controller.preModel.points ?? ''),
-                    orderingInfoWidget(context, 'Booking Retention Till'.tr,
+                    // orderingInfoWidget(context, 'Remaining Reward'.tr,
+                    //     controller.preModel.points ?? ''),
+                    orderingInfoWidget(context, 'Retention Till'.tr,
                         controller.preModel.endChargeTime ?? '',
                         isBookingDeadline: true),
                   ],
@@ -160,47 +161,81 @@ class PerBookingPage extends BasePage<PreBookingPageCtr> {
           ),
         ),
         bottomNavigationBar: SafeArea(
-          child: Obx(() => InkWell(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Obx(() => InkWell(
+                    onTap: () {
+                      if (!controller.isLoading.value) {
+                        controller.bookNext();
+                      }
+                    },
+                    child: Container(
+                      height: 40.h,
+                      decoration: BoxDecoration(
+                        color: controller.isLoading.value
+                            ? toColor('#767676')
+                            : toColor('#141517'),
+                        borderRadius: BorderRadius.circular(5.r),
+                      ),
+                      margin: EdgeInsets.only(
+                        top: 10.h,
+                        bottom: 10.h,
+                        left: 15.w,
+                        right: 15.w,
+                      ),
+                      alignment: Alignment.center,
+                      child: controller.isLoading.value
+                          ? SizedBox(
+                              width: 20.w,
+                              height: 20.w,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.w,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : Text(
+                              "CONFIRM".tr,
+                              style: TextStyle(
+                                color: toColor('ffffff'),
+                                fontFamily: FONT_LIGHT,
+                                fontSize: 14.sp,
+                              ),
+                            ),
+                    ),
+                  )),
+              // 充值按钮
+              InkWell(
                 onTap: () {
-                  if (!controller.isLoading.value) {
-                    controller.bookNext();
-                  }
+                  // 跳转到充值页面
+                  Get.to(() => TopUpPage());
                 },
                 child: Container(
                   height: 40.h,
                   decoration: BoxDecoration(
-                    color: controller.isLoading.value
-                        ? toColor('#767676')
-                        : toColor('#141517'),
+                    color: Colors.red,
                     borderRadius: BorderRadius.circular(5.r),
                   ),
                   margin: EdgeInsets.only(
-                    top: 10.h,
+                    top: 0.h,
                     bottom: 15.h,
                     left: 15.w,
                     right: 15.w,
                   ),
                   alignment: Alignment.center,
-                  child: controller.isLoading.value
-                      ? SizedBox(
-                          width: 20.w,
-                          height: 20.w,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.w,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : Text(
-                          "CONFIRM".tr,
-                          style: TextStyle(
-                            color: toColor('ffffff'),
-                            fontFamily: FONT_LIGHT,
-                            fontSize: 14.sp,
-                          ),
-                        ),
+                  child: Text(
+                    "Top Up".tr,
+                    style: TextStyle(
+                      color: toColor('ffffff'),
+                      fontFamily: FONT_LIGHT,
+                      fontSize: 14.sp,
+                    ),
+                  ),
                 ),
-              )),
+              ),
+            ],
+          ),
         ),
       );
 
@@ -214,6 +249,7 @@ class PerBookingPage extends BasePage<PreBookingPageCtr> {
             child: Row(
               children: [
                 Expanded(
+                  flex: 2,
                   child: Row(
                     children: [
                       Text(
@@ -231,7 +267,7 @@ class PerBookingPage extends BasePage<PreBookingPageCtr> {
                       ),
                       if (isBookingDeadline)
                         Padding(
-                          padding: EdgeInsets.only(left: 5.w),
+                          padding: EdgeInsets.only(left: 3.w),
                           child: Icon(
                             Icons.info_outline,
                             color: Colors.red,
@@ -242,17 +278,19 @@ class PerBookingPage extends BasePage<PreBookingPageCtr> {
                   ),
                 ),
                 Expanded(
+                  flex: 3,
                   child: Text(
                     value,
                     style: TextStyle(
-                      color: isBookingDeadline ? Colors.red : toColor('#1A1A1A'),
+                      color:
+                          isBookingDeadline ? Colors.red : toColor('#1A1A1A'),
                       fontSize: 12.sp,
                       fontFamily: FONT_MEDIUM,
-                      fontWeight:
-                          isBookingDeadline ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isBookingDeadline
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                     textAlign: TextAlign.right,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
