@@ -8,6 +8,7 @@ class BookingPreModel {
   dynamic areaName;
   String? userName;
   String? price;
+  String? orgPrice;
   String? discount;
   String? htmlString;
 
@@ -28,6 +29,7 @@ class BookingPreModel {
     this.memberId,
     this.storeId,
     this.htmlString,
+    this.orgPrice,
     this.areaId,
     this.bookingTime,
     this.storeName,
@@ -52,6 +54,7 @@ class BookingPreModel {
         id: json["id"],
         memberId: json["memberId"],
         discount: json["discount"],
+        orgPrice: json["orgPrice"],
 
         storeId: json["storeId"],
         htmlString: json["htmlString"],
@@ -82,6 +85,7 @@ class BookingPreModel {
         "id": id,
         "memberId": memberId,
         "storeId": storeId,
+        "orgPrice":orgPrice,
         "areaId": areaId,
         "bookingTime": bookingTime,
         "discount":discount,
@@ -90,7 +94,7 @@ class BookingPreModel {
         "price":price,
         "userName": userName,
         "computers":  computers,
-    "htmlString":  htmlString,
+        "htmlString":  htmlString,
 
         "phone": phone,
         "bookingBegin": bookingBegin,

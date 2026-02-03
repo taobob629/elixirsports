@@ -52,16 +52,61 @@ class PerBookingPage extends BasePage<PreBookingPageCtr> {
                           height: 12.h,
                         ),
                         4.horizontalSpace,
-                        Text(
-                          controller.preModel.address ?? '',
+                        Expanded(
+                          child: Text(
+                            controller.preModel.address ?? '',
+                            style: TextStyle(
+                              color: toColor('#3D3D3D'),
+                              fontFamily: FONT_LIGHT,
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ).paddingOnly(top: 12.h),
+                    Wrap(
+                      spacing: 10.w,
+                      runSpacing: 10.h,
+                      children: controller.preModel.sites
+                          .map((site) => Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Image.asset(
+                                    AssetsUtils.seat_green_icon,
+                                    width: 40.w,
+                                  ),
+                                  Text(
+                                    site.name ?? '',
+                                    style: TextStyle(
+                                      color: toColor('#3D3D3D'),
+                                      fontFamily: FONT_LIGHT,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ))
+                          .toList(),
+                    ).paddingOnly(top: 28.h, bottom: 10.h),
+                    if (controller.preModel.areaName != null &&
+                        controller.preModel.areaName != '')
+                      Container(
+                        margin: EdgeInsets.only(top: 10.h, bottom: 10.h),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 15.w, vertical: 8.h),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5.r),
+                        ),
+                        child: Text(
+                          controller.preModel.areaName ?? '',
                           style: TextStyle(
                             color: toColor('#3D3D3D'),
                             fontFamily: FONT_LIGHT,
                             fontSize: 12.sp,
                           ),
                         ),
-                      ],
-                    ).paddingOnly(top: 12.h),
+                      ),
                   ],
                 ),
               ),
@@ -75,83 +120,20 @@ class PerBookingPage extends BasePage<PreBookingPageCtr> {
                 width: 1.sw,
                 child: Column(
                   children: [
-                    SizedBox(
-                      width: 64.w,
-                      height: 74.w,
-                      child: Stack(
-                        children: [
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: SizedBox(
-                              width: 64.w,
-                              height: 64.w,
-                              child: ImageUtil.networkImage(
-                                url:
-                                    "${UserController.find.profileModel.value.avatar}",
-                                border: 64.r,
-                                width: 64.w,
-                                height: 64.w,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.topCenter,
-                            child: Obx(() => Visibility(
-                                  visible: UserController
-                                              .find.profileModel.value.level ==
-                                          5 ||
-                                      UserController
-                                              .find.profileModel.value.level ==
-                                          10 ||
-                                      UserController
-                                              .find.profileModel.value.level ==
-                                          15,
-                                  child: Image.asset(
-                                    UserController.find.profileModel.value
-                                                .level ==
-                                            5
-                                        ? AssetsUtils.no_5_icon
-                                        : UserController.find.profileModel.value
-                                                    .level ==
-                                                10
-                                            ? AssetsUtils.no_10_icon
-                                            : UserController.find.profileModel
-                                                        .value.level ==
-                                                    15
-                                                ? AssetsUtils.no_15_icon
-                                                : AssetsUtils.no_5_icon,
-                                    height: 28.w,
-                                  ),
-                                )),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          controller.preModel.userName ?? '',
-                          style: TextStyle(
-                            color: toColor('#1A1A1A'),
-                            fontSize: 18.sp,
-                            fontFamily: FONT_MEDIUM,
-                          ),
-                        ).paddingOnly(left: 10.w),
-                      ],
-                    ).paddingOnly(top: 15.h),
                     orderingInfoWidget(
-                        context, 'Price'.tr, controller.preModel.price ?? ''),
+                        context, 'Price'.tr, controller.preModel.price ?? '',
+                        orgPrice: controller.preModel.orgPrice,
+                        showOriginalPrice:
+                            controller.preModel.orgPrice != null &&
+                                controller.preModel.orgPrice !=
+                                    controller.preModel.price),
                     orderingInfoWidget(context, 'Discount'.tr,
                         controller.preModel.discount ?? ''),
-                    orderingInfoWidget(
-                        context, 'Area'.tr, controller.preModel.areaName ?? ''),
                     orderingInfoWidget(context, 'Remaining Balance'.tr,
                         controller.preModel.balance ?? ''),
                     // orderingInfoWidget(context, 'Remaining Reward'.tr,
                     //     controller.preModel.points ?? ''),
-                    orderingInfoWidget(context, 'Retention Till'.tr,
+                    orderingInfoWidget(context, 'Reservation hold'.tr,
                         controller.preModel.endChargeTime ?? '',
                         isBookingDeadline: true),
                   ],
@@ -225,7 +207,7 @@ class PerBookingPage extends BasePage<PreBookingPageCtr> {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    "Top Up".tr,
+                    "TOP UP".tr,
                     style: TextStyle(
                       color: toColor('ffffff'),
                       fontFamily: FONT_LIGHT,
@@ -240,7 +222,9 @@ class PerBookingPage extends BasePage<PreBookingPageCtr> {
       );
 
   Widget orderingInfoWidget(BuildContext context, String name, String value,
-          {bool isBookingDeadline = false}) =>
+          {bool isBookingDeadline = false,
+          String? orgPrice,
+          bool showOriginalPrice = false}) =>
       Column(
         children: [
           InkWell(
@@ -279,18 +263,42 @@ class PerBookingPage extends BasePage<PreBookingPageCtr> {
                 ),
                 Expanded(
                   flex: 3,
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      color:
-                          isBookingDeadline ? Colors.red : toColor('#1A1A1A'),
-                      fontSize: 12.sp,
-                      fontFamily: FONT_MEDIUM,
-                      fontWeight: isBookingDeadline
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                  child: Container(
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (showOriginalPrice && orgPrice != null)
+                          Padding(
+                            padding: EdgeInsets.only(right: 2.w),
+                            child: Text(
+                              orgPrice,
+                              style: TextStyle(
+                                color: toColor('#1A1A1A'),
+                                fontSize: 10.sp,
+                                fontFamily: FONT_MEDIUM,
+                                fontWeight: FontWeight.normal,
+                                decoration: TextDecoration.lineThrough,
+                                decorationColor: Colors.red,
+                                decorationThickness: 2.w,
+                              ),
+                            ),
+                          ),
+                        Text(
+                          value,
+                          style: TextStyle(
+                            color: isBookingDeadline
+                                ? Colors.red
+                                : toColor('#1A1A1A'),
+                            fontSize: 12.sp,
+                            fontFamily: FONT_MEDIUM,
+                            fontWeight: isBookingDeadline
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        ),
+                      ],
                     ),
-                    textAlign: TextAlign.right,
                   ),
                 ),
               ],
