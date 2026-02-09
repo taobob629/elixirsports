@@ -115,259 +115,261 @@ class _TopUpConfirmDialogState extends State<TopUpConfirmDialog>
   }
 
   @override
-  Widget build(BuildContext context) => Container(
-        width: 1.sw,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(15.r),
-            topRight: Radius.circular(15.r),
+  Widget build(BuildContext context) => SafeArea(
+        child: Container(
+          width: 1.sw,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15.r),
+              topRight: Radius.circular(15.r),
+            ),
           ),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.h),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'PAYMENT'.tr,
-                    style: TextStyle(
-                      color: toColor('#3D3D3D'),
-                      fontSize: 15.sp,
-                      fontFamily: FONT_MEDIUM,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () => dismissLoading(),
-                    child: Text(
-                      'CANCEL'.tr,
-                      style: TextStyle(
-                        color: toColor('#767676'),
-                        fontSize: 14.sp,
-                        fontFamily: FONT_MEDIUM,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              RichText(
-                text: TextSpan(
-                  text: "S\$",
-                  style: TextStyle(
-                    color: toColor('#333333'),
-                    fontFamily: FONT_MEDIUM,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: widget.money.toString(),
-                      style: TextStyle(
-                        fontSize: 36.sp,
-                      ),
-                    ),
-                  ],
-                ),
-              ).marginOnly(top: 12.h),
-              Text(
-                "Payment Amount".tr,
-                style: TextStyle(
-                  color: toColor('#767676'),
-                  fontFamily: FONT_MEDIUM,
-                  fontSize: 13.sp,
-                ),
-              ).paddingOnly(top: 10.h, bottom: 20.h),
-              Visibility(
-                visible: widget.type == 0,
-                child: Row(
+          padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.h),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Reward'.tr,
+                      'PAYMENT'.tr,
                       style: TextStyle(
-                        color: toColor('#333333'),
-                        fontSize: 13.sp,
+                        color: toColor('#3D3D3D'),
+                        fontSize: 15.sp,
                         fontFamily: FONT_MEDIUM,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // 静态文本 + 动画数字
-                    Text.rich(
-                      TextSpan(
-                        // 静态部分：+S$
-                        text: '+S\$',
+                    InkWell(
+                      onTap: () => dismissLoading(),
+                      child: Text(
+                        'CANCEL'.tr,
                         style: TextStyle(
-                          color: toColor('#EA0000'),
+                          color: toColor('#767676'),
                           fontSize: 14.sp,
                           fontFamily: FONT_MEDIUM,
-                          fontWeight: FontWeight.bold,
                         ),
-                        // 动画数字部分
-                        children: [
-                          TextSpan(
-                            text: '$_currentAnimatedValue',
-                            style: TextStyle(
-                              color: toColor('#EA0000'),
-                              fontSize: 20.sp,
-                              fontFamily: FONT_MEDIUM,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ],
                 ),
-              ),
-              Visibility(
-                visible: widget.type == 0,
-                child: InkWell(
-                  child: Container(
-                    margin: EdgeInsets.only(top: 32.h, bottom: 20.h),
-                    padding: EdgeInsets.only(
-                      left: 16.w,
-                      right: 19.w,
-                      top: 17.h,
-                      bottom: 17.h,
+                RichText(
+                  text: TextSpan(
+                    text: "S\$",
+                    style: TextStyle(
+                      color: toColor('#333333'),
+                      fontFamily: FONT_MEDIUM,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
                     ),
-                    decoration: BoxDecoration(
-                      color: toColor('#F0F6F9'),
-                      borderRadius: BorderRadius.circular(5.r),
-                    ),
-                    child: Column(
-                      children: [
-                        InkWell(
-                          onTap: () => showCoupon.value = !showCoupon.value,
-                          child: Row(
-                            children: [
-                              SvgPicture.asset(
-                                AssetsUtils.icon_coupon,
-                                width: 20.w,
-                              ),
-                              Expanded(
-                                child: Text(
-                                  "COUPON".tr,
-                                  style: TextStyle(
-                                    color: toColor('#1A1A1A'),
-                                    fontFamily: FONT_MEDIUM,
-                                    fontSize: 13.sp,
-                                  ),
-                                ).paddingOnly(left: 10.w),
-                              ),
-                              Obx(() => RichText(
-                                    text: TextSpan(
-                                      text: "Quantity：".tr,
-                                      style: TextStyle(
-                                        color: toColor('#333333'),
-                                        fontFamily: FONT_MEDIUM,
-                                        fontSize: 13.sp,
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text:
-                                              "${couponList.where((item) => item.available == 1).length}",
-                                          style: TextStyle(
-                                              color: toColor('#EA0000')),
-                                        ),
-                                      ],
-                                    ),
-                                  )),
-                              Obx(() => Icon(
-                                    showCoupon.value
-                                        ? Icons.keyboard_arrow_down_outlined
-                                        : Icons.keyboard_arrow_right_outlined,
-                                    size: 28.sp,
-                                    color: toColor('#42494F'),
-                                  ).marginOnly(left: 13.w)),
-                            ],
-                          ),
+                    children: [
+                      TextSpan(
+                        text: widget.money.toString(),
+                        style: TextStyle(
+                          fontSize: 36.sp,
                         ),
-                        Obx(() => Visibility(
-                              visible: showCoupon.value,
-                              child: Container(
-                                constraints: BoxConstraints(
-                                  maxHeight: 0.35.sh,
-                                ),
-                                margin: EdgeInsets.only(top: 15.h),
-                                child: ListView.separated(
-                                  padding: EdgeInsets.zero,
-                                  itemBuilder: (c, i) =>
-                                      itemWidget(couponList[i], i),
-                                  separatorBuilder: (c, i) => Divider(
-                                    height: 0.5.h,
-                                    color: toColor('#D4E4E4'),
-                                  ),
-                                  itemCount: couponList.length,
-                                ),
+                      ),
+                    ],
+                  ),
+                ).marginOnly(top: 12.h),
+                Text(
+                  "Payment Amount".tr,
+                  style: TextStyle(
+                    color: toColor('#767676'),
+                    fontFamily: FONT_MEDIUM,
+                    fontSize: 13.sp,
+                  ),
+                ).paddingOnly(top: 10.h, bottom: 20.h),
+                Visibility(
+                  visible: widget.type == 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Reward'.tr,
+                        style: TextStyle(
+                          color: toColor('#333333'),
+                          fontSize: 13.sp,
+                          fontFamily: FONT_MEDIUM,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      // 静态文本 + 动画数字
+                      Text.rich(
+                        TextSpan(
+                          // 静态部分：+S$
+                          text: '+S\$',
+                          style: TextStyle(
+                            color: toColor('#EA0000'),
+                            fontSize: 14.sp,
+                            fontFamily: FONT_MEDIUM,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          // 动画数字部分
+                          children: [
+                            TextSpan(
+                              text: '$_currentAnimatedValue',
+                              style: TextStyle(
+                                color: toColor('#EA0000'),
+                                fontSize: 20.sp,
+                                fontFamily: FONT_MEDIUM,
+                                fontWeight: FontWeight.bold,
                               ),
-                            )),
-                      ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Visibility(
+                  visible: widget.type == 0,
+                  child: InkWell(
+                    child: Container(
+                      margin: EdgeInsets.only(top: 32.h, bottom: 20.h),
+                      padding: EdgeInsets.only(
+                        left: 16.w,
+                        right: 19.w,
+                        top: 17.h,
+                        bottom: 17.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: toColor('#F0F6F9'),
+                        borderRadius: BorderRadius.circular(5.r),
+                      ),
+                      child: Column(
+                        children: [
+                          InkWell(
+                            onTap: () => showCoupon.value = !showCoupon.value,
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  AssetsUtils.icon_coupon,
+                                  width: 20.w,
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "COUPON".tr,
+                                    style: TextStyle(
+                                      color: toColor('#1A1A1A'),
+                                      fontFamily: FONT_MEDIUM,
+                                      fontSize: 13.sp,
+                                    ),
+                                  ).paddingOnly(left: 10.w),
+                                ),
+                                Obx(() => RichText(
+                                      text: TextSpan(
+                                        text: "Quantity：".tr,
+                                        style: TextStyle(
+                                          color: toColor('#333333'),
+                                          fontFamily: FONT_MEDIUM,
+                                          fontSize: 13.sp,
+                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text:
+                                                "${couponList.where((item) => item.available == 1).length}",
+                                            style: TextStyle(
+                                                color: toColor('#EA0000')),
+                                          ),
+                                        ],
+                                      ),
+                                    )),
+                                Obx(() => Icon(
+                                      showCoupon.value
+                                          ? Icons.keyboard_arrow_down_outlined
+                                          : Icons.keyboard_arrow_right_outlined,
+                                      size: 28.sp,
+                                      color: toColor('#42494F'),
+                                    ).marginOnly(left: 13.w)),
+                              ],
+                            ),
+                          ),
+                          Obx(() => Visibility(
+                                visible: showCoupon.value,
+                                child: Container(
+                                  constraints: BoxConstraints(
+                                    maxHeight: 0.35.sh,
+                                  ),
+                                  margin: EdgeInsets.only(top: 15.h),
+                                  child: ListView.separated(
+                                    padding: EdgeInsets.zero,
+                                    itemBuilder: (c, i) =>
+                                        itemWidget(couponList[i], i),
+                                    separatorBuilder: (c, i) => Divider(
+                                      height: 0.5.h,
+                                      color: toColor('#D4E4E4'),
+                                    ),
+                                    itemCount: couponList.length,
+                                  ),
+                                ),
+                              )),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Obx(() => PayMethodWidget(
-                    name: "Alipay".tr,
-                    icon: SvgPicture.asset(
-                      AssetsUtils.icon_alipay,
-                      width: 20.w,
-                      height: 20.w,
-                    ),
-                    isSelect: payMethod.value == 4,
-                    callback: () => payMethod.value = 4,
-                  )),
-              Container(
-                height: 1.h,
-                color: toColor('#EEEEEE'),
-                margin: EdgeInsets.symmetric(
-                  vertical: 14.h,
+                Obx(() => PayMethodWidget(
+                      name: "Alipay".tr,
+                      icon: SvgPicture.asset(
+                        AssetsUtils.icon_alipay,
+                        width: 20.w,
+                        height: 20.w,
+                      ),
+                      isSelect: payMethod.value == 4,
+                      callback: () => payMethod.value = 4,
+                    )),
+                Container(
+                  height: 1.h,
+                  color: toColor('#EEEEEE'),
+                  margin: EdgeInsets.symmetric(
+                    vertical: 14.h,
+                  ),
                 ),
-              ),
-              Obx(() => PayMethodWidget(
-                    name: "Wechat Pay".tr,
-                    icon: Image.asset(
-                      "assets/images/icon_wechat.png",
-                      width: 20.w,
-                      height: 20.w,
-                    ),
-                    isSelect: payMethod.value == 5,
-                    callback: () => payMethod.value = 5,
-                  )),
-              Container(
-                height: 1.h,
-                color: toColor('#EEEEEE'),
-                margin: EdgeInsets.symmetric(
-                  vertical: 14.h,
+                Obx(() => PayMethodWidget(
+                      name: "Wechat Pay".tr,
+                      icon: Image.asset(
+                        "assets/images/icon_wechat.png",
+                        width: 20.w,
+                        height: 20.w,
+                      ),
+                      isSelect: payMethod.value == 5,
+                      callback: () => payMethod.value = 5,
+                    )),
+                Container(
+                  height: 1.h,
+                  color: toColor('#EEEEEE'),
+                  margin: EdgeInsets.symmetric(
+                    vertical: 14.h,
+                  ),
                 ),
-              ),
-              Obx(() => PayMethodWidget(
-                    name: "PayNow".tr,
-                    icon: Image.asset(
-                      "assets/images/icon_paynow.png",
-                      width: 20.w,
-                      height: 20.w,
-                    ),
-                    isSelect: payMethod.value == 8,
-                    callback: () => payMethod.value = 8,
-                  )),
-              Container(
-                height: 1.h,
-                color: toColor('#EEEEEE'),
-                margin: EdgeInsets.symmetric(
-                  vertical: 14.h,
+                Obx(() => PayMethodWidget(
+                      name: "PayNow".tr,
+                      icon: Image.asset(
+                        "assets/images/icon_paynow.png",
+                        width: 20.w,
+                        height: 20.w,
+                      ),
+                      isSelect: payMethod.value == 8,
+                      callback: () => payMethod.value = 8,
+                    )),
+                Container(
+                  height: 1.h,
+                  color: toColor('#EEEEEE'),
+                  margin: EdgeInsets.symmetric(
+                    vertical: 14.h,
+                  ),
                 ),
-              ),
-              Obx(() => MyButtonWidget(
-                    btnText: "PAYMENT".tr,
-                    marginBottom: 10.h,
-                    onTap: topUp,
-                    isLoading: isLoading.value,
-                  )),
-            ],
+                Obx(() => MyButtonWidget(
+                      btnText: "PAYMENT".tr,
+                      marginBottom: 30.h,
+                      onTap: topUp,
+                      isLoading: isLoading.value,
+                    )),
+              ],
+            ),
           ),
         ),
       );
