@@ -199,7 +199,6 @@ class DeveloperPageController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    pushToken.value = StorageManager.getPushToken();
     env.value = StorageManager.getEnv();
   }
 
