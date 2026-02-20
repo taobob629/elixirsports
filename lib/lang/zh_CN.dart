@@ -259,8 +259,16 @@ const Map<String, String> zh_CN = {
   'The image size cannot exceed 10MB':'图片大小不能超过10MB',
   'Booking Seats':'预定座位',
   'Area':'区域',
-  'Reservation hold':'预订保留'
-  // 'Set your password':'设置你的密码',
+  'Reservation hold':'预订保留',
+  'Change Phone Number':'修改手机号',
+  'Current Phone Number':'当前手机号',
+  'Enter verification code':'请输入验证码',
+  'Get Code':'发送验证码',
+  'Next':'下一步',
+  'Save':'保存',
+  'Phone number updated successfully':'手机号更新成功',
+
+  // 'Set your password':'设置你的密码',Get Code
 
 
 
