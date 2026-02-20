@@ -41,7 +41,7 @@ class BookingApi {
     });
     return BookingDetailModel.fromJson(response.data);
   }
-  // 提交预定 
+  // 提交预定
   static Future<BookingPreModel> appPreBookingInfo({
     int? storeId,
     String? areaId,
