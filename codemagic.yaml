@@ -1,0 +1,30 @@
+workflows:
+  ios-workflow:
+    name: iOS TestFlight
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Set up code signing
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "com.elixir.esports" --type IOS_APP_STORE
+          keychain add-certificates
+          xcode-project use-profiles
+      - name: Get dependencies
+        script: |
+          flutter packages pub get
+          cd ios && pod install && cd ..
+      - name: Build iOS
+        script: |
+          flutter build ipa --release
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        apple_id: $APPLE_ID
+        password: $APPLE_PASSWORD
+        app_specific_password: $APPLE_APP_SPECIFIC_PASSWORD
+        provider_shortname: $APPLE_PROVIDER_SHORTNAME
