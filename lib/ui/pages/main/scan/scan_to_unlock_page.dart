@@ -51,12 +51,16 @@ class ScanToUnlockPage extends BasePage<ScanToUnlockCtr> {
                           height: 12.h,
                         ),
                         4.horizontalSpace,
-                        Text(
-                          controller.scanModel.storeInfo?.address ?? '',
-                          style: TextStyle(
-                            color: toColor('#3D3D3D'),
-                            fontFamily: FONT_LIGHT,
-                            fontSize: 12.sp,
+                        Expanded(
+                          child: Text(
+                            controller.scanModel.storeInfo?.address ?? '',
+                            style: TextStyle(
+                              color: toColor('#3D3D3D'),
+                              fontFamily: FONT_LIGHT,
+                              fontSize: 12.sp,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                         ),
                       ],
