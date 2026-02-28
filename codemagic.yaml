@@ -21,6 +21,6 @@ workflows:
           flutter build ipa --release
       - name: Distribute to TestFlight
         script: |
-          app-store-connect distribute-tests --build-number $(app-store-connect get-latest-build-number "com.elixir.esports") --apple-id "6472011182" --wait-for-processing true
+          app-store-connect distribute-tests --build-number $(app-store-connect get-latest-build-number "com.elixir.esports") --apple-id "6747395204" --wait-for-processing true
     artifacts:
       - build/ios/ipa/*.ipa
