@@ -1,11 +1,12 @@
 workflows:
-  ios-workflow:
+  ios-testflight:
     name: iOS TestFlight
     max_build_duration: 60
     environment:
       flutter: stable
       xcode: latest
       cocoapods: default
+      api_key: codemagic
     scripts:
       - name: Set up code signing
         script: |
@@ -13,18 +14,22 @@ workflows:
           app-store-connect fetch-signing-files "com.elixir.esports" --type IOS_APP_STORE
           keychain add-certificates
           xcode-project use-profiles
-      - name: Get dependencies
+      - name: Get Flutter packages
         script: |
           flutter packages pub get
-          cd ios && pod install && cd ..
-      - name: Build iOS
+      - name: Build iOS for TestFlight
         script: |
-          flutter build ipa --release
+          flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
+      - name: Add changelog
+        script: |
+          echo "Build $(git rev-parse --short HEAD)" > /tmp/changelog.txt
+      - name: Distribute to TestFlight
+        script: |
+          app-store-connect distribute-tests --build-number $(app-store-connect get-latest-build-number "com.elixir.esports") --apple-id "6472011182" --wait-for-processing true
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
-      app_store_connect:
-        apple_id: $APPLE_ID
-        password: $APPLE_PASSWORD
-        app_specific_password: $APPLE_APP_SPECIFIC_PASSWORD
-        provider_shortname: $APPLE_PROVIDER_SHORTNAME
+      email:
+        recipients:
+          - notify_on_success: true
+          - notify_on_failure: false
