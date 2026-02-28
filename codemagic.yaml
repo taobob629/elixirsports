@@ -6,7 +6,6 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
-      api_key: codemagic
     scripts:
       - name: Set up code signing
         script: |
@@ -19,17 +18,9 @@ workflows:
           flutter packages pub get
       - name: Build iOS for TestFlight
         script: |
-          flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
-      - name: Add changelog
-        script: |
-          echo "Build $(git rev-parse --short HEAD)" > /tmp/changelog.txt
+          flutter build ipa --release
       - name: Distribute to TestFlight
         script: |
           app-store-connect distribute-tests --build-number $(app-store-connect get-latest-build-number "com.elixir.esports") --apple-id "6472011182" --wait-for-processing true
     artifacts:
       - build/ios/ipa/*.ipa
-    publishing:
-      email:
-        recipients:
-          - notify_on_success: true
-          - notify_on_failure: false
