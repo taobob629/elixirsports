@@ -1,0 +1,79 @@
+name: iOS TestFlight
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Install CocoaPods dependencies
+        run: |
+          cd ios
+          pod install
+
+      - name: Create export options plist
+        run: |
+          cat > /tmp/export_options.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string></string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+              <key>uploadBitcode</key>
+              <true/>
+              <key>uploadSymbols</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Build iOS IPA
+        run: |
+          flutter build ipa --release --export-options-plist=/tmp/export_options.plist
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: build/ios/ipa/*.ipa
+
+  publish-testflight:
+    needs: build
+    runs-on: macos-latest
+    steps:
+      - name: Download IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-ipa
+
+      - name: Publish to TestFlight
+        uses: apple-actions/upload-testflight-build@v1
+        with:
+          app-build-path: ${{ github.workspace }}/*.ipa
+          app-specific-password: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+          apple-id: ${{ secrets.APPLE_ID }}
+          issuer-id: ${{ secrets.ISSUER_ID }}
+          key-id: ${{ secrets.KEY_ID }}
+          private-key: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
