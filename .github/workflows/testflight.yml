@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -26,69 +26,71 @@ jobs:
           cd ios
           pod install
 
-      # ===== 代码签名 =====
-      - name: Import Code Signing Certificate
-        env:
-          CERTIFICATE: ${{ secrets.CERTIFICATE }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        run: |
-          # 创建临时钥匙串
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+      # ===== 使用 fastlane 自动代码签名 =====
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
 
-          # 解码并导入证书
-          echo -n "$CERTIFICATE" | base64 --decode -o $RUNNER_TEMP/certificate.p12
-          security import $RUNNER_TEMP/certificate.p12 -P "" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-          security list-keychain -d user -s $KEYCHAIN_PATH
+      - name: Install fastlane
+        run: gem install fastlane
 
-      - name: Create export options plist
+      - name: Create Appfile for fastlane
         run: |
-          cat > /tmp/export_options.plist << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>teamID</key>
-              <string></string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-              <key>uploadBitcode</key>
-              <true/>
-              <key>uploadSymbols</key>
-              <true/>
-          </dict>
-          </plist>
+          cat > ios/fastlane/Appfile << 'EOF'
+          apple_id("${{ secrets.APPLE_ID }}")
+          app_identifier("com.elixir.esports")
+          team_id("${{ secrets.TEAM_ID }}")
           EOF
 
-      - name: Build iOS IPA
+      - name: Create Fastfile for fastlane
         run: |
-          flutter build ipa --release --export-options-plist=/tmp/export_options.plist
+          cat > ios/fastlane/Fastfile << 'EOF'
+          default_platform(:ios)
 
-      - name: Upload IPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-ipa
-          path: build/ios/ipa/*.ipa
+          platform :ios do
+            desc "Build and upload to TestFlight"
+            lane :testflight do
+              # 获取最新的 TestFlight build 号
+              latest_build_number = app_store_connect_build_number(
+                platform: "ios",
+                api_key: {
+                  "key_id" => "${{ secrets.KEY_ID }}",
+                  "issuer_id" => "${{ secrets.ISSUER_ID }}",
+                  "key" => "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}"
+                }
+              )
+              
+              # 自动递增 build 号
+              new_build_number = latest_build_number.to_i + 1
+              
+              # 构建
+              build_app(
+                workspace: "ios/Runner.xcworkspace",
+                scheme: "Runner",
+                export_options: {
+                  method: "app-store",
+                  signingStyle: "automatic"
+                },
+                build_number: new_build_number.to_s
+              )
 
-  publish-testflight:
-    needs: build
-    runs-on: macos-latest
-    steps:
-      - name: Download IPA
-        uses: actions/download-artifact@v4
-        with:
-          name: ios-ipa
+              # 上传到 TestFlight
+              upload_to_testflight(
+                api_key: {
+                  "key_id" => "${{ secrets.KEY_ID }}",
+                  "issuer_id" => "${{ secrets.ISSUER_ID }}",
+                  "key" => "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}"
+                },
+                beta_groups: ["Internal Testers"]
+              )
+            end
+          end
+          EOF
 
-      - name: Publish to TestFlight
-        uses: apple-actions/upload-testflight-build@v1
-        with:
-          app-build-path: ${{ github.workspace }}/*.ipa
-          app-specific-password: ${{ secrets.APP_SPECIFIC_PASSWORD }}
-          apple-id: ${{ secrets.APPLE_ID }}
-          issuer-id: ${{ secrets.ISSUER_ID }}
-          key-id: ${{ secrets.KEY_ID }}
-          private-key: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+      - name: Build and upload to TestFlight
+        run: |
+          cd ios
+          fastlane testflight
+        env:
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
