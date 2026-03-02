@@ -7,6 +7,8 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
+      # 引用环境变量组
+      group: apple_credentials
       # 代码签名配置
       ios_signing:
         distribution_type: app_store
@@ -16,8 +18,8 @@ workflows:
         APPLE_ID: "6747395204"
         KEY_ID: "4PJ2JDKKG9"
         ISSUER_ID: "e7251b06-66a7-4e3e-a955-fc319af14a54"
-        # 私钥通过环境变量注入（已勾选Secret，不会暴露）
-        APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
+        # 私钥从环境变量中获取
+        # APP_STORE_CONNECT_PRIVATE_KEY
     scripts:
       - name: 初始化密钥链并获取签名文件
         script: |
@@ -34,7 +36,7 @@ workflows:
       - name: 安装Flutter依赖
         script: |
           flutter pub get
-          cd ios && pod install && cd ..
+          cd ios && pod install
       - name: 自动递增Build Number
         script: |
           LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number \
@@ -48,25 +50,46 @@ workflows:
           fi
           NEW_BUILD=$((LATEST_BUILD + 1))
           echo "新Build Number: $NEW_BUILD"
+          # 导出变量供后续步骤使用
+          echo "export NEW_BUILD=$NEW_BUILD" >> $CM_ENV
+      - name: 创建export_options.plist
+        script: |
+          cat > /tmp/export_options.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string></string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+              <key>uploadBitcode</key>
+              <true/>
+              <key>uploadSymbols</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
       - name: 构建IPA
         script: |
+          # 确保 NEW_BUILD 变量可用
+          source $CM_ENV 2>/dev/null || true
+          if [ -z "$NEW_BUILD" ]; then
+            NEW_BUILD=1
+          fi
+          echo "使用Build Number: $NEW_BUILD"
           flutter build ipa --release \
             --build-number="$NEW_BUILD" \
-            --export-options-plist=/Users/builder/export_options.plist
+            --export-options-plist=/tmp/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
-        # 手动指定API密钥（替代团队集成）
-        auth: api_key
-        api_key:
-          key_id: $KEY_ID
-          issuer_id: $ISSUER_ID
-          private_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        # 核心：提交到TestFlight
+        # 使用CodeMagic团队集成自动处理发布
         submit_to_testflight: true
         expire_build_submitted_for_review: true
         beta_groups:
           - "Internal Testers"
-        wait_for_processing: true
