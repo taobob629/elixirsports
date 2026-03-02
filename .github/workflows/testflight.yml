@@ -26,6 +26,23 @@ jobs:
           cd ios
           pod install
 
+      # ===== 代码签名 =====
+      - name: Import Code Signing Certificate
+        env:
+          CERTIFICATE: ${{ secrets.CERTIFICATE }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # 创建临时钥匙串
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # 解码并导入证书
+          echo -n "$CERTIFICATE" | base64 --decode -o $RUNNER_TEMP/certificate.p12
+          security import $RUNNER_TEMP/certificate.p12 -P "" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
       - name: Create export options plist
         run: |
           cat > /tmp/export_options.plist << 'EOF'
@@ -50,8 +67,6 @@ jobs:
       - name: Build iOS IPA
         run: |
           flutter build ipa --release --export-options-plist=/tmp/export_options.plist
-        env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
