@@ -86,7 +86,12 @@ workflows:
       - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
-        # 使用CodeMagic团队集成自动处理发布
+        # 使用环境变量中的API密钥进行认证
+        api_key:
+          key_id: $KEY_ID
+          issuer_id: $ISSUER_ID
+          private_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        # 提交到TestFlight
         submit_to_testflight: true
         expire_build_submitted_for_review: true
         beta_groups:
