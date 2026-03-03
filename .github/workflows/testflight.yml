@@ -40,7 +40,7 @@ jobs:
             <string>5U9XJBS26D</string>
             <key>signingStyle</key>
             <string>automatic</string>
-            <key>export</key>
+            <key>allowProvisioningUpdates</key>
             <true/>
           </dict>
           </plist>
@@ -55,8 +55,6 @@ jobs:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
-          CODE_SIGNING_ALLOWED: NO
-          CODE_SIGNING_REQUIRED: NO
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
