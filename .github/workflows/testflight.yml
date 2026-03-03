@@ -27,17 +27,35 @@ jobs:
           cd ios
           pod install
 
+      - name: Create Export Options Plist
+        run: |
+          cat > /tmp/ExportOptions.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>teamID</key>
+            <string>5U9XJBS26D</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+            <key>export</key>
+            <true/>
+          </dict>
+          </plist>
+          EOF
+
       - name: Build iOS app
         run: |
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -allowProvisioningUpdates archive
+          flutter build ipa \
+            --release \
+            --export-options-plist=/tmp/ExportOptions.plist \
+            --team-id=5U9XJBS26D
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
-          CODE_SIGNING_ALLOWED: 'YES'
-          CODE_SIGN_IDENTITY: '-'
-          DEVELOPMENT_TEAM: '5U9XJBS26D'
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
