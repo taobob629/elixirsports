@@ -27,20 +27,8 @@ jobs:
           cd ios
           pod install
 
-      - name: Set up code signing
-        run: |
-          keychain initialize
-          app-store-connect fetch-signing-files "com.elixir.esports" --type IOS_APP_STORE
-          keychain add-certificates
-          xcode-project use-profiles
-        env:
-          KEY_ID: ${{ secrets.KEY_ID }}
-          ISSUER_ID: ${{ secrets.ISSUER_ID }}
-          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
-
       - name: Build iOS app
-        run: |
-          flutter build ipa --release --export-options-plist=/tmp/ExportOptions.plist
+        run: flutter build ipa --release --export-options-plist=/tmp/ExportOptions.plist
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
@@ -54,10 +42,31 @@ jobs:
       - name: Install fastlane
         run: gem install fastlane
 
+      - name: Create Fastfile for upload
+        run: |
+          mkdir -p ios/fastlane
+          cat > ios/fastlane/Fastfile << 'EOF'
+          default_platform(:ios)
+
+          platform :ios do
+            lane :upload do
+              ipa_path = Dir.glob("../build/ios/ipa/*.ipa").last
+              upload_to_testflight(
+                ipa: ipa_path,
+                api_key: {
+                  "key_id" => ENV["KEY_ID"],
+                  "issuer_id" => ENV["ISSUER_ID"],
+                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
+                }
+              )
+            end
+          end
+          EOF
+
       - name: Upload to TestFlight
         run: |
           cd ios
-          fastlane upload_ipa
+          fastlane upload
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
