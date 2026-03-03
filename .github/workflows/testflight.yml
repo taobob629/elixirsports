@@ -42,7 +42,6 @@ jobs:
           app_identifier("com.elixir.esports")
           team_id("5U9XJBS26D")
           apple_id("${{ secrets.APPLE_ID }}")
-          api_key("${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}")
           EOF
 
       - name: Create Fastfile
@@ -53,15 +52,12 @@ jobs:
 
           platform :ios do
             lane :build do
-              # Build IPA with automatic signing
               build_app(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                export_team_id: "5U9XJBS26D",
-                signing_style: "automatic",
-                skip_build_archive: false
+                export_team_id: "5U9XJBS26D"
               )
             end
 
