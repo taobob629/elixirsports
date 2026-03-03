@@ -27,11 +27,15 @@ jobs:
           cd ios
           pod install
 
-      - name: Build iOS app
-        run: |
-          flutter build ipa --release
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
 
-      - name: Create Appfile for fastlane
+      - name: Install fastlane
+        run: gem install fastlane
+
+      - name: Create Appfile
         run: |
           mkdir -p ios/fastlane
           cat > ios/fastlane/Appfile << EOF
@@ -40,13 +44,39 @@ jobs:
           apple_id("${{ secrets.APPLE_ID }}")
           EOF
 
-      - name: Create Fastfile for fastlane
+      - name: Create Fastfile
         run: |
           mkdir -p ios/fastlane
           cat > ios/fastlane/Fastfile << 'EOF'
           default_platform(:ios)
 
           platform :ios do
+            lane :build do
+              # Create provisioning profile
+              sigh(
+                app_identifier: "com.elixir.esports",
+                team_id: "5U9XJBS26D",
+                type: "app-store",
+                api_key: {
+                  "key_id" => ENV["KEY_ID"],
+                  "issuer_id" => ENV["ISSUER_ID"],
+                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
+                }
+              )
+
+              # Build IPA
+              build_app(
+                workspace: "Runner.xcworkspace",
+                scheme: "Runner",
+                configuration: "Release",
+                export_options: {
+                  method: "app-store",
+                  teamID: "5U9XJBS26D",
+                  signingStyle: "automatic"
+                }
+              )
+            end
+
             lane :upload_testflight do
               pilot(
                 app_identifier: "com.elixir.esports",
@@ -62,17 +92,10 @@ jobs:
           end
           EOF
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-
-      - name: Install fastlane
-        run: gem install fastlane
-
-      - name: Upload to TestFlight
+      - name: Build and upload to TestFlight
         run: |
           cd ios
+          fastlane build
           fastlane upload_testflight
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
