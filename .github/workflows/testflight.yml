@@ -27,7 +27,6 @@ jobs:
           cd ios
           pod install
 
-      # ===== 使用 fastlane 自动代码签名 =====
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -36,62 +35,11 @@ jobs:
       - name: Install fastlane
         run: gem install fastlane
 
-      - name: Create Appfile for fastlane
-        run: |
-          cat > ios/fastlane/Appfile << 'EOF'
-          apple_id("${{ secrets.APPLE_ID }}")
-          app_identifier("com.elixir.esports")
-          team_id("${{ secrets.TEAM_ID }}")
-          EOF
-
-      - name: Create Fastfile for fastlane
-        run: |
-          cat > ios/fastlane/Fastfile << 'EOF'
-          default_platform(:ios)
-
-          platform :ios do
-            desc "Build and upload to TestFlight"
-            lane :testflight do
-              # 获取最新的 TestFlight build 号
-              latest_build_number = app_store_connect_build_number(
-                platform: "ios",
-                api_key: {
-                  "key_id" => "${{ secrets.KEY_ID }}",
-                  "issuer_id" => "${{ secrets.ISSUER_ID }}",
-                  "key" => "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}"
-                }
-              )
-              
-              # 自动递增 build 号
-              new_build_number = latest_build_number.to_i + 1
-              
-              # 构建
-              build_app(
-                workspace: "ios/Runner.xcworkspace",
-                scheme: "Runner",
-                export_options: {
-                  method: "app-store",
-                  signingStyle: "automatic"
-                },
-                build_number: new_build_number.to_s
-              )
-
-              # 上传到 TestFlight
-              upload_to_testflight(
-                api_key: {
-                  "key_id" => "${{ secrets.KEY_ID }}",
-                  "issuer_id" => "${{ secrets.ISSUER_ID }}",
-                  "key" => "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}"
-                },
-                beta_groups: ["Internal Testers"]
-              )
-            end
-          end
-          EOF
-
       - name: Build and upload to TestFlight
         run: |
           cd ios
           fastlane testflight
         env:
-          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          KEY_ID: ${{ secrets.KEY_ID }}
+          ISSUER_ID: ${{ secrets.ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}

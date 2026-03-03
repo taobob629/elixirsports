@@ -1,0 +1,3 @@
+app_identifier("com.elixir.esports")
+apple_id("${{ secrets.APPLE_ID }}")
+team_id("${{ secrets.TEAM_ID }}")
