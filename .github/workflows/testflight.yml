@@ -17,6 +17,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: stable
+          architecture: x64
 
       - name: Get Flutter dependencies
         run: flutter pub get
