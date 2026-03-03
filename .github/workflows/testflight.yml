@@ -27,66 +27,45 @@ jobs:
           cd ios
           pod install
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-
-      - name: Install fastlane
-        run: gem install fastlane
-
-      - name: Create Appfile
-        run: |
-          mkdir -p ios/fastlane
-          cat > ios/fastlane/Appfile << EOF
-          app_identifier("com.elixir.esports")
-          team_id("5U9XJBS26D")
-          apple_id("${{ secrets.APPLE_ID }}")
-          EOF
-
-      - name: Create Fastfile
-        run: |
-          mkdir -p ios/fastlane
-          cat > ios/fastlane/Fastfile << 'EOF'
-          default_platform(:ios)
-
-          platform :ios do
-            lane :build do
-              # Build IPA with automatic signing using xcargs
-              build_app(
-                workspace: "Runner.xcworkspace",
-                scheme: "Runner",
-                configuration: "Release",
-                export_options: {
-                  method: "app-store",
-                  teamID: "5U9XJBS26D",
-                  signingStyle: "automatic"
-                },
-                xcargs: "allowProvisioningUpdates=1"
-              )
-            end
-
-            lane :upload_testflight do
-              pilot(
-                app_identifier: "com.elixir.esports",
-                skip_waiting_for_build_processing: true,
-                distribute_external: false,
-                api_key: {
-                  "key_id" => ENV["KEY_ID"],
-                  "issuer_id" => ENV["ISSUER_ID"],
-                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
-                }
-              )
-            end
-          end
-          EOF
-
-      - name: Build and upload to TestFlight
+      - name: Build without code signing
         run: |
           cd ios
-          fastlane build
-          fastlane upload_testflight
-        env:
-          KEY_ID: ${{ secrets.KEY_ID }}
-          ISSUER_ID: ${{ secrets.ISSUER_ID }}
-          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath /tmp/Runner.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            archive
+
+      - name: Create Export Options Plist
+        run: |
+          cat > /tmp/ExportOptions.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>teamID</key>
+            <string>5U9XJBS26D</string>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Export IPA
+        run: |
+          cd ios
+          xcodebuild -exportArchive \
+            -archivePath /tmp/Runner.xcarchive \
+            -exportOptionsPlist /tmp/ExportOptions.plist \
+            -exportPath /tmp/ipa \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Upload to TestFlight using altool
+        run: |
+          ls -la /tmp/ipa/
+          xcrun altool --upload-app -f /tmp/ipa/Runner.ipa -t ios -u "${{ secrets.APPLE_ID }}" -p "${{ secrets.APP_SPECIFIC_PASSWORD }}" --apiKey "${{ secrets.KEY_ID }}" --apiKeyId "${{ secrets.ISSUER_ID }}" --apiKeyIssuer "${{ secrets.ISSUER_ID }}"
