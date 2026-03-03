@@ -27,45 +27,96 @@ jobs:
           cd ios
           pod install
 
-      - name: Build without code signing
-        run: |
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath /tmp/Runner.xcarchive \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            archive
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
 
-      - name: Create Export Options Plist
+      - name: Install fastlane
+        run: gem install fastlane
+
+      - name: Create Appfile
         run: |
-          cat > /tmp/ExportOptions.plist << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>app-store</string>
-            <key>teamID</key>
-            <string>5U9XJBS26D</string>
-          </dict>
-          </plist>
+          mkdir -p ios/fastlane
+          cat > ios/fastlane/Appfile << EOF
+          app_identifier("com.elixir.esports")
+          team_id("5U9XJBS26D")
+          apple_id("${{ secrets.APPLE_ID }}")
           EOF
 
-      - name: Export IPA
+      - name: Create Fastfile with match
+        run: |
+          mkdir -p ios/fastlane
+          cat > ios/fastlane/Fastfile << 'EOF'
+          default_platform(:ios)
+
+          platform :ios do
+            lane :certificates do
+              match(
+                type: "appstore",
+                app_identifier: "com.elixir.esports",
+                team_id: "5U9XJBS26D",
+                api_key: {
+                  "key_id" => ENV["KEY_ID"],
+                  "issuer_id" => ENV["ISSUER_ID"],
+                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
+                }
+              )
+            end
+
+            lane :build do
+              match(
+                type: "appstore",
+                app_identifier: "com.elixir.esports",
+                team_id: "5U9XJBS26D",
+                api_key: {
+                  "key_id" => ENV["KEY_ID"],
+                  "issuer_id" => ENV["ISSUER_ID"],
+                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
+                }
+              )
+
+              build_app(
+                workspace: "Runner.xcworkspace",
+                scheme: "Runner",
+                configuration: "Release",
+                export_options: {
+                  method: "app-store-connect",
+                  teamID: "5U9XJBS26D"
+                }
+              )
+            end
+
+            lane :upload_testflight do
+              pilot(
+                app_identifier: "com.elixir.esports",
+                skip_waiting_for_build_processing: true,
+                distribute_external: false,
+                api_key: {
+                  "key_id" => ENV["KEY_ID"],
+                  "issuer_id" => ENV["ISSUER_ID"],
+                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
+                }
+              )
+            end
+          end
+          EOF
+
+      - name: Setup certificates and build
         run: |
           cd ios
-          xcodebuild -exportArchive \
-            -archivePath /tmp/Runner.xcarchive \
-            -exportOptionsPlist /tmp/ExportOptions.plist \
-            -exportPath /tmp/ipa \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+          fastlane certificates
+          fastlane build
+        env:
+          KEY_ID: ${{ secrets.KEY_ID }}
+          ISSUER_ID: ${{ secrets.ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
 
-      - name: Upload to TestFlight using altool
+      - name: Upload to TestFlight
         run: |
-          ls -la /tmp/ipa/
-          xcrun altool --upload-app -f /tmp/ipa/Runner.ipa -t ios -u "${{ secrets.APPLE_ID }}" -p "${{ secrets.APP_SPECIFIC_PASSWORD }}" --apiKey "${{ secrets.KEY_ID }}" --apiKeyId "${{ secrets.ISSUER_ID }}" --apiKeyIssuer "${{ secrets.ISSUER_ID }}"
+          cd ios
+          fastlane upload_testflight
+        env:
+          KEY_ID: ${{ secrets.KEY_ID }}
+          ISSUER_ID: ${{ secrets.ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
