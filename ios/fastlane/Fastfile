@@ -5,7 +5,7 @@ platform :ios do
   lane :deploy do
     # 构建 iOS 应用
     build_app(
-      workspace: "ios/Runner.xcworkspace",
+      workspace: "Runner.xcworkspace",
       scheme: "Runner",
       export_options: {
         method: "app-store",
