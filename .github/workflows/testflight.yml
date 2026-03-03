@@ -35,10 +35,19 @@ jobs:
       - name: Install fastlane
         run: gem install fastlane
 
-      - name: Decode Provisioning Profile
+      - name: Decode Certificate and Provisioning Profile
         run: |
           mkdir -p ios/Runner
+          mkdir -p ~/Library/MobileDevice/Certificates
+          
+          # Decode provisioning profile
           echo "$PROVISIONING_PROFILE" | base64 --decode > ios/Runner/Runner.mobileprovision
+          
+          # Decode certificate
+          echo "$CERTIFICATE" | base64 --decode > ios/Runner/distribution.cer
+          
+          # Convert .cer to .p12 (requires private key)
+          # For now, we'll use automatic signing with API key
 
       - name: Create Appfile
         run: |
@@ -49,7 +58,7 @@ jobs:
           itc_team_id("120847696")
           EOF
 
-      - name: Create Fastfile
+      - name: Create Fastfile with gym and pilot
         run: |
           mkdir -p ios/fastlane
           cat > ios/fastlane/Fastfile << 'EOF'
@@ -57,25 +66,28 @@ jobs:
 
           platform :ios do
             lane :build do
-              # Authenticate with App Store Connect using API Key
+              # Use App Store Connect API for signing
               app_store_connect_api_key(
                 key_id: ENV["KEY_ID"],
                 issuer_id: ENV["ISSUER_ID"],
                 key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
               )
               
-              # Build with automatic code signing using API
-              build_app(
+              # Build with automatic code signing - let xcodebuild handle it
+              gym(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                export_team_id: "5U9XJBS26D"
+                export_team_id: "5U9XJBS26D",
+                build_settings: {
+                  'CODE_SIGN_STYLE' => 'Automatic',
+                  'CODE_SIGNING_ALLOWED' => 'YES'
+                }
               )
             end
 
             lane :upload_testflight do
-              # Upload to TestFlight using App Store Connect API
               pilot(
                 app_identifier: "com.elixir.esports",
                 skip_waiting_for_build_processing: true,
@@ -100,3 +112,4 @@ jobs:
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
           PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
+          CERTIFICATE: ${{ secrets.CERTIFICATE }}
