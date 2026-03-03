@@ -27,15 +27,32 @@ jobs:
           cd ios
           pod install
 
-      - name: Import API Key
+      - name: Create Appfile for fastlane
         run: |
-          echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > /tmp/api_key.p8
-          mkdir -p ~/.appstoreconnectkit
-          cp /tmp/api_key.p8 ~/.appstoreconnectkit/
+          mkdir -p ios/fastlane
+          cat > ios/fastlane/Appfile << EOF
+          app_identifier("com.elixir.esports")
+          team_id("5U9XJBS26D")
+          apple_id("${{ secrets.APPLE_ID }}")
+          EOF
 
-      - name: Build iOS app (simulator only for testing)
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install fastlane
+        run: gem install fastlane
+
+      - name: Build and upload to TestFlight
         run: |
-          flutter build ios --simulator --no-codesign
-
-      - name: Verify build
-        run: ls -la build/ios/iphonesimulator/
+          cd ios
+          fastlane pilot upload \
+            --api_key_key_id "${{ secrets.KEY_ID }}" \
+            --api_key_issuer_id "${{ secrets.ISSUER_ID }}" \
+            --api_key "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" \
+            --app_identifier "com.elixir.esports" \
+            --skip_waiting_for_build_processing \
+            --distribute_external false
+        env:
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
