@@ -57,7 +57,8 @@ jobs:
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                export_team_id: "5U9XJBS26D"
+                export_team_id: "5U9XJBS26D",
+                xcargs: "CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO"
               )
             end
 
