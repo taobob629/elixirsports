@@ -55,10 +55,9 @@ jobs:
             --generate_apple_certs true
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_USER: ${{ secrets.APPLE_ID }}
-          FASTLANE_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
-          API_KEY_ID: ${{ secrets.KEY_ID }}
-          API_KEY_ISSUER: ${{ secrets.ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
 
       - name: Create Fastfile
         run: |
