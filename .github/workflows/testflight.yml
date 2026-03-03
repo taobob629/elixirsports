@@ -52,7 +52,7 @@ jobs:
 
           platform :ios do
             lane :build do
-              # Build IPA with automatic signing
+              # Build IPA with automatic signing using xcargs
               build_app(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
@@ -62,7 +62,7 @@ jobs:
                   teamID: "5U9XJBS26D",
                   signingStyle: "automatic"
                 },
-                allow_provisioning_updates: true
+                xcargs: "allowProvisioningUpdates=1"
               )
             end
 
