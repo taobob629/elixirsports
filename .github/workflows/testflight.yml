@@ -70,8 +70,7 @@ jobs:
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                export_team_id: "5U9XJBS26D",
-                provisioning_profile: "./ios/Runner/Runner.mobileprovision"
+                export_team_id: "5U9XJBS26D"
               )
             end
 
