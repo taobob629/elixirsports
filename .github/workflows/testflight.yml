@@ -56,6 +56,8 @@ jobs:
             --generate_apple_certs true
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
+          FASTLANE_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
 
       - name: Create Fastfile
         run: |
