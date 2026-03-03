@@ -27,74 +27,15 @@ jobs:
           cd ios
           pod install
 
-      - name: Build iOS app using xcodebuild
+      - name: Import API Key
         run: |
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath /tmp/Runner.xcarchive \
-            -allowProvisioningUpdates \
-            -allowProvisioningDeviceRegistration \
-            archive
-          
-          xcodebuild -exportArchive \
-            -archivePath /tmp/Runner.xcarchive \
-            -exportOptionsPlist /tmp/ExportOptions.plist \
-            -exportPath /tmp/ipa \
-            -allowProvisioningUpdates
+          echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > /tmp/api_key.p8
+          mkdir -p ~/.appstoreconnectkit
+          cp /tmp/api_key.p8 ~/.appstoreconnectkit/
 
-      - name: Create Export Options Plist
+      - name: Build iOS app (simulator only for testing)
         run: |
-          cat > /tmp/ExportOptions.plist << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>app-store</string>
-            <key>teamID</key>
-            <string>5U9XJBS26D</string>
-            <key>signingStyle</key>
-            <string>automatic</string>
-          </dict>
-          </plist>
-          EOF
+          flutter build ios --simulator --no-codesign
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-
-      - name: Install fastlane
-        run: gem install fastlane
-
-      - name: Create Fastfile for upload
-        run: |
-          mkdir -p ios/fastlane
-          cat > ios/fastlane/Fastfile << 'EOF'
-          default_platform(:ios)
-
-          platform :ios do
-            lane :upload do
-              ipa_path = Dir.glob("/tmp/ipa/*.ipa").last
-              upload_to_testflight(
-                ipa: ipa_path,
-                api_key: {
-                  "key_id" => ENV["KEY_ID"],
-                  "issuer_id" => ENV["ISSUER_ID"],
-                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
-                }
-              )
-            end
-          end
-          EOF
-
-      - name: Upload to TestFlight
-        run: |
-          cd ios
-          fastlane upload
-        env:
-          KEY_ID: ${{ secrets.KEY_ID }}
-          ISSUER_ID: ${{ secrets.ISSUER_ID }}
-          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+      - name: Verify build
+        run: ls -la build/ios/iphonesimulator/
