@@ -61,7 +61,7 @@ jobs:
               app_store_connect_api_key(
                 key_id: ENV["KEY_ID"],
                 issuer_id: ENV["ISSUER_ID"],
-                key: ENV["APP_STORE_CONNECT_PRIVATE_KEY"],
+                key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"],
                 in_visible_secure_env: true
               )
               
