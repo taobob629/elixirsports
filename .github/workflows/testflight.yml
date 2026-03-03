@@ -44,46 +44,25 @@ jobs:
           apple_id("${{ secrets.APPLE_ID }}")
           EOF
 
-      - name: Create Fastfile with match
+      - name: Create Fastfile
         run: |
           mkdir -p ios/fastlane
           cat > ios/fastlane/Fastfile << 'EOF'
           default_platform(:ios)
 
           platform :ios do
-            lane :certificates do
-              match(
-                type: "appstore",
-                app_identifier: "com.elixir.esports",
-                team_id: "5U9XJBS26D",
-                api_key: {
-                  "key_id" => ENV["KEY_ID"],
-                  "issuer_id" => ENV["ISSUER_ID"],
-                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
-                }
-              )
-            end
-
             lane :build do
-              match(
-                type: "appstore",
-                app_identifier: "com.elixir.esports",
-                team_id: "5U9XJBS26D",
-                api_key: {
-                  "key_id" => ENV["KEY_ID"],
-                  "issuer_id" => ENV["ISSUER_ID"],
-                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
-                }
-              )
-
+              # Build IPA with automatic signing using xcargs
               build_app(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
                 export_options: {
-                  method: "app-store-connect",
-                  teamID: "5U9XJBS26D"
-                }
+                  method: "app-store",
+                  teamID: "5U9XJBS26D",
+                  signingStyle: "automatic"
+                },
+                xcargs: "CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO"
               )
             end
 
@@ -102,19 +81,10 @@ jobs:
           end
           EOF
 
-      - name: Setup certificates and build
+      - name: Build and upload to TestFlight
         run: |
           cd ios
-          fastlane certificates
           fastlane build
-        env:
-          KEY_ID: ${{ secrets.KEY_ID }}
-          ISSUER_ID: ${{ secrets.ISSUER_ID }}
-          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
-
-      - name: Upload to TestFlight
-        run: |
-          cd ios
           fastlane upload_testflight
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
