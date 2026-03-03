@@ -11,3 +11,6 @@ apk: 运行脚本 build_apk_release.sh
 extension UIApplication: Launcher {}
   解决方法：https://stackoverflow.com/questions/79013344/cannot-extend-uiapplication-to-conform-to-custom-protocol-in-xcode-16
           使用链接里面的最后一个解决办法可以解决，
+
+## TestFlight
+GitHub Actions 自动构建测试
