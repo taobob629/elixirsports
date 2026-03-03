@@ -42,6 +42,7 @@ jobs:
           app_identifier("com.elixir.esports")
           team_id("5U9XJBS26D")
           apple_id("${{ secrets.APPLE_ID }}")
+          api_key("${{ secrets.APPLE_STORE_CONNECT_PRIVATE_KEY }}")
           EOF
 
       - name: Match (create certificates)
@@ -55,9 +56,6 @@ jobs:
             --generate_apple_certs true
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.KEY_ID }}
-          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
 
       - name: Create Fastfile
         run: |
