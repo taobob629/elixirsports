@@ -38,7 +38,7 @@ jobs:
       - name: Build and upload to TestFlight
         run: |
           cd ios
-          fastlane testflight
+          fastlane deploy
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}

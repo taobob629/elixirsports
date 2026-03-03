@@ -2,20 +2,7 @@ default_platform(:ios)
 
 platform :ios do
   desc "构建并上传到 TestFlight"
-  lane :testflight do
-    # 使用 App Store Connect API 获取最新的构建号
-    latest_build_number = app_store_connect_build_number(
-      platform: "ios",
-      api_key: {
-        "key_id" => ENV["KEY_ID"],
-        "issuer_id" => ENV["ISSUER_ID"],
-        "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
-      }
-    )
-
-    # 自动递增构建号
-    new_build_number = latest_build_number.to_i + 1
-
+  lane :deploy do
     # 构建 iOS 应用
     build_app(
       workspace: "ios/Runner.xcworkspace",
@@ -23,8 +10,7 @@ platform :ios do
       export_options: {
         method: "app-store",
         signingStyle: "automatic"
-      },
-      build_number: new_build_number.to_s
+      }
     )
 
     # 上传到 TestFlight
