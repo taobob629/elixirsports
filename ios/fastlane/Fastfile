@@ -1,20 +1,18 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "构建并上传到 TestFlight"
-  lane :deploy do
-    # 构建 iOS 应用
-    build_app(
-      workspace: "Runner.xcworkspace",
-      scheme: "Runner",
-      export_options: {
-        method: "app-store",
-        signingStyle: "automatic"
-      }
-    )
+  desc "上传 IPA 到 TestFlight"
+  lane :upload_ipa do
+    # 查找最新的 IPA 文件
+    ipa_path = Dir.glob("../build/ios/ipa/*.ipa").sort.last
+
+    if ipa_path.nil?
+      ipa_path = Dir.glob("../*.ipa").sort.last
+    end
 
     # 上传到 TestFlight
     upload_to_testflight(
+      ipa: ipa_path,
       api_key: {
         "key_id" => ENV["KEY_ID"],
         "issuer_id" => ENV["ISSUER_ID"],

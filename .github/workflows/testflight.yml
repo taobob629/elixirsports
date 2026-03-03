@@ -27,6 +27,25 @@ jobs:
           cd ios
           pod install
 
+      - name: Set up code signing
+        run: |
+          keychain initialize
+          app-store-connect fetch-signing-files "com.elixir.esports" --type IOS_APP_STORE
+          keychain add-certificates
+          xcode-project use-profiles
+        env:
+          KEY_ID: ${{ secrets.KEY_ID }}
+          ISSUER_ID: ${{ secrets.ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+
+      - name: Build iOS app
+        run: |
+          flutter build ipa --release --export-options-plist=/tmp/ExportOptions.plist
+        env:
+          KEY_ID: ${{ secrets.KEY_ID }}
+          ISSUER_ID: ${{ secrets.ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -35,10 +54,10 @@ jobs:
       - name: Install fastlane
         run: gem install fastlane
 
-      - name: Build and upload to TestFlight
+      - name: Upload to TestFlight
         run: |
           cd ios
-          fastlane deploy
+          fastlane upload_ipa
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
