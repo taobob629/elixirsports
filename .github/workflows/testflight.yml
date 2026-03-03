@@ -35,12 +35,18 @@ jobs:
       - name: Install fastlane
         run: gem install fastlane
 
+      - name: Decode Provisioning Profile
+        run: |
+          mkdir -p ios/Runner
+          echo "$PROVISIONING_PROFILE" | base64 --decode > ios/Runner/Runner.mobileprovision
+
       - name: Create Appfile
         run: |
           mkdir -p ios/fastlane
           cat > ios/fastlane/Appfile << EOF
           app_identifier("com.elixir.esports")
           team_id("5U9XJBS26D")
+          itc_team_id("120847696")
           EOF
 
       - name: Create Fastfile
@@ -51,16 +57,27 @@ jobs:
 
           platform :ios do
             lane :build do
+              # Authenticate with App Store Connect using API Key
+              app_store_connect_api_key(
+                key_id: ENV["KEY_ID"],
+                issuer_id: ENV["ISSUER_ID"],
+                key: ENV["APP_STORE_CONNECT_PRIVATE_KEY"],
+                in_visible_secure_env: true
+              )
+              
+              # Build with automatic code signing using API
               build_app(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                export_team_id: "5U9XJBS26D"
+                export_team_id: "5U9XJBS26D",
+                provisioning_profile: "./ios/Runner/Runner.mobileprovision"
               )
             end
 
             lane :upload_testflight do
+              # Upload to TestFlight using App Store Connect API
               pilot(
                 app_identifier: "com.elixir.esports",
                 skip_waiting_for_build_processing: true,
@@ -84,3 +101,4 @@ jobs:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
