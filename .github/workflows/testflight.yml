@@ -52,10 +52,12 @@ jobs:
             --team-id "5U9XJBS26D" \
             --git-url "${{ secrets.MATCH_REPO }}" \
             --git_branch "main" \
-            --app_identifier "com.elixir.esports"
+            --app_identifier "com.elixir.esports" \
+            --readonly false
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+          FASTLANE_USER: ${{ secrets.APPLE_ID }}
+          FASTLANE_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
 
       - name: Create Fastfile
         run: |
