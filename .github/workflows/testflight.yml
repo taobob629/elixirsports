@@ -53,6 +53,8 @@ jobs:
             --git_branch "main" \
             --app_identifier "com.elixir.esports" \
             --readonly true
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
       - name: Create Fastfile
         run: |
