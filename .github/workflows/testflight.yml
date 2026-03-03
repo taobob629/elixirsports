@@ -27,6 +27,23 @@ jobs:
           cd ios
           pod install
 
+      - name: Build iOS app using xcodebuild
+        run: |
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath /tmp/Runner.xcarchive \
+            -allowProvisioningUpdates \
+            -allowProvisioningDeviceRegistration \
+            archive
+          
+          xcodebuild -exportArchive \
+            -archivePath /tmp/Runner.xcarchive \
+            -exportOptionsPlist /tmp/ExportOptions.plist \
+            -exportPath /tmp/ipa \
+            -allowProvisioningUpdates
+
       - name: Create Export Options Plist
         run: |
           cat > /tmp/ExportOptions.plist << 'EOF'
@@ -40,21 +57,9 @@ jobs:
             <string>5U9XJBS26D</string>
             <key>signingStyle</key>
             <string>automatic</string>
-            <key>allowProvisioningUpdates</key>
-            <true/>
           </dict>
           </plist>
           EOF
-
-      - name: Build iOS app
-        run: |
-          flutter build ipa \
-            --release \
-            --export-options-plist=/tmp/ExportOptions.plist
-        env:
-          KEY_ID: ${{ secrets.KEY_ID }}
-          ISSUER_ID: ${{ secrets.ISSUER_ID }}
-          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -72,7 +77,7 @@ jobs:
 
           platform :ios do
             lane :upload do
-              ipa_path = Dir.glob("../build/ios/ipa/*.ipa").last
+              ipa_path = Dir.glob("/tmp/ipa/*.ipa").last
               upload_to_testflight(
                 ipa: ipa_path,
                 api_key: {
