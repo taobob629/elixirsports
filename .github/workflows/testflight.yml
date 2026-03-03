@@ -44,6 +44,21 @@ jobs:
           apple_id("${{ secrets.APPLE_ID }}")
           EOF
 
+      - name: Match
+        run: |
+          cd ios
+          fastlane match appstore \
+            --username "${{ secrets.APPLE_ID }}" \
+            --team-id "5U9XJBS26D" \
+            --git-url "${{ secrets.MATCH_REPO }}" \
+            --git_branch "main" \
+            --password "${{ secrets.MATCH_PASSWORD }}" \
+            --app_identifier "com.elixir.esports" \
+            --api_key_key_id "${{ secrets.KEY_ID }}" \
+            --api_key_issuer_id "${{ secrets.ISSUER_ID }}"
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
       - name: Create Fastfile
         run: |
           mkdir -p ios/fastlane
@@ -56,9 +71,7 @@ jobs:
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
-                export_method: "app-store",
-                export_team_id: "5U9XJBS26D",
-                xcargs: "CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO"
+                export_method: "app-store"
               )
             end
 
