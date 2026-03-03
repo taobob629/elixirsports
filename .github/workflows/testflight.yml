@@ -27,75 +27,9 @@ jobs:
           cd ios
           pod install
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-
-      - name: Install fastlane
-        run: gem install fastlane
-
-      - name: Create Appfile
+      - name: Build iOS app (simulator)
         run: |
-          mkdir -p ios/fastlane
-          cat > ios/fastlane/Appfile << EOF
-          app_identifier("com.elixir.esports")
-          team_id("5U9XJBS26D")
-          apple_id("${{ secrets.APPLE_ID }}")
-          api_key("${{ secrets.APPLE_STORE_CONNECT_PRIVATE_KEY }}")
-          EOF
+          flutter build ios --simulator --no-codesign
 
-      - name: Match (create certificates)
-        run: |
-          cd ios
-          fastlane match appstore \
-            --team-id "5U9XJBS26D" \
-            --git-url "${{ secrets.MATCH_REPO }}" \
-            --git_branch "main" \
-            --app_identifier "com.elixir.esports" \
-            --generate_apple_certs true
-        env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_USER: ${{ secrets.APPLE_ID }}
-          FASTLANE_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
-
-      - name: Create Fastfile
-        run: |
-          mkdir -p ios/fastlane
-          cat > ios/fastlane/Fastfile << 'EOF'
-          default_platform(:ios)
-
-          platform :ios do
-            lane :build do
-              build_app(
-                workspace: "Runner.xcworkspace",
-                scheme: "Runner",
-                configuration: "Release",
-                export_method: "app-store"
-              )
-            end
-
-            lane :upload_testflight do
-              pilot(
-                app_identifier: "com.elixir.esports",
-                skip_waiting_for_build_processing: true,
-                distribute_external: false,
-                api_key: {
-                  "key_id" => ENV["KEY_ID"],
-                  "issuer_id" => ENV["ISSUER_ID"],
-                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
-                }
-              )
-            end
-          end
-          EOF
-
-      - name: Build and upload to TestFlight
-        run: |
-          cd ios
-          fastlane build
-          fastlane upload_testflight
-        env:
-          KEY_ID: ${{ secrets.KEY_ID }}
-          ISSUER_ID: ${{ secrets.ISSUER_ID }}
-          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+      - name: Verify build
+        run: ls -la build/ios/iphonesimulator/
