@@ -28,7 +28,7 @@ jobs:
           pod install
 
       - name: Build iOS app
-        run: flutter build ipa --release --export-options-plist=/tmp/ExportOptions.plist
+        run: flutter build ipa --release
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
