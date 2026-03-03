@@ -27,9 +27,60 @@ jobs:
           cd ios
           pod install
 
-      - name: Build iOS app (simulator)
-        run: |
-          flutter build ios --simulator --no-codesign
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
 
-      - name: Verify build
-        run: ls -la build/ios/iphonesimulator/
+      - name: Install fastlane
+        run: gem install fastlane
+
+      - name: Create Appfile
+        run: |
+          mkdir -p ios/fastlane
+          cat > ios/fastlane/Appfile << EOF
+          app_identifier("com.elixir.esports")
+          team_id("5U9XJBS26D")
+          EOF
+
+      - name: Create Fastfile
+        run: |
+          mkdir -p ios/fastlane
+          cat > ios/fastlane/Fastfile << 'EOF'
+          default_platform(:ios)
+
+          platform :ios do
+            lane :build do
+              build_app(
+                workspace: "Runner.xcworkspace",
+                scheme: "Runner",
+                configuration: "Release",
+                export_method: "app-store",
+                export_team_id: "5U9XJBS26D"
+              )
+            end
+
+            lane :upload_testflight do
+              pilot(
+                app_identifier: "com.elixir.esports",
+                skip_waiting_for_build_processing: true,
+                distribute_external: false,
+                api_key: {
+                  "key_id" => ENV["KEY_ID"],
+                  "issuer_id" => ENV["ISSUER_ID"],
+                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
+                }
+              )
+            end
+          end
+          EOF
+
+      - name: Build and upload to TestFlight
+        run: |
+          cd ios
+          fastlane build
+          fastlane upload_testflight
+        env:
+          KEY_ID: ${{ secrets.KEY_ID }}
+          ISSUER_ID: ${{ secrets.ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
