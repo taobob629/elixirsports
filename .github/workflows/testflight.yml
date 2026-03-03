@@ -52,19 +52,7 @@ jobs:
 
           platform :ios do
             lane :build do
-              # Create provisioning profile
-              sigh(
-                app_identifier: "com.elixir.esports",
-                team_id: "5U9XJBS26D",
-                type: "app-store",
-                api_key: {
-                  "key_id" => ENV["KEY_ID"],
-                  "issuer_id" => ENV["ISSUER_ID"],
-                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
-                }
-              )
-
-              # Build IPA
+              # Build IPA with automatic signing
               build_app(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
@@ -73,7 +61,8 @@ jobs:
                   method: "app-store",
                   teamID: "5U9XJBS26D",
                   signingStyle: "automatic"
-                }
+                },
+                allow_provisioning_updates: true
               )
             end
 
