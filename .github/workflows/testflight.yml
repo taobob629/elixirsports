@@ -28,11 +28,16 @@ jobs:
           pod install
 
       - name: Build iOS app
-        run: flutter build ipa --release
+        run: |
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -allowProvisioningUpdates archive
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          CODE_SIGNING_ALLOWED: 'YES'
+          CODE_SIGN_IDENTITY: '-'
+          DEVELOPMENT_TEAM: '5U9XJBS26D'
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
