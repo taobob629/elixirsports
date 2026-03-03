@@ -36,6 +36,28 @@ jobs:
           apple_id("${{ secrets.APPLE_ID }}")
           EOF
 
+      - name: Create Fastfile for fastlane
+        run: |
+          mkdir -p ios/fastlane
+          cat > ios/fastlane/Fastfile << 'EOF'
+          default_platform(:ios)
+
+          platform :ios do
+            lane :upload_testflight do
+              pilot(
+                app_identifier: "com.elixir.esports",
+                skip_waiting_for_build_processing: true,
+                distribute_external: false,
+                api_key: {
+                  "key_id" => ENV["KEY_ID"],
+                  "issuer_id" => ENV["ISSUER_ID"],
+                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
+                }
+              )
+            end
+          end
+          EOF
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -47,12 +69,8 @@ jobs:
       - name: Build and upload to TestFlight
         run: |
           cd ios
-          fastlane pilot upload \
-            --api_key_key_id "${{ secrets.KEY_ID }}" \
-            --api_key_issuer_id "${{ secrets.ISSUER_ID }}" \
-            --api_key "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" \
-            --app_identifier "com.elixir.esports" \
-            --skip_waiting_for_build_processing \
-            --distribute_external false
+          fastlane upload_testflight
         env:
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+          KEY_ID: ${{ secrets.KEY_ID }}
+          ISSUER_ID: ${{ secrets.ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
