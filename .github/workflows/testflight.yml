@@ -27,6 +27,10 @@ jobs:
           cd ios
           pod install
 
+      - name: Build iOS app
+        run: |
+          flutter build ipa --release
+
       - name: Create Appfile for fastlane
         run: |
           mkdir -p ios/fastlane
@@ -66,7 +70,7 @@ jobs:
       - name: Install fastlane
         run: gem install fastlane
 
-      - name: Build and upload to TestFlight
+      - name: Upload to TestFlight
         run: |
           cd ios
           fastlane upload_testflight
