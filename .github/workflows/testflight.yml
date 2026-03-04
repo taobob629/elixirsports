@@ -80,10 +80,7 @@ jobs:
                 configuration: "Release",
                 export_method: "app-store",
                 export_team_id: "5U9XJBS26D",
-                build_settings: {
-                  'CODE_SIGN_STYLE' => 'Automatic',
-                  'CODE_SIGNING_ALLOWED' => 'YES'
-                }
+                xcargs: "CODE_SIGN_STYLE=Automatic CODE_SIGNING_ALLOWED=YES"
               )
             end
 
