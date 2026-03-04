@@ -92,21 +92,21 @@ class DeveloperPage extends StatelessWidget {
                     Radio<String>(
                         activeColor: toColor('e33e45'),
                         fillColor: MaterialStateProperty.all(Colors.black),
-                        value: "dev180",
+                        value: "sinbob",
                         groupValue: controller.env.value,
                         onChanged: (value) {
                           controller.env.value = value!;
                         }),
                     RichText(
                       text: TextSpan(
-                        text: "dev180: \n",
+                        text: "sinbob: \n",
                         style: TextStyle(
                           fontSize: 16.sp,
                           color: Colors.black,
                         ),
                         children: [
                           TextSpan(
-                            text: "http://43.159.57.180:8091/",
+                            text: "http://sinbob.elixiresports.com:8091",
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: Colors.red,

@@ -32,8 +32,7 @@ const Map<String, String> en_US = {
   'OR': 'OR',
   'Register Success': 'Register Success',
   'I GOT IT': 'I GOT IT',
-  'You have successfully registered. Please go to the store front desk to activate.':
-      'You have successfully registered. Please go to the store front desk to activate.',
+  'You have successfully registered.': 'You have successfully registered.',
   'CREATE AN ACCOUNT': 'CREATE AN ACCOUNT',
   'Forgot Password': 'Forgot Password',
   'Forgot password': 'Forgot Password',

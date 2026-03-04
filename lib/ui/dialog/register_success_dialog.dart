@@ -64,7 +64,7 @@ class RegisterSuccessDialog extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'You have successfully registered. Please go to the store front desk to activate.'
+                    'You have successfully registered.'
                         .tr,
                     style: TextStyle(
                       color: toColor('#767676'),

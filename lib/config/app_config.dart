@@ -15,7 +15,7 @@ class AppConfig {
   static String? name;
 
   static const String _devServer = 'http://146.56.192.175:8091/';
-  static const String _devServer2 = 'https://essps.faceplusluxurytravel.cn:8092/';
+  static const String _devServer2 = 'http://sinbob.elixiresports.com:8091/';
 
   static const String _prodServer = 'http://www.elixiresports.com:8091/';
 
@@ -41,7 +41,7 @@ class AppConfig {
     if (env == "dev175") {
       return _devServer;
     }
-    if (env == "dev180") {
+    if (env == "sinbob") {
       return _devServer2;
     }
     return _prodServer;

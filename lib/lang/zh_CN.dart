@@ -35,7 +35,7 @@ const Map<String, String> zh_CN = {
   'SAVE': '保存',
   'Register Success': '注册成功',
   'I GOT IT': '知道了',
-  'You have successfully registered. Please go to the store front desk to activate.': '您已注册成功，请到店面前台激活。',
+  'You have successfully registered.': '您已注册成功。',
   'CREATE AN ACCOUNT': '创建账号',
   'Forgot Password': '忘记密码',
   'Forgot password': '忘记密码',
