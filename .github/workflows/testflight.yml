@@ -13,6 +13,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Checkout certificates repo
+        uses: actions/checkout@v4
+        with:
+          repository: taobob629/certificates
+          path: certificates
+          token: ${{ secrets.GH_TOKEN }}
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -44,7 +51,7 @@ jobs:
           itc_team_id("120847696")
           EOF
 
-      - name: Create Fastfile with Automatic Signing
+      - name: Create Fastfile with match
         run: |
           mkdir -p ios/fastlane
           cat > ios/fastlane/Fastfile << 'EOF'
@@ -52,20 +59,27 @@ jobs:
 
           platform :ios do
             lane :build do
-              # Use App Store Connect API for automatic signing
+              # Use App Store Connect API for authentication
               app_store_connect_api_key(
                 key_id: ENV["KEY_ID"],
                 issuer_id: ENV["ISSUER_ID"],
                 key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
               )
               
-              # Build with Automatic Code Signing
+              # Use match to fetch certificates
+              match(
+                type: "appstore",
+                app_identifier: "com.elixir.esports",
+                readonly: true,
+                git_branch: "main"
+              )
+              
+              # Build with certificates from match
               gym(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
-                export_method: "app-store",
-                xcargs: "CODE_SIGN_STYLE=Automatic CODE_SIGNING_ALLOWED=YES DEVELOPMENT_TEAM=5U9XJBS26D"
+                export_method: "app-store"
               )
             end
 
@@ -93,3 +107,4 @@ jobs:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
