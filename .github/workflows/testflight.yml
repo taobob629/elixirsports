@@ -13,13 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Checkout certificates repo
-        uses: actions/checkout@v4
-        with:
-          repository: taobob629/certificates
-          path: certificates
-          token: ${{ secrets.GH_TOKEN }}
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -51,7 +44,7 @@ jobs:
           itc_team_id("120847696")
           EOF
 
-      - name: Create Fastfile with match
+      - name: Create Fastfile
         run: |
           mkdir -p ios/fastlane
           cat > ios/fastlane/Fastfile << 'EOF'
@@ -66,20 +59,13 @@ jobs:
                 key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
               )
               
-              # Use match to fetch certificates
-              match(
-                type: "appstore",
-                app_identifier: "com.elixir.esports",
-                readonly: true,
-                git_branch: "main"
-              )
-              
-              # Build with certificates from match
+              # Build with Automatic Signing
               gym(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
-                export_method: "app-store"
+                export_method: "app-store",
+                xcargs: "CODE_SIGN_STYLE=Automatic CODE_SIGNING_ALLOWED=YES DEVELOPMENT_TEAM=5U9XJBS26D"
               )
             end
 
@@ -107,4 +93,3 @@ jobs:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
