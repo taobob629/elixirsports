@@ -60,16 +60,16 @@ jobs:
                 key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
               )
               
-              # Decode p12 certificate
-              p12_path = "./ios/Runner.p12"
-              File.write(p12_path, ENV["P12_FILE"].unpack("m0").first)
+              # Decode p12 certificate using sh
+              sh("mkdir -p ../certs")
+              p12_path = "../certs/certificate.p12"
+              p12_content = Base64.decode64(ENV["P12_FILE"])
+              File.open(p12_path, "wb") { |f| f.write(p12_content) }
               
-              # Import certificate using fastlane
+              # Import certificate
               import_certificate(
                 certificate_path: p12_path,
-                certificate_password: ENV["P12_PASSWORD"],
-                keychain_path: "~/Library/Keychains/login.keychain",
-                keychain_password: ENV["P12_PASSWORD"]
+                certificate_password: ENV["P12_PASSWORD"]
               )
               
               # Build with manual signing
