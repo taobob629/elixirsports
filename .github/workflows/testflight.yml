@@ -96,12 +96,10 @@ jobs:
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                codesigning_identity: "iPhone Distribution",
+                codesigning_identity: "Apple Distribution: ELIXIR ESPORTS PTE. LTD. (5U9XJBS26D)",
                 export_team_id: "5U9XJBS26D",
                 output_directory: "./build",
-                output_name: "Runner.ipa",
-                skip_profile_detection: true,
-                xcargs: "PROVISIONING_PROFILE_SPECIFIER='esports' CODE_SIGN_STYLE=Manual"
+                output_name: "Runner.ipa"
               )
               
               pilot(
