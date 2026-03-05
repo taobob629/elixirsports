@@ -84,14 +84,17 @@ jobs:
               sh("security default-keychain -s #{keychain_name}")
               sh("security unlock-keychain -p #{keychain_password} #{keychain_name}")
               sh("security set-keychain-settings -t 3600 -u #{keychain_name}")
-              sh("security set-key-partition-list -S apple-tool:,apple: -s -k #{keychain_password} #{keychain_name}")
               
+              # 先导入证书
               import_certificate(
                 certificate_path: p12_path,
                 certificate_password: ENV["P12_PASSWORD"],
                 keychain_name: keychain_name,
                 keychain_password: keychain_password
               )
+              
+              # 再设置partition list
+              sh("security set-key-partition-list -S apple-tool:,apple: -s -k #{keychain_password} #{keychain_name}")
               
               gym(
                 workspace: "Runner.xcworkspace",
