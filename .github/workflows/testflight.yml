@@ -47,10 +47,6 @@ jobs:
       - name: Create Fastfile with p12 certificate
         run: |
           mkdir -p ios/fastlane
-          mkdir -p ~/Library/MobileDevice/Certificates
-          
-          # Decode p12 certificate
-          echo "$P12_FILE" | base64 --decode > ~/Library/MobileDevice/Certificates/distribution.p12
           
           cat > ios/fastlane/Fastfile << 'EOF'
           default_platform(:ios)
@@ -64,14 +60,25 @@ jobs:
                 key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
               )
               
-              # Build with manual signing using p12 certificate
+              # Decode p12 certificate
+              p12_path = "./ios/Runner.p12"
+              File.write(p12_path, ENV["P12_FILE"].unpack("m0").first)
+              
+              # Import certificate using fastlane
+              import_certificate(
+                certificate_path: p12_path,
+                certificate_password: ENV["P12_PASSWORD"],
+                keychain_path: "~/Library/Keychains/login.keychain",
+                keychain_password: ENV["P12_PASSWORD"]
+              )
+              
+              # Build with manual signing
               gym(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                codesigning_identity: "Apple Distribution: ELIXIR ESPORTS PTE. LTD. (5U9XJBS26D)",
-                xcargs: "CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO"
+                codesigning_identity: "Apple Distribution: ELIXIR ESPORTS PTE. LTD. (5U9XJBS26D)"
               )
             end
 
@@ -93,10 +100,6 @@ jobs:
       - name: Build and upload to TestFlight
         run: |
           cd ios
-          # Import p12 certificate to keychain
-          security unlock-keychain -p "$P12_PASSWORD" ~/Library/Keychains/login.keychain-db
-          security import ~/Library/MobileDevice/Certificates/distribution.p12 -P "$P12_PASSWORD" -A -t cert -k ~/Library/Keychains/login.keychain-db
-          
           fastlane build
           fastlane upload_testflight
         env:
