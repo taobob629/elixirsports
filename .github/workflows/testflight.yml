@@ -69,7 +69,9 @@ jobs:
               # Import certificate
               import_certificate(
                 certificate_path: p12_path,
-                certificate_password: ENV["P12_PASSWORD"]
+                certificate_password: ENV["P12_PASSWORD"],
+                keychain_name: "temp_keychain",
+                keychain_password: "temp_keychain_pwd"
               )
               
               # Build with manual signing
