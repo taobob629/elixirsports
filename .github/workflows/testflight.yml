@@ -80,13 +80,13 @@ jobs:
                 keychain_password: "temp_keychain_pwd"
               )
               
-              # Build with manual signing
+              # Build with automatic signing
               gym(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                codesigning_identity: "Apple Distribution: ELIXIR ESPORTS PTE. LTD. (5U9XJBS26D)"
+                signing_style: "automatic"
               )
             end
 
