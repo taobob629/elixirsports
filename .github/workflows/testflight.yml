@@ -66,6 +66,11 @@ jobs:
               p12_content = Base64.decode64(ENV["P12_FILE"])
               File.open(p12_path, "wb") { |f| f.write(p12_content) }
               
+              # Create keychain
+              sh("security create-keychain -p temp_keychain_pwd temp_keychain")
+              sh("security default-keychain -s temp_keychain")
+              sh("security unlock-keychain -p temp_keychain_pwd temp_keychain")
+              
               # Import certificate
               import_certificate(
                 certificate_path: p12_path,
