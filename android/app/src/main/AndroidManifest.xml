@@ -47,7 +47,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="elixiresports" />
             </intent-filter>
-            <!-- App Links 配置 - 支持多个域名 -->
+            <!-- App Links 配置 - 多个域名 -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
