@@ -44,9 +44,14 @@ jobs:
           itc_team_id("120847696")
           EOF
 
-      - name: Create Fastfile
+      - name: Create Fastfile with p12 certificate
         run: |
           mkdir -p ios/fastlane
+          mkdir -p ~/Library/MobileDevice/Certificates
+          
+          # Decode p12 certificate
+          echo "$P12_FILE" | base64 --decode > ~/Library/MobileDevice/Certificates/distribution.p12
+          
           cat > ios/fastlane/Fastfile << 'EOF'
           default_platform(:ios)
 
@@ -59,13 +64,14 @@ jobs:
                 key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
               )
               
-              # Build with Automatic Signing
+              # Build with manual signing using p12 certificate
               gym(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                xcargs: "CODE_SIGN_STYLE=Automatic CODE_SIGNING_ALLOWED=YES DEVELOPMENT_TEAM=5U9XJBS26D"
+                codesigning_identity: "Apple Distribution: ELIXIR ESPORTS PTE. LTD. (5U9XJBS26D)",
+                xcargs: "CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO"
               )
             end
 
@@ -87,9 +93,15 @@ jobs:
       - name: Build and upload to TestFlight
         run: |
           cd ios
+          # Import p12 certificate to keychain
+          security unlock-keychain -p "$P12_PASSWORD" ~/Library/Keychains/login.keychain-db
+          security import ~/Library/MobileDevice/Certificates/distribution.p12 -P "$P12_PASSWORD" -A -t cert -k ~/Library/Keychains/login.keychain-db
+          
           fastlane build
           fastlane upload_testflight
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          P12_FILE: ${{ secrets.P12_FILE }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
