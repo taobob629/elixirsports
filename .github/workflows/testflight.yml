@@ -80,13 +80,17 @@ jobs:
                 keychain_password: "temp_keychain_pwd"
               )
               
-              # Build with automatic signing
+              # Build with automatic signing via export_options
               gym(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                signing_style: "automatic"
+                export_options: {
+                  method: "app-store",
+                  signingStyle: "automatic",
+                  teamID: "5U9XJBS26D"
+                }
               )
             end
 
