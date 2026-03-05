@@ -60,9 +60,10 @@ jobs:
                 key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
               )
               
-              # Decode p12 certificate using sh
-              sh("mkdir -p ../certs")
-              p12_path = "../certs/certificate.p12"
+              # Decode p12 certificate
+              # Use absolute path in RUNNER_TEMP
+              cert_dir = Dir.pwd
+              p12_path = "#{cert_dir}/certificate.p12"
               p12_content = Base64.decode64(ENV["P12_FILE"])
               File.open(p12_path, "wb") { |f| f.write(p12_content) }
               
