@@ -22,18 +22,37 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
+      - name: Build Flutter iOS (无签名，仅编译)
+        run: flutter build ios --release --no-codesign --verbose
+        working-directory: .
+
       - name: Install CocoaPods dependencies
         run: |
           cd ios
-          pod install
+          pod install --repo-update
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
+          bundler-cache: true # 自动安装 Gemfile 依赖
 
-      - name: Install fastlane
-        run: gem install fastlane
+      - name: Install fastlane and dependencies
+        run: |
+          cd ios
+          gem install fastlane -N
+          gem install cfpropertylist # 解决 export_options 解析问题
+
+      - name: 导入 MobileProvision 描述文件
+        env:
+          MOBILE_PROVISION_BASE64: ${{ secrets.MOBILE_PROVISION_BASE64 }}
+        run: |
+          # 创建描述文件目录
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          # 解码并保存描述文件
+          echo "$MOBILE_PROVISION_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/esports.mobileprovision
+          # 验证描述文件是否有效
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/esports.mobileprovision
 
       - name: Create Appfile
         run: |
@@ -44,7 +63,7 @@ jobs:
           itc_team_id("120847696")
           EOF
 
-      - name: Create Fastfile with p12 certificate
+      - name: Create Fastfile
         run: |
           mkdir -p ios/fastlane
           
@@ -52,59 +71,68 @@ jobs:
           default_platform(:ios)
 
           platform :ios do
-            lane :build do
-              # Use App Store Connect API for authentication
+            lane :build_and_upload do
+              # App Store Connect API 认证
               app_store_connect_api_key(
                 key_id: ENV["KEY_ID"],
                 issuer_id: ENV["ISSUER_ID"],
-                key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
+                key_content: ENV["APP_STORE_CONNECT_PRIVATE_KEY"],
+                duration: 1200,
+                in_house: false
               )
               
-              # Decode p12 certificate
-              # Use absolute path in RUNNER_TEMP
-              cert_dir = Dir.pwd
+              # 解码 P12 证书
+              cert_dir = ENV["RUNNER_TEMP"]
               p12_path = "#{cert_dir}/certificate.p12"
               p12_content = Base64.decode64(ENV["P12_FILE"])
               File.open(p12_path, "wb") { |f| f.write(p12_content) }
               
-              # Create keychain
-              sh("security create-keychain -p temp_keychain_pwd temp_keychain")
-              sh("security default-keychain -s temp_keychain")
-              sh("security unlock-keychain -p temp_keychain_pwd temp_keychain")
+              # 配置钥匙串（解决 CI 环境签名权限问题）
+              keychain_name = "ios_build_keychain"
+              keychain_password = "temp_123456"
+              sh("security create-keychain -p #{keychain_password} #{keychain_name}")
+              sh("security default-keychain -s #{keychain_name}")
+              sh("security unlock-keychain -p #{keychain_password} #{keychain_name}")
+              sh("security set-keychain-settings -t 3600 -u #{keychain_name}")
+              # 关键：授予 codesign 访问权限
+              sh("security set-key-partition-list -S apple-tool:,apple: -s -k #{keychain_password} #{keychain_name}")
               
-              # Import certificate
+              # 导入证书
               import_certificate(
                 certificate_path: p12_path,
                 certificate_password: ENV["P12_PASSWORD"],
-                keychain_name: "temp_keychain",
-                keychain_password: "temp_keychain_pwd"
+                keychain_name: keychain_name,
+                keychain_password: keychain_password
               )
               
-              # Build with automatic signing via export_options
+              # 构建 IPA（关键修正：移除不稳定的自动签名，指定明确的签名配置）
               gym(
                 workspace: "Runner.xcworkspace",
                 scheme: "Runner",
                 configuration: "Release",
                 export_method: "app-store",
-                export_options: {
-                  method: "app-store",
-                  signingStyle: "automatic",
-                  teamID: "5U9XJBS26D"
-                }
+                codesigning_identity: "iPhone Distribution",
+                export_team_id: "5U9XJBS26D",
+                output_directory: "./build",
+                output_name: "Runner.ipa",
+                # 禁用自动签名检测，使用手动配置
+                skip_profile_detection: true,
+                # 传递额外的 xcodebuild 参数
+                xcargs: "PROVISIONING_PROFILE_SPECIFIER='esports' CODE_SIGN_STYLE=Manual"
               )
-            end
-
-            lane :upload_testflight do
+              
+              # 上传到 TestFlight（指定 IPA 路径，避免路径问题）
               pilot(
+                ipa: "./build/Runner.ipa",
                 app_identifier: "com.elixir.esports",
                 skip_waiting_for_build_processing: true,
                 distribute_external: false,
-                api_key: {
-                  "key_id" => ENV["KEY_ID"],
-                  "issuer_id" => ENV["ISSUER_ID"],
-                  "key" => ENV["APP_STORE_CONNECT_PRIVATE_KEY"]
-                }
+                notify_testers: false
               )
+              
+              # 清理临时文件
+              sh("rm -f #{p12_path}")
+              sh("security delete-keychain #{keychain_name}")
             end
           end
           EOF
@@ -112,11 +140,11 @@ jobs:
       - name: Build and upload to TestFlight
         run: |
           cd ios
-          fastlane build
-          fastlane upload_testflight
+          fastlane build_and_upload
         env:
           KEY_ID: ${{ secrets.KEY_ID }}
           ISSUER_ID: ${{ secrets.ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
           P12_FILE: ${{ secrets.P12_FILE }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          MOBILE_PROVISION_BASE64: ${{ secrets.MOBILE_PROVISION_BASE64 }}
