@@ -78,23 +78,18 @@ jobs:
               p12_content = Base64.decode64(ENV["P12_FILE"])
               File.open(p12_path, "wb") { |f| f.write(p12_content) }
               
-              keychain_name = "ios_build_keychain"
-              keychain_password = "temp_123456"
-              sh("security create-keychain -p #{keychain_password} #{keychain_name}")
-              sh("security default-keychain -s #{keychain_name}")
-              sh("security unlock-keychain -p #{keychain_password} #{keychain_name}")
-              sh("security set-keychain-settings -t 3600 -u #{keychain_name}")
+              keychain_path = File.expand_path("~/Library/Keychains/ios_build_keychain-db")
+              sh("security create-keychain -p temp_123456 #{keychain_path}")
+              sh("security unlock-keychain -p temp_123456 #{keychain_path}")
+              sh("security set-keychain-settings -lut 7200 #{keychain_path}")
+              sh("security list-keychains -s #{keychain_path} /Library/Keychains/System.keychain")
               
-              # 先导入证书
+              # 导入证书
               import_certificate(
                 certificate_path: p12_path,
                 certificate_password: ENV["P12_PASSWORD"],
-                keychain_name: keychain_name,
-                keychain_password: keychain_password
+                keychain_path: keychain_path
               )
-              
-              # 再设置partition list
-              sh("security set-key-partition-list -S apple-tool:,apple: -s -k #{keychain_password} #{keychain_name}")
               
               gym(
                 workspace: "Runner.xcworkspace",
