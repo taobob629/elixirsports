@@ -56,7 +56,15 @@ jobs:
           echo "$P12_FILE" | base64 --decode > $p12_path
           
           security import $p12_path -P $P12_PASSWORD -A -t cert -f pkcs12 -k ~/Library/Keychains/ios_build_keychain-db
-          security set-key-partition-list -S apple-tool:,apple: -k temp_123456 -D "" -l "Apple Distribution: ELIXIR ESPORTS PTE. LTD. (5U9XJBS26D)" ~/Library/Keychains/ios_build_keychain-db
+          
+          # Get the actual certificate identity name
+          CERT_IDENTITY=$(security find-identity -v -p codesigning ~/Library/Keychains/ios_build_keychain-db | grep "Apple Distribution" | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          echo "Found certificate: $CERT_IDENTITY"
+          
+          # Set partition list if certificate was found
+          if [ -n "$CERT_IDENTITY" ]; then
+            security set-key-partition-list -S apple-tool:,apple: -k temp_123456 -D "" -l "$CERT_IDENTITY" ~/Library/Keychains/ios_build_keychain-db || true
+          fi
 
       - name: Import provisioning profile
         env:
