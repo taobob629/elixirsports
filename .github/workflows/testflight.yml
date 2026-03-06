@@ -38,6 +38,11 @@ jobs:
           flutter pub get
           pod install
 
+      - name: Install bundle
+        run: |
+          cd ios
+          bundle install
+
       - name: Create keychain
         run: |
           keychain_path=~/Library/Keychains/ios_build_keychain-db
