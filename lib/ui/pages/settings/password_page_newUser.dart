@@ -17,7 +17,14 @@ class PasswordPageNewuser extends BasePage<SettingsCtr> {
   SettingsCtr createController() => SettingsCtr();
 
   @override
-  Widget buildBody(BuildContext context) => KeyboardDismissOnTap(
+  Widget buildBody(BuildContext context) {
+    // 每次进入页面时清空密码输入框
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.newPsdCtr.text = '';
+      controller.repeatPsdCtr.text = '';
+    });
+    
+    return KeyboardDismissOnTap(
         dismissOnCapturedTaps: true,
         child: BaseScaffold(
           title: "PASSWORD".tr,
@@ -70,4 +77,5 @@ class PasswordPageNewuser extends BasePage<SettingsCtr> {
           ).paddingOnly(bottom: 15.h),
         ),
       );
+  }
 }

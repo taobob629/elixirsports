@@ -9,6 +9,7 @@ import '../../../base/base_page.dart';
 import '../../../base/base_scaffold.dart';
 import '../../../config/icon_font.dart';
 import '../../../getx_ctr/settings_ctr.dart';
+import '../../../getx_ctr/user_controller.dart';
 import '../../widget/my_button_widget.dart';
 import '../../../../utils/color_utils.dart';
 
@@ -18,125 +19,157 @@ class UpdatePhonePage extends BasePage<SettingsCtr> {
   @override
   SettingsCtr createController() => SettingsCtr();
 
+  void _loadDefaultPhoneNumber() {
+    // 从用户数据中获取当前手机号
+    String currentPhone = UserController.find.profileModel.value.phone ?? '';
+    // 获取国家代码
+    String userCountryCode =
+        UserController.find.profileModel.value.countryCode ?? '';
+    String defaultCountryCode = 'SG';
+    // 确保国家代码有效
+    if (userCountryCode.isNotEmpty) {
+      defaultCountryCode = userCountryCode;
+    }
+
+    // 初始化手机号
+    if (currentPhone.isNotEmpty) {
+      try {
+        controller.newPhoneNumber =
+            PhoneNumber(isoCode: defaultCountryCode, phoneNumber: currentPhone);
+      } catch (e) {
+        controller.newPhoneNumber = PhoneNumber(isoCode: defaultCountryCode);
+      }
+    } else {
+      controller.newPhoneNumber = PhoneNumber(isoCode: defaultCountryCode);
+    }
+  }
+
   @override
-  Widget buildBody(BuildContext context) => KeyboardDismissOnTap(
-        dismissOnCapturedTaps: true,
-        child: BaseScaffold(
-          title: "Update Phone Number".tr,
-          resizeToAvoidBottomInset: true,
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding:
-                  EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15.r),
-                      color: Colors.white,
-                    ),
-                    padding: EdgeInsets.fromLTRB(15.w, 20.h, 20.w, 25.h),
-                    margin: EdgeInsets.only(bottom: 20.h),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // 手机号输入
-                        Container(
-                          decoration: BoxDecoration(
-                            color: toColor('#ECF1FA'),
-                            borderRadius: BorderRadius.circular(8.r),
-                          ),
-                          margin: EdgeInsets.symmetric(horizontal: 0.w),
-                          padding: EdgeInsets.symmetric(vertical: 8.h),
-                          child: InternationalPhoneNumberInput(
-                            hintText: 'Phone Number'.tr,
-                            onInputChanged: (PhoneNumber number) =>
-                                controller.newPhoneNumber = number,
-                            onInputValidated: (bool value) {},
-                            ignoreBlank: true,
-                            autoValidateMode: AutovalidateMode.disabled,
-                            initialValue: controller.newPhoneNumber ?? PhoneNumber(isoCode: 'SG'),
-                            cursorColor: Colors.black,
-                            textStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12.sp,
-                            ),
-                            inputDecoration: InputDecoration(
-                              isDense: true,
-                              isCollapsed: true,
-                              border: InputBorder.none,
-                              contentPadding:
-                                  EdgeInsets.symmetric(vertical: 8.h),
-                            ),
-                            selectorTextStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 12.sp,
-                            ),
-                            selectorConfig: SelectorConfig(
-                              selectorType: PhoneInputSelectorType.DIALOG,
-                              setSelectorButtonAsPrefixIcon: true,
-                              leadingPadding: 15,
-                            ),
-                            searchBoxDecoration: InputDecoration(
-                              hintText:
-                                  'Search by country name or code'.tr,
-                            ),
-                            countries: controller.countries,
-                          ),
-                        ),
-                        SizedBox(height: 15.h),
-                        // 验证码输入
-                        Row(
-                          children: [
-                            Expanded(
-                              child: MyTextFieldWidget(
-                                controller: controller.newCodeCtr,
-                                hintText: "Enter verification code".tr,
-                                keyboardType: TextInputType.number,
-                                onTap: () =>
-                                    controller.sendNewPhoneCode(),
-                                rightIcon: Obx(() => Text(
-                                          controller.newCodeCountdown.value >
-                                                  0
-                                              ? "${controller.newCodeCountdown.value}s"
-                                              : "Get Code".tr,
-                                          style: TextStyle(
-                                            color: toColor('#767676'),
-                                            fontSize: 12.sp,
-                                            fontFamily: FONT_MEDIUM,
-                                          ),
-                                        )),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+  Widget buildBody(BuildContext context) {
+    // 每次进入页面时清空验证码输入框和重置倒计时
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.newCodeCtr.text = '';
+      controller.newCodeCountdown.value = 0;
+
+      // 每次进入页面时，从用户数据中获取默认手机号
+      _loadDefaultPhoneNumber();
+    });
+
+    return KeyboardDismissOnTap(
+      dismissOnCapturedTaps: true,
+      child: BaseScaffold(
+        title: "Update Phone Number".tr,
+        resizeToAvoidBottomInset: true,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15.r),
+                    color: Colors.white,
                   ),
-                  MyButtonWidget(
-                    btnText: "Save".tr,
-                    marginLeft: 0.w,
-                    marginRight: 0.w,
-                    marginTop: 0.h,
-                    marginBottom: 30.h,
-                    onTap: () {
-                      // 验证新手机号并保存
-                      controller.updatePhone().then((success) {
-                        if (success) {
-                          Get.back();
-                          Get.snackbar("Success".tr,
-                              "Phone number updated successfully".tr,
-                              backgroundColor: Colors.green,
-                              colorText: Colors.white);
-                        }
-                      });
-                    },
+                  padding: EdgeInsets.fromLTRB(15.w, 20.h, 20.w, 25.h),
+                  margin: EdgeInsets.only(bottom: 20.h),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 手机号输入
+                      Container(
+                        decoration: BoxDecoration(
+                          color: toColor('#ECF1FA'),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        margin: EdgeInsets.symmetric(horizontal: 0.w),
+                        padding: EdgeInsets.symmetric(vertical: 8.h),
+                        child: InternationalPhoneNumberInput(
+                          hintText: 'Phone Number'.tr,
+                          onInputChanged: (PhoneNumber number) =>
+                              controller.newPhoneNumber = number,
+                          onInputValidated: (bool value) {},
+                          ignoreBlank: true,
+                          autoValidateMode: AutovalidateMode.disabled,
+                          initialValue: controller.newPhoneNumber ??
+                              PhoneNumber(isoCode: 'SG'),
+                          cursorColor: Colors.black,
+                          textStyle: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12.sp,
+                          ),
+                          inputDecoration: InputDecoration(
+                            isDense: true,
+                            isCollapsed: true,
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(vertical: 8.h),
+                          ),
+                          selectorTextStyle: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12.sp,
+                          ),
+                          selectorConfig: SelectorConfig(
+                            selectorType: PhoneInputSelectorType.DIALOG,
+                            setSelectorButtonAsPrefixIcon: true,
+                            leadingPadding: 15,
+                          ),
+                          searchBoxDecoration: InputDecoration(
+                            hintText: 'Search by country name or code'.tr,
+                          ),
+                          countries: controller.countries,
+                        ),
+                      ),
+                      SizedBox(height: 15.h),
+                      // 验证码输入
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MyTextFieldWidget(
+                              controller: controller.newCodeCtr,
+                              hintText: "Enter verification code".tr,
+                              keyboardType: TextInputType.number,
+                              onTap: () => controller.sendNewPhoneCode(),
+                              rightIcon: Obx(() => Text(
+                                    controller.newCodeCountdown.value > 0
+                                        ? "${controller.newCodeCountdown.value}s"
+                                        : "Get Code".tr,
+                                    style: TextStyle(
+                                      color: toColor('#767676'),
+                                      fontSize: 12.sp,
+                                      fontFamily: FONT_MEDIUM,
+                                    ),
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                MyButtonWidget(
+                  btnText: "Save".tr,
+                  marginLeft: 0.w,
+                  marginRight: 0.w,
+                  marginTop: 0.h,
+                  marginBottom: 30.h,
+                  onTap: () {
+                    // 验证新手机号并保存
+                    controller.updatePhone().then((success) {
+                      if (success) {
+                        Get.back();
+                        Get.snackbar("Success".tr,
+                            "Phone number updated successfully".tr,
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white);
+                      }
+                    });
+                  },
+                ),
+              ],
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
 }

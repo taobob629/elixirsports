@@ -13,6 +13,7 @@ import '../ui/dialog/confirm_dialog.dart';
 import '../ui/dialog/upgrade_dialog.dart';
 import '../ui/pages/settings/password_page.dart';
 import '../ui/pages/settings/password_page_newUser.dart';
+import '../utils/storage_manager.dart';
 import 'user_controller.dart';
 import '../ui/dialog/change_avatar_dialog.dart';
 import '../utils/toast_utils.dart';
@@ -53,20 +54,23 @@ class SettingsCtr extends BasePageController {
     countries.value = await LoginApi.getCountry();
 
     // Get country code from user data
-    String userCountryCode = UserController.find.profileModel.value.countryCode ?? '';
+    String userCountryCode =
+        UserController.find.profileModel.value.countryCode ?? '';
     // Default to SG if country code is empty or not in the country list
     String defaultCountryCode = 'SG';
-    if (userCountryCode.isNotEmpty && countries.value.contains(userCountryCode)) {
+    if (userCountryCode.isNotEmpty &&
+        countries.value.contains(userCountryCode)) {
       defaultCountryCode = userCountryCode;
     }
 
-    // Set current phone number from ProfileModel as newPhoneNumber
+    // 每次进入页面时，都从用户数据中初始化newPhoneNumber
     String currentPhone = UserController.find.profileModel.value.phone ?? '';
     // Only set phone number if it's not empty to avoid validation errors
     if (currentPhone.isNotEmpty) {
       try {
         // Set newPhoneNumber to current phone number as initial value
-        newPhoneNumber = PhoneNumber(isoCode: defaultCountryCode, phoneNumber: currentPhone);
+        newPhoneNumber =
+            PhoneNumber(isoCode: defaultCountryCode, phoneNumber: currentPhone);
       } catch (e) {
         // If phone number validation fails, just set the country code without phone number
         newPhoneNumber = PhoneNumber(isoCode: defaultCountryCode);
@@ -231,6 +235,8 @@ class SettingsCtr extends BasePageController {
     bool? verifySuccess = await LoginApi.checkOldPwd(code: oldPsdCtr.text);
     if (verifySuccess != null && verifySuccess) {
       if (oldPsdCtr.text.isNotEmpty) {
+        // 保存新的密码
+        StorageManager.setPassword(newPsdCtr.text);
         await ProfileApi.changePassword(
           oldPwd: oldPsdCtr.text,
           password: newPsdCtr.text,
@@ -261,6 +267,8 @@ class SettingsCtr extends BasePageController {
       return;
     }
     await LoginApi.setPassword(password: newPsdCtr.text);
+    // 保存新的密码
+    StorageManager.setPassword(newPsdCtr.text);
     Get.back();
   }
 
