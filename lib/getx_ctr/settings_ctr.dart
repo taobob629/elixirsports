@@ -27,17 +27,13 @@ class SettingsCtr extends BasePageController {
   TextEditingController repeatPsdCtr = TextEditingController();
 
   // 更换手机号相关控制器
-  TextEditingController oldCodeCtr = TextEditingController();
   TextEditingController newCodeCtr = TextEditingController();
 
   // 手机号对象，用于处理国家代码和手机号
-  PhoneNumber? oldPhoneNumber;
   PhoneNumber? newPhoneNumber;
 
   // 验证码倒计时
-  RxInt oldCodeCountdown = 0.obs;
   RxInt newCodeCountdown = 0.obs;
-  Timer? _oldCodeTimer;
   Timer? _newCodeTimer;
 
   // 国家列表
@@ -46,94 +42,46 @@ class SettingsCtr extends BasePageController {
   @override
   void requestData() async {
     nameCtr.text = UserController.find.profileModel.value.name ?? '';
+    // 清空验证码输入框
+    newCodeCtr.text = '';
+    // 重置倒计时
+    newCodeCountdown.value = 0;
+    // 清空密码输入框
+    oldPsdCtr.text = '';
+    newPsdCtr.text = '';
+    repeatPsdCtr.text = '';
     countries.value = await LoginApi.getCountry();
 
-    // Set current phone number from UserModel as oldPhoneNumber
-    String currentPhone = UserController.find.userModel.value.phone ?? '';
+    // Get country code from user data
+    String userCountryCode = UserController.find.profileModel.value.countryCode ?? '';
+    // Default to SG if country code is empty or not in the country list
+    String defaultCountryCode = 'SG';
+    if (userCountryCode.isNotEmpty && countries.value.contains(userCountryCode)) {
+      defaultCountryCode = userCountryCode;
+    }
+
+    // Set current phone number from ProfileModel as newPhoneNumber
+    String currentPhone = UserController.find.profileModel.value.phone ?? '';
+    // Only set phone number if it's not empty to avoid validation errors
     if (currentPhone.isNotEmpty) {
-      // Simplified approach: assume SG country code if not specified
-      oldPhoneNumber = PhoneNumber(isoCode: 'SG', phoneNumber: currentPhone);
+      try {
+        // Set newPhoneNumber to current phone number as initial value
+        newPhoneNumber = PhoneNumber(isoCode: defaultCountryCode, phoneNumber: currentPhone);
+      } catch (e) {
+        // If phone number validation fails, just set the country code without phone number
+        newPhoneNumber = PhoneNumber(isoCode: defaultCountryCode);
+      }
+    } else {
+      // Even if currentPhone is empty, set newPhoneNumber with default country code
+      newPhoneNumber = PhoneNumber(isoCode: defaultCountryCode);
     }
   }
 
   @override
   void onClose() {
     // 清理定时器
-    _oldCodeTimer?.cancel();
     _newCodeTimer?.cancel();
     super.onClose();
-  }
-
-  // 发送老手机号验证码
-  void sendOldPhoneCode() async {
-    if (oldCodeCountdown.value > 0) return;
-
-    if (oldPhoneNumber == null) {
-      showToast("Please enter old phone number".tr);
-      return;
-    }
-
-    String phone = oldPhoneNumber!.parseNumber();
-    if (phone.isEmpty) {
-      showToast("Please enter old phone number".tr);
-      return;
-    }
-
-    showLoading();
-    try {
-      // 调用发送验证码API
-      await LoginApi.sendPhoneCode(phone);
-      dismissLoading();
-
-      // 开始倒计时
-      _startOldCodeCountdown();
-      showToast("Verification code sent successfully".tr);
-    } catch (e) {
-      dismissLoading();
-      showToast("Failed to send verification code".tr);
-    }
-  }
-
-  // 验证老手机号
-  Future<bool> verifyOldPhone() async {
-    if (oldPhoneNumber == null) {
-      showToast("Please enter old phone number".tr);
-      return false;
-    }
-
-    String phone = oldPhoneNumber!.parseNumber();
-    if (phone.isEmpty) {
-      showToast("Please enter old phone number".tr);
-      return false;
-    }
-
-    if (oldCodeCtr.text.isEmpty) {
-      showToast("Please enter verification code".tr);
-      return false;
-    }
-
-    showLoading();
-    try {
-      // 调用验证老手机号API
-      final response = await http.post('app/user/verifyOldPhone', data: {
-        "phone": phone,
-        "code": oldCodeCtr.text,
-      });
-      dismissLoading();
-      print("verifyOldPhone response:${response}");
-
-      print("verifyOldPhone response data:${response.data}");
-      if (response.data == true) {
-        return true;
-      } else {
-        showToast(response.data['msg'] ?? "Verification failed".tr);
-        return false;
-      }
-    } catch (e) {
-      dismissLoading();
-      showToast("Verification failed".tr);
-      return false;
-    }
   }
 
   // 发送新手机号验证码
@@ -151,10 +99,13 @@ class SettingsCtr extends BasePageController {
       return;
     }
 
+    // 获取国家代码，默认为SG
+    String country = newPhoneNumber!.isoCode ?? 'SG';
+
     showLoading();
     try {
       // 调用发送验证码API
-      await LoginApi.sendPhoneCode(phone);
+      await LoginApi.sendPhoneCode(phone, country);
       dismissLoading();
 
       // 开始倒计时
@@ -166,51 +117,37 @@ class SettingsCtr extends BasePageController {
     }
   }
 
-
-
   // 更新手机号
   Future<bool> updatePhone() async {
-    if (oldPhoneNumber == null) {
-      showToast("Please enter old phone number".tr);
-      return false;
-    }
-
     if (newPhoneNumber == null) {
       showToast("Please enter new phone number".tr);
       return false;
     }
 
-    String oldPhone = oldPhoneNumber!.parseNumber();
     String newPhone = newPhoneNumber!.parseNumber();
-
-    if (oldPhone.isEmpty) {
-      showToast("Please enter old phone number".tr);
-      return false;
-    }
 
     if (newPhone.isEmpty) {
       showToast("Please enter new phone number".tr);
       return false;
     }
 
-    if (oldCodeCtr.text.isEmpty) {
-      showToast("Please enter old phone verification code".tr);
+    if (newCodeCtr.text.isEmpty) {
+      showToast("Please enter verification code".tr);
       return false;
     }
 
-    if (newCodeCtr.text.isEmpty) {
-      showToast("Please enter new phone verification code".tr);
-      return false;
-    }
+    // 获取国家代码
+    String countryCode = newPhoneNumber!.isoCode ?? 'SG';
 
     showLoading();
     try {
       // 调用更新手机号API
       final response = await http.post('app/user/updatePhone', data: {
-        "oldPhone": oldPhone,
-        "oldCode": oldCodeCtr.text,
+        "oldPhone": "",
+        "oldCode": "",
         "newPhone": newPhone,
         "newCode": newCodeCtr.text,
+        "countryCode": countryCode,
       });
       dismissLoading();
 
@@ -227,19 +164,6 @@ class SettingsCtr extends BasePageController {
       showToast("Update failed".tr);
       return false;
     }
-  }
-
-  // 开始老手机号验证码倒计时
-  void _startOldCodeCountdown() {
-    oldCodeCountdown.value = 60;
-    _oldCodeTimer?.cancel();
-    _oldCodeTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (oldCodeCountdown.value > 0) {
-        oldCodeCountdown.value--;
-      } else {
-        _oldCodeTimer?.cancel();
-      }
-    });
   }
 
   // 开始新手机号验证码倒计时
@@ -369,7 +293,7 @@ class SettingsCtr extends BasePageController {
       }
     } catch (e) {
       dismissLoading();
-      // showToast("Failed to check password status".tr);
+      showToast("Failed to check password status".tr);
       // 发生错误时默认打开PasswordPage
       Get.to(() => PasswordPage());
     }

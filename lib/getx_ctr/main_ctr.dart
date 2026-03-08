@@ -49,7 +49,7 @@ class MainCtr extends BasePageController {
         Get.to(() => LoginPage());
         return;
       }
-      UserController.find.requestProfileData();
+      await UserController.find.requestProfileData();
     } else if (index == 1) {
       if (Get.isRegistered<ServiceCtr>()) {
         ServiceCtr.find.requestData();

@@ -1,5 +1,6 @@
 import 'package:catcher_2/core/catcher_2.dart';
 import 'package:elixir_esports/ui/pages/main_page.dart';
+import 'package:elixir_esports/ui/pages/settings/update_phone_page.dart';
 import 'package:elixir_esports/ui/widget/custom_error_widget.dart';
 import 'package:elixir_esports/ui/widget/custom_loading_widget.dart';
 import 'package:elixir_esports/ui/widget/custom_success_widget.dart';
@@ -98,6 +99,9 @@ class App extends StatelessWidget {
               //跟随系统语言
               fallbackLocale: const Locale('en', 'US'),
               home: MainPage(),
+              getPages: [
+                GetPage(name: '/update_phone', page: () => UpdatePhonePage()),
+              ],
               navigatorObservers: [FlutterSmartDialog.observer],
               builder: FlutterSmartDialog.init(
                 loadingBuilder: (String msg) => CustomLoadingWidget(

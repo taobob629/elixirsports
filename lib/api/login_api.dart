@@ -153,21 +153,22 @@ class LoginApi {
   /// 检查密码是否设置
   static Future<bool> checkPassword() async {
     var response = await http.get('app/user/checkPassword');
-    print("check password data:${response.data}");
+    // print("check password data:${response.data}");
+    return response.data;
     // 检查返回数据结构是否正确
-    if (response.data != null && response.data['code'] == 200) {
-      return response.data['data'] == true;
-    } else {
-      // 如果返回结构不正确，默认为false
-      return false;
-    }
+    // if (response.data != null && response.data['code'] == 200) {
+    //   return response.data['data'] == true;
+    // } else {
+    //   // 如果返回结构不正确，默认为false
+    //   return false;
+    // }
   }
 
   /// 发送手机号验证码
-  static Future<void> sendPhoneCode(String phone) async {
+  static Future<void> sendPhoneCode(String phone, String country) async {
     await http.get(
       'app/user/sendPhoneCode',
-      queryParameters: {"phone": phone},
+      queryParameters: {"phone": phone, "country": country},
     );
   }
 }
