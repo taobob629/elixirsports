@@ -140,7 +140,7 @@ class _TopUpPageBodyState extends State<_TopUpPageBody> {
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                "S${widget.controller.moneyList[index]}",
+                                "S\$${widget.controller.moneyList[index]}",
                                 style: TextStyle(
                                   color: widget.controller.currentIndex.value ==
                                           index
